@@ -16,70 +16,78 @@
     :uploadFunction="(file:any)=>uploadFunction(file, doctype, ticketId)"
     @keydown.capture="handleKeydown"
   >
-    <template #top>
-      <div class="sticky top-0 z-10 bg-white border-y">
-        <div class="mx-6 md:mx-10 flex items-center gap-3 py-2.5">
-        <!-- Back Button -->
-          <Button
-            variant="ghost"
-            size="sm"
-            label="← Back to thread"
-            @click="handleBack"
-          />
-          <!-- Divider -->
-          <div class="h-4 w-px bg-gray-300 mx-1"></div>
-          <!-- TO -->
-        <span class="text-xs text-gray-500">TO:</span>
-        <span v-if="hasDraft" class="text-green-400 text-xs">●</span>
-        <MultiSelectInput
-          v-model="toEmailsClone"
-          class="flex-1"
-          :validate="validateEmailWithZod"
-          :error-message="(value) => `${value} is an invalid email address`"
-        />
-        <Button
-          :label="'CC'"
-          :class="[cc ? 'bg-gray-300 hover:bg-gray-200' : '']"
-          @click="toggleCC()"
-        />
-        <Button
-          variant="ghost"
-          size="sm"
-          label="BCC"
-          @click="toggleBCC()"
-        />
-      </div>
-      </div>
-        <div
-        v-if="showCC || cc"
-        class="mx-10 flex items-center gap-2 py-2.5"
-        :class="cc || showCC ? 'border-b' : ''"
-      >
-        <span class="text-xs text-gray-500">CC:</span>
-        <MultiSelectInput
-          ref="ccInput"
-          v-model="ccEmailsClone"
-          class="flex-1"
-          :validate="validateEmailWithZod"
-          :error-message="(value) => `${value} is an invalid email address`"
-        />
-    </div>
-      <div
-        v-if="showBCC || bcc"
-        class="mx-10 flex items-center gap-2 py-2.5"
-        :class="bcc || showBCC ? 'border-b' : ''"
-      >
-        <span class="text-xs text-gray-500">BCC:</span>
-        <MultiSelectInput
-          ref="bccInput"
-          v-model="bccEmailsClone"
-          class="flex-1"
-          :validate="validateEmailWithZod"
-          :error-message="(value) => `${value} is an invalid email address`"
-        />
-      </div>
-    </template>
+   <template #top>
+  <div class="sticky top-0 z-10 bg-white border-y">
 
+    <!-- TO Row -->
+    <div class="mx-6 md:mx-10 flex items-center gap-3 py-2.5">
+      <Button
+        variant="ghost"
+        size="sm"
+        label="← Back to thread"
+        @click="handleBack"
+      />
+
+      <div class="h-4 w-px bg-gray-300 mx-1"></div>
+
+      <span class="text-xs text-gray-500">TO:</span>
+      <span v-if="hasDraft" class="text-green-400 text-xs">●</span>
+
+      <MultiSelectInput
+        v-model="toEmailsClone"
+        class="flex-1"
+        :validate="validateEmailWithZod"
+        :error-message="(value) => `${value} is an invalid email address`"
+      />
+
+      <Button
+        :label="'CC'"
+        :class="[cc ? 'bg-gray-300 hover:bg-gray-200' : '']"
+        @click="toggleCC()"
+      />
+
+      <Button
+        variant="ghost"
+        size="sm"
+        label="BCC"
+        @click="toggleBCC()"
+      />
+    </div>
+
+    <!-- CC -->
+    <div
+      v-if="showCC || cc"
+      class="mx-10 flex items-center gap-2 py-2.5"
+      :class="cc || showCC ? 'border-t' : ''"
+    >
+      <span class="text-xs text-gray-500">CC:</span>
+      <MultiSelectInput
+        ref="ccInput"
+        v-model="ccEmailsClone"
+        class="flex-1"
+        :validate="validateEmailWithZod"
+        :error-message="(value) => `${value} is an invalid email address`"
+      />
+    </div>
+
+    <!-- BCC -->
+    <div
+      v-if="showBCC || bcc"
+      class="mx-10 flex items-center gap-2 py-2.5"
+      :class="bcc || showBCC ? 'border-t' : ''"
+    >
+      <span class="text-xs text-gray-500">BCC:</span>
+      <MultiSelectInput
+        ref="bccInput"
+        v-model="bccEmailsClone"
+        class="flex-1"
+        :validate="validateEmailWithZod"
+        :error-message="(value) => `${value} is an invalid email address`"
+      />
+    </div>
+
+  </div>
+</template>
     <template #editor>
       <div class="flex-1 overflow-y-auto min-h-[350px]">
         <EditorContent :editor="editor" />
@@ -508,6 +516,16 @@ function handleDelete(e: KeyboardEvent) {
 
 function handleKeydown(e: KeyboardEvent) {
   const key = e.key.toLowerCase();
+
+  // 🔥 NEW: Ctrl/Cmd + Enter → Send
+  if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+    e.preventDefault();
+
+    if (!isDisabled.value) {
+      submitMail();
+    }
+    return;
+  }
 
   if ((e.metaKey || e.ctrlKey) && key === "a") {
     handleSelectAll(e);
