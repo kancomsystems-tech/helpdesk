@@ -778,9 +778,7 @@ export const HandleExcelPaste = Extension.create({
     view.dispatch(followUpTr);
   });
 
-  return true;
-}
-            
+  return true; 
           },
         },
       }),
