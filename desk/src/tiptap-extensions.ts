@@ -584,12 +584,12 @@ function escapeHtml(text = "") {
 function normalizeCellText(text = "") {
   return String(text)
     .replace(/\u00a0/g, " ")
-    .replace(/[ \t]+/g, " ")
-    .replace(/\n\s+/g, "\n")
-    .replace(/\s+\n/g, "\n")
+    .replace(/\r/g, "")
+    .replace(/\n+/g, " ")
+    .replace(/\t+/g, " ")
+    .replace(/[ ]{2,}/g, " ")
     .trim();
 }
-
 function buildCleanTableHTMLFromPastedTable(table: HTMLTableElement) {
   const rows = Array.from(table.querySelectorAll("tr"))
     .map((tr) =>
@@ -608,37 +608,40 @@ function buildCleanTableHTMLFromPastedTable(table: HTMLTableElement) {
     rows[0].some((c) => c.tag === "th") ||
     rows[0].filter((c) => c.text).length >= Math.max(2, Math.ceil(rows[0].length * 0.6));
 
-  const tableStyle = [
-    "border-collapse:collapse",
-    "width:100%",
-    "max-width:100%",
-    "table-layout:auto",
-    "font-family:Arial,sans-serif",
-    "font-size:13px",
-    "line-height:1.4",
-    "margin:8px 0",
-  ].join(";");
+ const tableStyle = [
+  "border-collapse:collapse",
+  "width:auto",
+  "max-width:100%",
+  "table-layout:auto",
+  "font-family:Arial,sans-serif",
+  "font-size:12px",
+  "line-height:1.2",
+  "margin:4px 0",
+].join(";");
 
-  const thStyle = [
-    "border:1px solid #d1d5db",
-    "padding:6px 8px",
-    "text-align:left",
-    "vertical-align:top",
-    "background-color:#f3f4f6",
-    "font-weight:600",
-    "white-space:pre-wrap",
-    "word-break:break-word",
-  ].join(";");
+const thStyle = [
+  "border:1px solid #d1d5db",
+  "padding:3px 5px",
+  "text-align:left",
+  "vertical-align:top",
+  "background-color:#f3f4f6",
+  "font-weight:600",
+  "white-space:normal",
+  "word-break:break-word",
+  "overflow-wrap:anywhere",
+  "max-width:160px",
+].join(";");
 
-  const tdStyle = [
-    "border:1px solid #d1d5db",
-    "padding:6px 8px",
-    "text-align:left",
-    "vertical-align:top",
-    "white-space:pre-wrap",
-    "word-break:break-word",
-  ].join(";");
-
+const tdStyle = [
+  "border:1px solid #d1d5db",
+  "padding:3px 5px",
+  "text-align:left",
+  "vertical-align:top",
+  "white-space:normal",
+  "word-break:break-word",
+  "overflow-wrap:anywhere",
+  "max-width:160px",
+].join(";");
   let html = `<table style="${tableStyle}">`;
 
   rows.forEach((row, rowIdx) => {
