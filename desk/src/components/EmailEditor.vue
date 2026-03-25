@@ -1,5 +1,6 @@
 <template>
   <TextEditor
+    class="flex flex-col h-[80vh]"
     ref="editorRef"
     :editor-class="[
       'prose-sm max-w-full mx-6 md:mx-10 py-3',
@@ -16,7 +17,18 @@
     @keydown.capture="handleKeydown"
   >
     <template #top>
-      <div class="mx-6 md:mx-10 flex items-center gap-2 border-y py-2.5">
+      <div class="sticky top-0 z-10 bg-white border-y">
+        <div class="mx-6 md:mx-10 flex items-center gap-3 py-2.5">
+        <!-- Back Button -->
+          <Button
+            variant="ghost"
+            size="sm"
+            label="← Back to thread"
+            @click="handleBack"
+          />
+          <!-- Divider -->
+          <div class="h-4 w-px bg-gray-300 mx-1"></div>
+          <!-- TO -->
         <span class="text-xs text-gray-500">TO:</span>
         <MultiSelectInput
           v-model="toEmailsClone"
@@ -30,12 +42,14 @@
           @click="toggleCC()"
         />
         <Button
-          :label="'BCC'"
-          :class="[bcc ? 'bg-gray-300 hover:bg-gray-200' : '']"
+          variant="ghost"
+          size="sm"
+          label="BCC"
           @click="toggleBCC()"
         />
       </div>
-      <div
+      </div>
+        <div
         v-if="showCC || cc"
         class="mx-10 flex items-center gap-2 py-2.5"
         :class="cc || showCC ? 'border-b' : ''"
@@ -48,7 +62,7 @@
           :validate="validateEmailWithZod"
           :error-message="(value) => `${value} is an invalid email address`"
         />
-      </div>
+    </div>
       <div
         v-if="showBCC || bcc"
         class="mx-10 flex items-center gap-2 py-2.5"
@@ -66,7 +80,7 @@
     </template>
 
     <template #editor>
-      <div class="overflow-y-auto min-h-[350px] max-h-[80vh]">
+      <div class="flex-1 overflow-y-auto min-h-[350px]">
         <EditorContent :editor="editor" />
         <div
           v-if="quotedContent"
@@ -78,8 +92,9 @@
       </div>
     </template>
     <template #bottom>
+      <div class="sticky bottom-0 z-10 bg-white border-t shadow-sm">
       <!-- Attachments -->
-      <div class="flex flex-wrap gap-2 px-10">
+      <div class="flex flex-wrap gap-2 px-10 py-2.5">
         <AttachmentItem
           v-for="a in attachments"
           :key="a.file_url"
@@ -97,7 +112,7 @@
       </div>
       <!-- TextEditor Fixed Menu -->
       <div
-        class="flex justify-between overflow-scroll pl-10 py-2.5 items-center"
+        class="flex justify-between pl-10 py-2.5 items-center"
       >
         <div class="flex items-center overflow-x-auto w-[60%]">
           <div class="flex gap-1">
@@ -427,6 +442,10 @@ function handleDiscard() {
   emit("discard");
 }
 
+  function handleBack() {
+  emit("discard");
+}
+  
 //on load set quoted content from storage
 onMounted(() => {
   if (quotedContent.value) {
@@ -510,3 +529,8 @@ defineExpose({
   submitMail,
 });
 </script>
+<style scoped>
+:deep(.ProseMirror) {
+  min-height: 300px;
+}
+</style>
