@@ -101,88 +101,86 @@
       </div>
     </template>
     <template #bottom>
-      <div class="sticky bottom-0 z-10 bg-white border-t shadow-sm">
-      <!-- Attachments -->
-      <div class="flex flex-wrap gap-2 px-10 py-2.5">
-        <AttachmentItem
-          v-for="a in attachments"
-          :key="a.file_url"
-          :label="a.file_name"
-          :url="!['MOV', 'MP4'].includes(a.file_type) ? a.file_url : null"
-        >
-          <template #suffix>
-            <FeatherIcon
-              class="h-3.5"
-              name="x"
-              @click.self.stop="removeAttachment(a)"
-            />
-          </template>
-        </AttachmentItem>
-      </div>
-      <!-- TextEditor Fixed Menu -->
-      <div
-        class="flex justify-between pl-10 py-2.5 items-center"
+  <div class="sticky bottom-0 z-10 bg-white border-t shadow-sm">
+
+    <!-- Attachments -->
+    <div class="flex flex-wrap gap-2 px-10 py-2.5">
+      <AttachmentItem
+        v-for="a in attachments"
+        :key="a.file_url"
+        :label="a.file_name"
+        :url="!['MOV', 'MP4'].includes(a.file_type) ? a.file_url : null"
       >
-        <div class="flex items-center overflow-x-auto w-[60%]">
-          <div class="flex gap-1">
-            <FileUploader
-              :upload-args="{
-                doctype: doctype,
-                docname: ticketId,
-                private: true,
-              }"
-              @success="
-                (f) => {
-                  attachments.push(f);
-                }
-              "
-            >
-              <template #default="{ openFileSelector, uploading }">
-                {{ void (isUploading = uploading) }}
-                <Button
-                  variant="ghost"
-                  @click="openFileSelector()"
-                  :loading="uploading"
-                >
-                  <template #icon>
-                    <AttachmentIcon
-                      class="h-4"
-                      style="color: #000000; stroke-width: 1.5 !important"
-                    />
-                  </template>
-                </Button>
-              </template>
-            </FileUploader>
-            <Button
-              variant="ghost"
-              @click="showSavedRepliesSelectorModal = true"
-            >
-              <template #icon>
-                <SavedReplyIcon class="h-4" />
-              </template>
-            </Button>
-          </div>
-          <TextEditorFixedMenu class="ml-1" :buttons="textEditorMenuButtons" />
-        </div>
-        <div
-          class="flex items-center justify-end space-x-2 sm:mt-0 w-[40%] mr-9"
-        >
-          <Button label="Discard" @click="handleDiscard" />
-          <Button
-            variant="solid"
-            :disabled="isDisabled"
-            :loading="sendMail.loading"
-            :label="label"
-            @click="
-              () => {
-                submitMail();
-              }
-            "
+        <template #suffix>
+          <FeatherIcon
+            class="h-3.5"
+            name="x"
+            @click.self.stop="removeAttachment(a)"
           />
+        </template>
+      </AttachmentItem>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="flex justify-between pl-10 py-2.5 items-center">
+
+      <!-- Left -->
+      <div class="flex items-center overflow-x-auto w-[60%]">
+        <div class="flex gap-1">
+
+          <FileUploader
+            :upload-args="{
+              doctype: doctype,
+              docname: ticketId,
+              private: true,
+            }"
+            @success="(f) => attachments.push(f)"
+          >
+            <template #default="{ openFileSelector, uploading }">
+              {{ void (isUploading = uploading) }}
+              <Button
+                variant="ghost"
+                @click="openFileSelector()"
+                :loading="uploading"
+              >
+                <template #icon>
+                  <AttachmentIcon class="h-4" />
+                </template>
+              </Button>
+            </template>
+          </FileUploader>
+
+          <Button
+            variant="ghost"
+            @click="showSavedRepliesSelectorModal = true"
+          >
+            <template #icon>
+              <SavedReplyIcon class="h-4" />
+            </template>
+          </Button>
+
         </div>
+
+        <TextEditorFixedMenu class="ml-1" :buttons="textEditorMenuButtons" />
       </div>
-    </template>
-  </TextEditor>
+
+      <!-- Right -->
+      <div class="flex items-center justify-end space-x-2 w-[40%] mr-9">
+        <Button label="Discard" @click="handleDiscard" />
+        <Button
+          variant="solid"
+          :disabled="isDisabled"
+          :loading="sendMail.loading"
+          :label="label"
+          @click="submitMail"
+        />
+      </div>
+
+    </div>
+
+  </div>
+</template>
+</TextEditor>
   <SavedRepliesSelectorModal
     v-if="showSavedRepliesSelectorModal"
     v-model="showSavedRepliesSelectorModal"
