@@ -89,17 +89,17 @@
   </div>
 </template>
     <template #editor>
-      <div class="flex-1 overflow-y-auto min-h-[350px]">
-        <EditorContent :editor="editor" />
-        <div
-          v-if="quotedContent"
-          ref="quotedContentRef"
-          contenteditable="true"
-          class="prose !max-w-full mx-6 md:mx-10 my-2 border-l-4 border-gray-300 pl-4 text-sm focus:outline-none"
-          @input="onQuotedInput"
-        />
-      </div>
-    </template>
+  <div class="flex-1 overflow-y-auto min-h-[350px]">
+    <EditorContent :editor="editor" />
+    <div
+      v-if="quotedContent"
+      ref="quotedContentRef"
+      contenteditable="true"
+      class="prose !max-w-full mx-6 md:mx-10 my-2 border-l-4 border-gray-300 pl-4 text-sm focus:outline-none"
+      @input="onQuotedInput"
+    ></div>
+  </div>
+</template>
     <template #bottom>
   <div class="sticky bottom-0 z-10 bg-white border-t shadow-sm">
 
