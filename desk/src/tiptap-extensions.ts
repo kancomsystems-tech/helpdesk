@@ -156,7 +156,7 @@ export const ComponentUtils: Extension = Extension.create({
             parseHTML: (el) => el.getAttribute("style"),
             renderHTML: () => ({
               style:
-                "border: 1px solid #d1d5db; padding: 3px 5px; vertical-align: top; text-align: left; white-space: normal; word-break: break-word; overflow-wrap: anywhere; max-width: 160px;",
+                "border: 1px solid #d1d5db; padding: 3px 5px; vertical-align: top; text-align: left; white-space: normal; word-break: break-word; overflow-wrap: anywhere; max-width: 180px;",
             }),
           },
         },
@@ -627,9 +627,9 @@ const thStyle = [
   "background-color:#f3f4f6",
   "font-weight:600",
   "white-space:normal",
-  "word-break:break-word",
-  "overflow-wrap:anywhere",
-  "max-width:160px",
+  "word-break:normal",
+  "overflow-wrap:break-word",
+  "max-width:180px",
 ].join(";");
 
 const tdStyle = [
@@ -638,9 +638,9 @@ const tdStyle = [
   "text-align:left",
   "vertical-align:top",
   "white-space:normal",
-  "word-break:break-word",
-  "overflow-wrap:anywhere",
-  "max-width:160px",
+  "word-break:normal",
+  "overflow-wrap:break-word",
+  "max-width:180px",
 ].join(";");
   const wrapperStyle = "max-width:100%; overflow-x:auto; margin:4px 0;";
   let html = `<div style="${wrapperStyle}"><table style="${tableStyle}">`;
