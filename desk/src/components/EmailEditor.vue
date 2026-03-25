@@ -555,4 +555,23 @@ const hasDraft = computed(() => {
 :deep(.ProseMirror) {
   min-height: 300px;
 }
+
+:deep(.ProseMirror table) {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+:deep(.ProseMirror th),
+:deep(.ProseMirror td) {
+  border: 1px solid #d1d5db;
+  padding: 6px 8px;
+  vertical-align: top;
+  word-break: break-word;
+}
+
+:deep(.ProseMirror p) {
+  margin: 0 0 8px 0;
+}
 </style>
