@@ -156,7 +156,7 @@ export const ComponentUtils: Extension = Extension.create({
             parseHTML: (el) => el.getAttribute("style"),
             renderHTML: () => ({
               style:
-                "border: 1px solid #d1d5db; padding: 6px 8px; vertical-align: top; text-align: left;",
+                "border: 1px solid #d1d5db; padding: 3px 5px; vertical-align: top; text-align: left; white-space: normal; word-break: break-word; overflow-wrap: anywhere; max-width: 160px;",
             }),
           },
         },
@@ -642,7 +642,8 @@ const tdStyle = [
   "overflow-wrap:anywhere",
   "max-width:160px",
 ].join(";");
-  let html = `<table style="${tableStyle}">`;
+  const wrapperStyle = "max-width:100%; overflow-x:auto; margin:4px 0;";
+  let html = `<div style="${wrapperStyle}"><table style="${tableStyle}">`;
 
   rows.forEach((row, rowIdx) => {
     html += "<tr>";
@@ -658,7 +659,7 @@ const tdStyle = [
     html += "</tr>";
   });
 
-  html += "</table>";
+  html += "</table></div>";
   return html;
 }
 
