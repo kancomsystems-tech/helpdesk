@@ -30,6 +30,7 @@
           <div class="h-4 w-px bg-gray-300 mx-1"></div>
           <!-- TO -->
         <span class="text-xs text-gray-500">TO:</span>
+        <span v-if="hasDraft" class="text-green-400 text-xs">●</span>
         <MultiSelectInput
           v-model="toEmailsClone"
           class="flex-1"
@@ -528,6 +529,11 @@ defineExpose({
   editor,
   submitMail,
 });
+
+const hasDraft = computed(() => {
+  return !isContentEmpty(newEmail.value) || !!quotedContent.value;
+});
+  
 </script>
 <style scoped>
 :deep(.ProseMirror) {
