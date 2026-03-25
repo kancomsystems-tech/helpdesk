@@ -66,7 +66,7 @@
     </template>
 
     <template #editor>
-      <div class="overflow-y-auto min-h-[7rem] max-h-[30vh]">
+      <div class="overflow-y-auto min-h-[350px] max-h-[80vh]">
         <EditorContent :editor="editor" />
         <div
           v-if="quotedContent"
