@@ -68,58 +68,55 @@
             @update:modelValue="changeTabTo"
             class="[&_[role='tab']]:px-0 [&_[role='tablist']]:px-5 [&_[role='tablist']]:gap-7.5"
           >
-            <template #tab-panel="{ tab }">
-              <div v-if="tab.name === 'details'">
-                <!-- ticket contact info -->
-                <TicketAgentContact
-                  :contact="ticket.data.contact"
-                  :ticketId="ticket.data.name"
-                  @email:open="communicationAreaRef.toggleEmailBox()"
-                />
-                <!-- feedback component -->
-                <TicketFeedback
-                  v-if="ticket.data.feedback_rating"
-                  class="border-b px-6 py-3 text-base text-gray-600"
-                  :ticket="ticket.data"
-                />
-                <!-- SLA Section -->
-                <h3 class="px-6 pt-3 font-semibold text-base">
-                  {{ __("SLA") }}
-                </h3>
-                <TicketAgentDetails :ticket="ticket.data" />
-                <!-- Ticket Fields -->
-                <h3 class="px-6 pt-3 font-semibold text-base">
-                  {{ __("Details") }}
-                </h3>
-                <TicketAgentFields
-                  :ticket="ticket.data"
-                  @update="({ field, value }) => updateTicket(field, value)"
-                  class="!border-0"
-                />
-              </div>
+<template #tab-panel="{ tab }">
+  <div v-if="tab.name === 'details'">
+    <!-- ticket contact info -->
+    <TicketAgentContact
+      :contact="ticket.data.contact"
+      :ticketId="ticket.data.name"
+      @email:open="communicationAreaRef.toggleEmailBox()"
+    />
+    <TicketFeedback
+      v-if="ticket.data.feedback_rating"
+      class="border-b px-6 py-3 text-base text-gray-600"
+      :ticket="ticket.data"
+    />
+    <h3 class="px-6 pt-3 font-semibold text-base">
+      {{ __("SLA") }}
+    </h3>
+    <TicketAgentDetails :ticket="ticket.data" />
+    <h3 class="px-6 pt-3 font-semibold text-base">
+      {{ __("Details") }}
+    </h3>
+    <TicketAgentFields
+      :ticket="ticket.data"
+      @update="({ field, value }) => updateTicket(field, value)"
+      class="!border-0"
+    />
+  </div>
 
-              <!-- Rest Activities -->
-              <TicketAgentActivities
-                v-else
-                ref="ticketAgentActivitiesRef"
-                :activities="filterActivities(tab.name)"
-                :title="tab.label"
-                :ticket-status="ticket.data?.status"
-                @update="
-                  () => {
-                    ticket.reload();
-                  }
-                "
-                @email:reply="
-                  (e) => {
-                    communicationAreaRef.replyToEmail(e);
-                  }
-                "
-              />
-            </template>
+  <div v-if="tab.name !== 'details'" class="flex-1 overflow-y-auto min-h-0">
+    <TicketAgentActivities
+      ref="ticketAgentActivitiesRef"
+      :activities="filterActivities(tab.name)"
+      :title="tab.label"
+      :ticket-status="ticket.data?.status"
+      @update="
+        () => {
+          ticket.reload();
+        }
+      "
+      @email:reply="
+        (e) => {
+          communicationAreaRef.replyToEmail(e);
+        }
+      "
+    />
+  </div>
+</template>
           </Tabs>
           <CommunicationArea
-            class="sticky bottom-0 z-50 bg-white"
+            class="z-10 bg-white border-t"
             ref="communicationAreaRef"
             v-model="ticket.data"
             :ticketId="ticket.data?.name"
@@ -446,7 +443,7 @@ const activities = computed(() => {
     ...commentProps,
     ...historyProps,
     ...callProps,
-  ].sort((a, b) => new Date(a.creation) - new Date(b.creation));
+  ].sort((a, b) => new Date(b.creation) - new Date(a.creation));
 
   const data = [];
   let i = 0;
