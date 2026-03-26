@@ -642,21 +642,20 @@ const tdStyle = [
 ].join(";");
   let html = `<table style="${tableStyle}">`;
 
-  rows.forEach((row, rowIdx) => {
-    html += "<tr>";
-    row.forEach((cell) => {
-      const useTh = firstRowLooksHeader && rowIdx === 0;
-      const tag = useTh ? "th" : "td";
-      const colspan = cell.colspan > 1 ? ` colspan="${cell.colspan}"` : "";
-      const rowspan = cell.rowspan > 1 ? ` rowspan="${cell.rowspan}"` : "";
-      const style = useTh ? thStyle : tdStyle;
+rows.forEach((row, rowIdx) => {
+  html += "<tr>";
+  row.forEach((cell) => {
+    const useTh = firstRowLooksHeader && rowIdx === 0;
+    const tag = useTh ? "th" : "td";
+    const colspan = cell.colspan > 1 ? ` colspan="${cell.colspan}"` : "";
+    const rowspan = cell.rowspan > 1 ? ` rowspan="${cell.rowspan}"` : "";
+    const style = useTh ? thStyle : tdStyle;
 
-      html += "</table>";
-    });
-    html += "</tr>";
+    html += `<${tag}${colspan}${rowspan} style="${style}">${escapeHtml(cell.text)}</${tag}>`;
   });
-
-  html += "</table></div>";
+  html += "</tr>";
+});
+  html += "</table>";
   return html;
 }
 
