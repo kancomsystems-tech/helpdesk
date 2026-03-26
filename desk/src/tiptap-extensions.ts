@@ -673,35 +673,29 @@ export const HandleExcelPaste = Extension.create({
   const clipboardData = event.clipboardData;
   if (!clipboardData) return false;
 
-  const types = Array.from(clipboardData.types);
-  const hasHtml = types.includes("text/html");
-  const hasText = types.includes("text/plain");
+  const html = clipboardData.getData("text/html") || "";
+  const text = clipboardData.getData("text/plain") || "";
+  const types = Array.from(clipboardData.types || []);
 
-  if (!hasHtml) return false;
+  // Debug
+  console.log("Paste types:", types);
+  console.log("Paste html preview:", html.slice(0, 300));
+  console.log("Paste text preview:", text.slice(0, 200));
 
-  const html = clipboardData.getData("text/html");
-  const text = clipboardData.getData("text/plain");
-
-  if (!html || !html.includes("<table")) {
-    return false;
-  }
+  // Only try custom handling when HTML exists
+  if (!html) return false;
 
   const tempDoc = new DOMParser().parseFromString(html, "text/html");
   const table = tempDoc.querySelector("table") as HTMLTableElement | null;
 
+  // If no table, let normal paste continue
   if (!table) {
     return false;
   }
 
-  event.preventDefault();
-
   const cleanHTML = buildCleanTableHTMLFromPastedTable(table);
 
   if (!cleanHTML) {
-    if (hasText && text) {
-      view.pasteText(text);
-      return true;
-    }
     return false;
   }
 
@@ -710,10 +704,6 @@ export const HandleExcelPaste = Extension.create({
     json = generateJSON(cleanHTML, excelPasteExtensions);
   } catch (e) {
     console.error("Excel paste JSON generation failed", e);
-    if (hasText && text) {
-      view.pasteText(text);
-      return true;
-    }
     return false;
   }
 
@@ -724,19 +714,19 @@ export const HandleExcelPaste = Extension.create({
     .map((n: any) => {
       try {
         return schema.nodeFromJSON(n);
-      } catch {
+      } catch (err) {
+        console.error("nodeFromJSON failed", err, n);
         return null;
       }
     })
     .filter(Boolean);
 
   if (!nodes.length) {
-    if (hasText && text) {
-      view.pasteText(text);
-      return true;
-    }
     return false;
   }
+
+  // Only now block native paste
+  event.preventDefault();
 
   let totalInsertedSize = 0;
   nodes.forEach((n: any) => {
@@ -779,8 +769,8 @@ export const HandleExcelPaste = Extension.create({
     view.dispatch(followUpTr);
   });
 
-  return true; 
-          },
+  return true;
+},
         },
       }),
     ];
