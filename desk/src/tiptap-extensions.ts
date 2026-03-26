@@ -156,7 +156,7 @@ export const ComponentUtils: Extension = Extension.create({
             parseHTML: (el) => el.getAttribute("style"),
             renderHTML: () => ({
               style:
-                "border: 1px solid #d1d5db; padding: 3px 5px; vertical-align: top; text-align: left; white-space: normal; word-break: break-word; overflow-wrap: anywhere; max-width: 180px;",
+                "border: 1px solid #d1d5db; padding: 3px 5px; vertical-align: top; text-align: left; white-space: normal; word-break: normal; overflow-wrap: break-word;"
             }),
           },
         },
@@ -629,7 +629,6 @@ const thStyle = [
   "white-space:normal",
   "word-break:normal",
   "overflow-wrap:break-word",
-  "max-width:180px",
 ].join(";");
 
 const tdStyle = [
@@ -640,10 +639,8 @@ const tdStyle = [
   "white-space:normal",
   "word-break:normal",
   "overflow-wrap:break-word",
-  "max-width:180px",
 ].join(";");
-  const wrapperStyle = "max-width:100%; overflow-x:auto; margin:4px 0;";
-  let html = `<div style="${wrapperStyle}"><table style="${tableStyle}">`;
+  let html = `<table style="${tableStyle}">`;
 
   rows.forEach((row, rowIdx) => {
     html += "<tr>";
@@ -654,7 +651,7 @@ const tdStyle = [
       const rowspan = cell.rowspan > 1 ? ` rowspan="${cell.rowspan}"` : "";
       const style = useTh ? thStyle : tdStyle;
 
-      html += `<${tag}${colspan}${rowspan} style="${style}">${escapeHtml(cell.text)}</${tag}>`;
+      html += "</table>";
     });
     html += "</tr>";
   });
