@@ -86,13 +86,20 @@
     <template #editor>
   <div class="flex-1 overflow-y-auto min-h-[350px]">
     <EditorContent :editor="editor" />
+
     <div
-      v-if="quotedContent"
-      ref="quotedContentRef"
-      contenteditable="false"
-      class="prose !max-w-full mx-6 md:mx-10 my-2 border-l-4 border-gray-300 pl-4 text-sm focus:outline-none"
-      aria-readonly="true"
-    ></div>
+  v-if="quotedContent"
+  class="mx-4 md:mx-6 mt-3 text-xs font-medium uppercase tracking-wide text-gray-500"
+>
+  Original message
+</div>
+    <div
+  v-if="quotedContent"
+  ref="quotedContentRef"
+  contenteditable="false"
+  aria-readonly="true"
+  class="prose !max-w-full mx-4 md:mx-6 my-2 rounded-md border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700"
+></div>
   </div>
 </template>
     <template #bottom>
