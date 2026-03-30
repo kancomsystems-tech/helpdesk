@@ -1,6 +1,6 @@
 <template>
   <TextEditor
-    class="flex flex-col h-[80vh]"
+    class="flex flex-col max-h-[40vh] sm:max-h-[45vh] md:max-h-[50vh] overflow-y-auto"
     ref="editorRef"
     :editor-class="[
       'prose-sm max-w-full mx-6 md:mx-10 py-3',
@@ -21,12 +21,7 @@
 
     <!-- TO Row -->
     <div class="mx-6 md:mx-10 flex items-center gap-3 py-2.5">
-      <Button
-        variant="ghost"
-        size="sm"
-        label="← Back to thread"
-        @click="handleBack"
-      />
+      
 
       <div class="h-4 w-px bg-gray-300 mx-1"></div>
 
@@ -94,9 +89,9 @@
     <div
       v-if="quotedContent"
       ref="quotedContentRef"
-      contenteditable="true"
+      contenteditable="false"
       class="prose !max-w-full mx-6 md:mx-10 my-2 border-l-4 border-gray-300 pl-4 text-sm focus:outline-none"
-      @input="onQuotedInput"
+      aria-readonly="true"
     ></div>
   </div>
 </template>
@@ -379,11 +374,7 @@ watch(quotedContent, (newVal, oldVal) => {
     });
   }
 });
-function onQuotedInput() {
-  const el = quotedContentRef.value;
-  if (!el) return;
-  quotedContent.value = el.innerHTML || null;
-}
+
 
 function toggleCC() {
   showCC.value = !showCC.value;
@@ -449,9 +440,7 @@ function handleDiscard() {
   emit("discard");
 }
 
-  function handleBack() {
-  emit("discard");
-}
+
   
 //on load set quoted content from storage
 onMounted(() => {
