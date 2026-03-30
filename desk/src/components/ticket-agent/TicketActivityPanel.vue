@@ -17,12 +17,7 @@
             communicationAreaRef.replyToEmail(e);
           }
         "
-        @update="
-          () => {
-            activities.reload();
-            ticketAgentActivitiesRef.scrollToLatestActivity();
-          }
-        "
+        @update="reloadAndScrollLatest"
       />
       <div v-else class="flex items-center justify-center flex-col mt-20">
         <LoadingIndicator :scale="8" class="text-ink-gray-5" />
@@ -40,12 +35,7 @@
     :cc-emails="[]"
     :bcc-emails="[]"
     :key="ticket.doc?.name"
-    @update="
-      () => {
-        activities.reload();
-        ticketAgentActivitiesRef.scrollToLatestActivity();
-      }
-    "
+    @update="reloadAndScrollLatest"
   />
 </template>
 
@@ -67,7 +57,7 @@ import {
 } from "@/types";
 import { LoadingIndicator, Tabs } from "frappe-ui";
 import { storeToRefs } from "pinia";
-import { computed, ComputedRef, defineAsyncComponent, inject, ref } from "vue";
+import { computed, ComputedRef, defineAsyncComponent, inject, nextTick, ref } from "vue";
 import TicketAgentActivities from "../ticket/TicketAgentActivities.vue";
 
 const CommunicationArea = defineAsyncComponent(
@@ -112,6 +102,15 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
 });
 
 const { tabIndex, changeTabTo } = useActiveTabManager(tabs);
+
+async function reloadAndScrollLatest() {
+  activities?.value?.reload?.();
+  await nextTick();
+  await nextTick();
+  requestAnimationFrame(() => {
+    ticketAgentActivitiesRef.value?.scrollToLatestActivity?.();
+  });
+}
 
 // TODO: refactor for pagination
 // can be done once we sort out the backend
