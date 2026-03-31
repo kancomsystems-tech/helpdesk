@@ -89,16 +89,21 @@
 
     <div
   v-if="quotedContent"
-  class="mx-4 md:mx-6 mt-3 text-xs font-medium uppercase tracking-wide text-gray-500"
+  class="mx-6 md:mx-10 mt-3 text-xs text-gray-600 whitespace-pre-line"
 >
-  Original message
+  <div v-if="quotedMeta?.date && quotedMeta?.sender">
+    On {{ formattedQuotedDate }}, {{ quotedMeta.sender }} wrote:
+  </div>
+  <div v-if="quotedMeta?.to">To: {{ quotedMeta.to }}</div>
+  <div v-if="quotedMeta?.cc">CC: {{ quotedMeta.cc }}</div>
+  <div v-if="quotedMeta?.subject">Subject: {{ quotedMeta.subject }}</div>
 </div>
-    <div
+
+<div
   v-if="quotedContent"
   ref="quotedContentRef"
   contenteditable="false"
-  aria-readonly="true"
-  class="prose !max-w-full mx-4 md:mx-6 my-2 rounded-md border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700"
+  class="prose !max-w-full mx-6 md:mx-10 my-2 border-l-4 border-gray-300 pl-4 text-sm focus:outline-none"
 ></div>
   </div>
 </template>
@@ -228,6 +233,9 @@ import {
   ref,
   watch,
 } from "vue";
+
+import dayjs from "dayjs";
+
 import SavedReplyIcon from "./icons/SavedReplyIcon.vue";
 
 const editorRef = ref(null);
@@ -404,19 +412,51 @@ async function removeAttachment(attachment) {
   attachments.value = attachments.value.filter((a) => a !== attachment);
   await removeAttachmentFromServer(attachment.name);
 }
+const formattedQuotedDate = computed(() => {
+  if (!quotedMeta.value?.date) return "";
+  return dayjs(quotedMeta.value.date).format("DD MMM YYYY, h:mm A");
+});
+const quotedMeta = ref<null | {
+  sender?: string;
+  date?: string;
+  to?: string;
+  cc?: string;
+  subject?: string;
+}>(null);
+
 
 function addToReply(
   body: string,
   toEmails: string[],
   ccEmails: string[],
-  bccEmails: string[]
+  bccEmails: string[],
+  meta?: {
+    sender?: string;
+    date?: string;
+    to?: string[] | string;
+    cc?: string[] | string;
+    subject?: string;
+  }
 ) {
   toEmailsClone.value = toEmails;
   ccEmailsClone.value = ccEmails;
   bccEmailsClone.value = bccEmails;
 
+  quotedMeta.value = meta
+    ? {
+        sender: meta.sender,
+        date: meta.date,
+        to: Array.isArray(meta.to)
+          ? meta.to.filter(Boolean).join(", ")
+          : meta.to,
+        cc: Array.isArray(meta.cc)
+          ? meta.cc.filter(Boolean).join(", ")
+          : meta.cc,
+        subject: meta.subject,
+      }
+    : null;
+
   if (body !== quotedContent.value) {
-    //trigger change for watch when replied to body data is different from current quoted content
     quotedContent.value = "";
     nextTick(() => {
       quotedContent.value = body;
@@ -427,7 +467,9 @@ function addToReply(
   nextTick(() => {
     newEmail.value = editorRef.value.editor.getHTML();
   });
-}
+} 
+
+
 
 function resetState() {
   newEmail.value = null;
