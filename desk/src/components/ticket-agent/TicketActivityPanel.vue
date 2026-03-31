@@ -1,32 +1,32 @@
 <template>
   <Tabs
-    :modelValue="tabIndex"
-    :tabs="tabs"
-    @update:modelValue="changeTabTo"
-    class="[&_[role='tab']]:px-0 [&_[role='tablist']]:px-5 [&_[role='tablist']]:gap-7.5 [&_[role='tablist']]:flex-shrink-0"
-  >
-    <template #tab-panel="{ tab }">
+  :modelValue="tabIndex"
+  :tabs="tabs"
+  @update:modelValue="changeTabTo"
+  class="[&_[role='tab']]:px-0 [&_[role='tablist']]:px-5 [&_[role='tablist']]:gap-7.5 [&_[role='tablist']]:flex-shrink-0"
+>
+  <template #tab-panel="{ tab }">
+    <div v-if="ticket.data" class="flex-1 overflow-y-auto min-h-0">
       <TicketAgentActivities
-        v-if="Boolean(activities.data)"
         ref="ticketAgentActivitiesRef"
-        :activities="filterActivities(tab.name as TicketTab)"
-        :title="tab.label"
-        :ticket-status="ticket.doc.status"
-        @email:reply="
-          (e) => {
-            communicationAreaRef.replyToEmail(e);
-          }
-        "
-        @update="reloadAndScrollLatest"
+        :activities="filterActivities('activity')"
+        title="Activity"
+        :ticket-status="ticket.data?.status"
+        @update="() => ticket.reload()"
+        @email:reply="(e) => {
+          communicationAreaRef.replyToEmail(e);
+        }"
       />
-      <div v-else class="flex items-center justify-center flex-col mt-20">
-        <LoadingIndicator :scale="8" class="text-ink-gray-5" />
-        <p class="text-xl font-medium text-ink-gray-5 absolute top-[50%]">
-          Loading...
-        </p>
-      </div>
-    </template>
-  </Tabs>
+    </div>
+
+    <div v-else class="flex items-center justify-center flex-col mt-20">
+      <LoadingIndicator :scale="8" class="text-ink-gray-5" />
+      <p class="text-xl font-medium text-ink-gray-5 absolute top-[50%]">
+        Loading...
+      </p>
+    </div>
+  </template>
+</Tabs>
   <!-- Comm Area -->
   <CommunicationArea
     ref="communicationAreaRef"

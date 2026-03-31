@@ -417,7 +417,7 @@ function addToReply(
 
   if (body !== quotedContent.value) {
     //trigger change for watch when replied to body data is different from current quoted content
-    quotedContent.value = null;
+    quotedContent.value = "";
     nextTick(() => {
       quotedContent.value = body;
     });
