@@ -1,43 +1,42 @@
 <template>
-  <Tabs
-  :modelValue="tabIndex"
-  :tabs="tabs"
-  @update:modelValue="changeTabTo"
-  class="[&_[role='tab']]:px-0 [&_[role='tablist']]:px-5 [&_[role='tablist']]:gap-7.5 [&_[role='tablist']]:flex-shrink-0"
->
-  <template #tab-panel="{ tab }">
-    <div v-if="ticket.data" class="flex-1 overflow-y-auto min-h-0">
-      <TicketAgentActivities
-        ref="ticketAgentActivitiesRef"
-        :activities="filterActivities('activity')"
-        title="Activity"
-        :ticket-status="ticket.data?.status"
-        @update="() => ticket.reload()"
-        @email:reply="(e) => {
-          communicationAreaRef.replyToEmail(e);
-        }"
-      />
-    </div>
+  <div class="h-full flex flex-col overflow-hidden">
+    <Tabs
+      :modelValue="tabIndex"
+      :tabs="tabs"
+      @update:modelValue="changeTabTo"
+      class="[&_[role='tab']]:px-0 [&_[role='tablist']]:px-5 [&_[role='tablist']]:gap-7.5 [&_[role='tablist']]:flex-shrink-0 flex flex-col min-h-0 flex-1"
+    >
+      <template #tab-panel="{ tab }">
+        <div v-if="ticket.doc?.name" class="flex-1 overflow-y-auto min-h-0">
+          <TicketAgentActivities
+            ref="ticketAgentActivitiesRef"
+            :activities="filterActivities(tab.name)"
+            title="Activity"
+            :ticket-status="ticket.data?.status"
+            @update="() => ticket.reload()"
+            @email:reply="(e) => {
+              communicationAreaRef?.replyToEmail?.(e);
+            }"
+          />
+        </div>
 
-    <div v-else class="flex items-center justify-center flex-col mt-20">
-      <LoadingIndicator :scale="8" class="text-ink-gray-5" />
-      <p class="text-xl font-medium text-ink-gray-5 absolute top-[50%]">
-        Loading...
-      </p>
-    </div>
-  </template>
-</Tabs>
-  <!-- Comm Area -->
-  <CommunicationArea
-    ref="communicationAreaRef"
-    :ticketId="String(ticket.doc?.name)"
-    :to-emails="[ticket.doc?.raised_by]"
-    :cc-emails="[]"
-    :bcc-emails="[]"
-    :key="ticket.doc?.name"
-    @update="reloadAndScrollLatest"
-  />
+        <div v-else class="flex items-center justify-center flex-col mt-20">
+          <LoadingIndicator :scale="8" class="text-ink-gray-5" />
+          <p class="text-xl font-medium text-ink-gray-5 absolute top-[50%]">
+            Loading...
+          </p>
+        </div>
+      </template>
+    </Tabs>
+
+    <CommunicationArea
+      ref="communicationAreaRef"
+      class="border-t"
+      @reload="reloadAndScrollLatest"
+    />
+  </div>
 </template>
+
 
 <script setup lang="ts">
 import {
