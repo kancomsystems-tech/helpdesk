@@ -8,16 +8,15 @@
     >
       <template #tab-panel="{ tab }">
         <div v-if="ticket.doc?.name" class="flex-1 overflow-y-auto min-h-0">
-          <TicketAgentActivities
-            ref="ticketAgentActivitiesRef"
-            :activities="filterActivities(tab.name)"
-            title="Activity"
-            :ticket-status="ticket.data?.status"
-            @update="() => ticket.reload()"
-            @email:reply="(e) => {
-              communicationAreaRef?.replyToEmail?.(e);
-            }"
-          />
+      <TicketAgentActivities
+        ref="ticketAgentActivitiesRef"
+        :activities="filterActivities(tab.name)"
+        :title="tab.label"
+        :ticket-status="ticket.data?.status"
+        :active-reply-email-id="tab.name === 'activity' ? activeReplyEmailId : null"
+        @update="() => ticket.reload()"
+        @email:reply="handleEmailReply"
+      />
         </div>
 
         <div v-else class="flex items-center justify-center flex-col mt-20">
@@ -29,12 +28,18 @@
       </template>
     </Tabs>
 
-    <CommunicationArea
-      ref="communicationAreaRef"
-      class="border-t"
-      @reload="reloadAndScrollLatest"
-    />
-  </div>
+<CommunicationArea
+  ref="communicationAreaRef"
+  class="border-t"
+  @reload="() => {
+    activeReplyEmailId.value = null;
+    reloadAndScrollLatest();
+  }"
+  @close="() => {
+    activeReplyEmailId.value = null;
+  }"
+/>
+</div>
 </template>
 
 
@@ -57,6 +62,9 @@ import {
 import { LoadingIndicator, Tabs } from "frappe-ui";
 import { storeToRefs } from "pinia";
 import { computed, ComputedRef, defineAsyncComponent, inject, nextTick, ref } from "vue";
+const ticketAgentActivitiesRef = ref(null);
+const communicationAreaRef = ref(null);
+const activeReplyEmailId = ref<string | null>(null);
 import TicketAgentActivities from "../ticket/TicketAgentActivities.vue";
 
 const CommunicationArea = defineAsyncComponent(
@@ -66,8 +74,7 @@ const CommunicationArea = defineAsyncComponent(
 const ticket = inject(TicketSymbol);
 const activities = inject(ActivitiesSymbol);
 
-const ticketAgentActivitiesRef = ref(null);
-const communicationAreaRef = ref(null);
+
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
 
@@ -109,6 +116,11 @@ async function reloadAndScrollLatest() {
   requestAnimationFrame(() => {
     ticketAgentActivitiesRef.value?.scrollToLatestActivity?.();
   });
+}
+
+function handleEmailReply(e: any) {
+  activeReplyEmailId.value = e?.name || null;
+  communicationAreaRef.value?.replyToEmail?.(e);
 }
 
 // TODO: refactor for pagination

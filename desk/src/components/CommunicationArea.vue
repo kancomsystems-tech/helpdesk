@@ -148,25 +148,22 @@ function splitIfString(str: string | string[]) {
   return str;
 }
 
-function replyToEmail(data: object) {
+function replyToEmail(data: any) {
   showEmailBox.value = true;
 
   emailEditorRef.value.addToReply(
-  data.content,
-  splitIfString(data.to),
-  splitIfString(data.cc),
-  splitIfString(data.bcc),
-  {
-    sender:
-      data.sender?.full_name && data.sender?.name
-        ? `${data.sender.full_name} <${data.sender.name}>`
-        : data.sender?.name || data.sender?.full_name || "",
-    date: data.creation,
-    to: splitIfString(data.to),
-    cc: splitIfString(data.cc),
-    subject: data.subject,
-  }
-);
+    data.content,
+    splitIfString(data.to),
+    splitIfString(data.cc),
+    splitIfString(data.bcc),
+    {
+      sender: data.sender,
+      date: data.date,
+      to: data.to,
+      cc: data.cc,
+      subject: data.subject,
+    }
+  );
 }
 
 const props = defineProps({

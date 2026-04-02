@@ -4,19 +4,19 @@
     class="flex flex-col flex-1 overflow-y-auto"
     :mask-length="20"
   >
-    <div v-if="activities.length" class="activities flex-1 h-full mt-1">
-      <div
-        v-for="(activity, i) in activities"
-        :key="activity.key"
-        class="activity"
-      >
+    <div v-if="visibleActivities.length" class="activities flex-1 h-full mt-1">
+    <div
+      v-for="(activity, i) in visibleActivities"
+      :key="activity.key"
+      class="activity"
+    >
         <!-- single activity -->
         <div
           class="w-full px-6 md:px-10 grid grid-cols-[30px_minmax(auto,_1fr)] gap-2 sm:gap-4"
         >
           <div
             class="relative flex justify-center after:absolute after:left-[50%] after:top-2 after:-z-10 after:border-l after:border-gray-200"
-            :class="[i != activities.length - 1 ? 'after:h-full' : 'after:h-4']"
+            :class="[i != visibleActivities.length - 1 ? 'after:h-full' : 'after:h-4']"
           >
             <div
               class="z-1 flex h-7 w-7 items-center justify-center rounded-full bg-white"
@@ -47,17 +47,18 @@
           </div>
           <div
             class="mb-4 flex flex-1"
-            :class="[i == activities.length - 1 && 'mb-5']"
+            :class="[i == visibleActivities.length - 1 && 'mb-5']"
           >
-            <EmailArea
-              v-if="activity.type === 'email'"
-              :activity="activity"
-              :show-split-option="
-                !activity.isFirstEmail && ticketStatus !== 'Closed'
-              "
-              class="py-2 px-3"
-              @reply="(e) => emit('email:reply', e)"
-            />
+          <EmailArea
+            v-if="activity.type === 'email'"
+            :activity="activity"
+            :active-reply-email-id="activeReplyEmailId"
+            :show-split-option="
+              !activity.isFirstEmail && ticketStatus !== 'Closed'
+            "
+            class="py-2 px-3"
+            @reply="(e) => emit('email:reply', e)"
+          />
             <CommentBox
               v-else-if="activity.type === 'comment'"
               :activity="activity"
@@ -141,9 +142,22 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  activeReplyEmailId: {
+    type: String,
+    default: null,
+  },
 });
 
 const emit = defineEmits(["email:reply", "update"]);
+
+const visibleActivities = computed(() => {
+  return props.activities.filter((activity) => {
+    return !(
+      activity.type === "email" &&
+      activity.name === props.activeReplyEmailId
+    );
+  });
+});
 
 const CommentBox = defineAsyncComponent(
   () => import("@/components/CommentBox.vue")
@@ -168,11 +182,10 @@ const emptyText = computed(() => {
     text = "No Email Communications";
   } else if (props.title == "Comments") {
     text = "No Comments";
-    return text;
   } else if (props.title == "Calls") {
     text = "No Calls";
-    return text;
   }
+  return text;
 });
 
 const emptyTextIcon = computed(() => {

@@ -83,28 +83,33 @@
 
   </div>
 </template>
-    <template #editor>
+  <template #editor>
   <div class="flex-1 overflow-y-auto min-h-[350px]">
     <EditorContent :editor="editor" />
 
-    <div
-  v-if="quotedContent"
-  class="mx-6 md:mx-10 mt-3 text-xs text-gray-600 whitespace-pre-line"
->
-  <div v-if="quotedMeta?.date && quotedMeta?.sender">
-    On {{ formattedQuotedDate }}, {{ quotedMeta.sender }} wrote:
-  </div>
-  <div v-if="quotedMeta?.to">To: {{ quotedMeta.to }}</div>
-  <div v-if="quotedMeta?.cc">CC: {{ quotedMeta.cc }}</div>
-  <div v-if="quotedMeta?.subject">Subject: {{ quotedMeta.subject }}</div>
-</div>
+    <div v-if="quotedContent">
 
-<div
-  v-if="quotedContent"
-  ref="quotedContentRef"
-  contenteditable="false"
-  class="prose !max-w-full mx-6 md:mx-10 my-2 border-l-4 border-gray-300 pl-4 text-sm focus:outline-none"
-></div>
+      <!-- HEADER -->
+      <div class="mx-6 md:mx-10 mt-3 text-xs text-gray-600 whitespace-pre-line">
+        <div v-if="quotedMeta">
+          <div v-if="quotedMeta.date || quotedMeta.sender">
+            On {{ formattedQuotedDate }}, {{ quotedMeta.sender }} wrote:
+          </div>
+          <div v-if="quotedMeta.to">To: {{ quotedMeta.to }}</div>
+          <div v-if="quotedMeta.cc">CC: {{ quotedMeta.cc }}</div>
+          <div v-if="quotedMeta.subject">Subject: {{ quotedMeta.subject }}</div>
+        </div>
+      </div>
+
+      <!-- CONTENT -->
+      <div
+        ref="quotedContentRef"
+        contenteditable="false"
+        class="prose !max-w-full mx-6 md:mx-10 my-2 border-l-4 border-gray-300 pl-4 text-sm focus:outline-none"
+      ></div>
+
+    </div>
+
   </div>
 </template>
     <template #bottom>
@@ -456,31 +461,33 @@ function addToReply(
       }
     : null;
 
-  if (body !== quotedContent.value) {
-    quotedContent.value = "";
-    nextTick(() => {
-      quotedContent.value = body;
-    });
-  }
+quotedContent.value = "";
 
-  editorRef.value.editor.chain().clearContent().focus("start").run();
+nextTick(() => {
+  quotedContent.value = body;
+
   nextTick(() => {
-    newEmail.value = editorRef.value.editor.getHTML();
+    if (quotedContentRef.value) {
+      quotedContentRef.value.innerHTML = body;
+    }
   });
-} 
+});
 
+}
 
 
 function resetState() {
   newEmail.value = null;
   attachments.value = [];
   quotedContent.value = null;
+  quotedMeta.value = null;
 }
 
 function handleDiscard() {
   attachments.value = [];
   newEmail.value = null;
   quotedContent.value = null;
+  quotedMeta.value = null;
   ccEmailsClone.value = [];
   bccEmailsClone.value = [];
   showCC.value = false;
@@ -595,8 +602,9 @@ const hasDraft = computed(() => {
 }
 
 :deep(.ProseMirror table) {
-  width: 100%;
-  table-layout: fixed;
+  width: auto;
+  min-width: 100%;
+  table-layout: auto;
   border-collapse: collapse;
   font-size: 12px;
 }
@@ -604,9 +612,9 @@ const hasDraft = computed(() => {
 :deep(.ProseMirror th),
 :deep(.ProseMirror td) {
   border: 1px solid #d1d5db;
-  padding: 6px 8px;
+  padding: 3px 6px;
   vertical-align: top;
-  word-break: break-word;
+  white-space: nowrap;
 }
 
 :deep(.ProseMirror p) {
