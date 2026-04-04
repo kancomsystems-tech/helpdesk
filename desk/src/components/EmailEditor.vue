@@ -1,6 +1,6 @@
 <template>
   <TextEditor
-    class="flex flex-col h-[80vh]"
+    class="flex flex-col max-h-[40vh] sm:max-h-[45vh] md:max-h-[50vh] overflow-y-auto"
     ref="editorRef"
     :editor-class="[
       'prose-sm max-w-full mx-6 md:mx-10 py-3',
@@ -21,12 +21,7 @@
 
     <!-- TO Row -->
     <div class="mx-6 md:mx-10 flex items-center gap-3 py-2.5">
-      <Button
-        variant="ghost"
-        size="sm"
-        label="← Back to thread"
-        @click="handleBack"
-      />
+      
 
       <div class="h-4 w-px bg-gray-300 mx-1"></div>
 
@@ -88,16 +83,33 @@
 
   </div>
 </template>
-    <template #editor>
+  <template #editor>
   <div class="flex-1 overflow-y-auto min-h-[350px]">
     <EditorContent :editor="editor" />
-    <div
-      v-if="quotedContent"
-      ref="quotedContentRef"
-      contenteditable="true"
-      class="prose !max-w-full mx-6 md:mx-10 my-2 border-l-4 border-gray-300 pl-4 text-sm focus:outline-none"
-      @input="onQuotedInput"
-    ></div>
+
+    <div v-if="quotedContent">
+
+      <!-- HEADER -->
+      <div class="mx-6 md:mx-10 mt-3 text-xs text-gray-600 whitespace-pre-line">
+        <div v-if="quotedMeta">
+          <div v-if="quotedMeta.date || quotedMeta.sender">
+            On {{ formattedQuotedDate }}, {{ quotedMeta.sender }} wrote:
+          </div>
+          <div v-if="quotedMeta.to">To: {{ quotedMeta.to }}</div>
+          <div v-if="quotedMeta.cc">CC: {{ quotedMeta.cc }}</div>
+          <div v-if="quotedMeta.subject">Subject: {{ quotedMeta.subject }}</div>
+        </div>
+      </div>
+
+      <!-- CONTENT -->
+      <div
+        ref="quotedContentRef"
+        contenteditable="false"
+        class="prose !max-w-full mx-6 md:mx-10 my-2 border-l-4 border-gray-300 pl-4 text-sm focus:outline-none"
+      ></div>
+
+    </div>
+
   </div>
 </template>
     <template #bottom>
@@ -226,6 +238,9 @@ import {
   ref,
   watch,
 } from "vue";
+
+import dayjs from "dayjs";
+
 import SavedReplyIcon from "./icons/SavedReplyIcon.vue";
 
 const editorRef = ref(null);
@@ -379,11 +394,7 @@ watch(quotedContent, (newVal, oldVal) => {
     });
   }
 });
-function onQuotedInput() {
-  const el = quotedContentRef.value;
-  if (!el) return;
-  quotedContent.value = el.innerHTML || null;
-}
+
 
 function toggleCC() {
   showCC.value = !showCC.value;
@@ -406,41 +417,77 @@ async function removeAttachment(attachment) {
   attachments.value = attachments.value.filter((a) => a !== attachment);
   await removeAttachmentFromServer(attachment.name);
 }
+const formattedQuotedDate = computed(() => {
+  if (!quotedMeta.value?.date) return "";
+  return dayjs(quotedMeta.value.date).format("DD MMM YYYY, h:mm A");
+});
+const quotedMeta = ref<null | {
+  sender?: string;
+  date?: string;
+  to?: string;
+  cc?: string;
+  subject?: string;
+}>(null);
+
 
 function addToReply(
   body: string,
   toEmails: string[],
   ccEmails: string[],
-  bccEmails: string[]
+  bccEmails: string[],
+  meta?: {
+    sender?: string;
+    date?: string;
+    to?: string[] | string;
+    cc?: string[] | string;
+    subject?: string;
+  }
 ) {
   toEmailsClone.value = toEmails;
   ccEmailsClone.value = ccEmails;
   bccEmailsClone.value = bccEmails;
 
-  if (body !== quotedContent.value) {
-    //trigger change for watch when replied to body data is different from current quoted content
-    quotedContent.value = null;
-    nextTick(() => {
-      quotedContent.value = body;
-    });
-  }
+  quotedMeta.value = meta
+    ? {
+        sender: meta.sender,
+        date: meta.date,
+        to: Array.isArray(meta.to)
+          ? meta.to.filter(Boolean).join(", ")
+          : meta.to,
+        cc: Array.isArray(meta.cc)
+          ? meta.cc.filter(Boolean).join(", ")
+          : meta.cc,
+        subject: meta.subject,
+      }
+    : null;
 
-  editorRef.value.editor.chain().clearContent().focus("start").run();
+quotedContent.value = "";
+
+nextTick(() => {
+  quotedContent.value = body;
+
   nextTick(() => {
-    newEmail.value = editorRef.value.editor.getHTML();
+    if (quotedContentRef.value) {
+      quotedContentRef.value.innerHTML = body;
+    }
   });
+});
+
 }
+
 
 function resetState() {
   newEmail.value = null;
   attachments.value = [];
   quotedContent.value = null;
+  quotedMeta.value = null;
 }
 
 function handleDiscard() {
   attachments.value = [];
   newEmail.value = null;
   quotedContent.value = null;
+  quotedMeta.value = null;
   ccEmailsClone.value = [];
   bccEmailsClone.value = [];
   showCC.value = false;
@@ -449,9 +496,7 @@ function handleDiscard() {
   emit("discard");
 }
 
-  function handleBack() {
-  emit("discard");
-}
+
   
 //on load set quoted content from storage
 onMounted(() => {
@@ -557,8 +602,9 @@ const hasDraft = computed(() => {
 }
 
 :deep(.ProseMirror table) {
-  width: 100%;
-  table-layout: fixed;
+  width: auto;
+  min-width: 100%;
+  table-layout: auto;
   border-collapse: collapse;
   font-size: 12px;
 }
@@ -566,9 +612,9 @@ const hasDraft = computed(() => {
 :deep(.ProseMirror th),
 :deep(.ProseMirror td) {
   border: 1px solid #d1d5db;
-  padding: 6px 8px;
+  padding: 3px 6px;
   vertical-align: top;
-  word-break: break-word;
+  white-space: nowrap;
 }
 
 :deep(.ProseMirror p) {

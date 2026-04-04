@@ -148,14 +148,21 @@ function splitIfString(str: string | string[]) {
   return str;
 }
 
-function replyToEmail(data: object) {
+function replyToEmail(data: any) {
   showEmailBox.value = true;
 
   emailEditorRef.value.addToReply(
     data.content,
     splitIfString(data.to),
     splitIfString(data.cc),
-    splitIfString(data.bcc)
+    splitIfString(data.bcc),
+    {
+      sender: data.sender,
+      date: data.date,
+      to: data.to,
+      cc: data.cc,
+      subject: data.subject,
+    }
   );
 }
 

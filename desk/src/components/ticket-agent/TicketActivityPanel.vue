@@ -1,53 +1,47 @@
 <template>
-  <Tabs
-    :modelValue="tabIndex"
-    :tabs="tabs"
-    @update:modelValue="changeTabTo"
-    class="[&_[role='tab']]:px-0 [&_[role='tablist']]:px-5 [&_[role='tablist']]:gap-7.5 [&_[role='tablist']]:flex-shrink-0"
-  >
-    <template #tab-panel="{ tab }">
+  <div class="h-full flex flex-col overflow-hidden">
+    <Tabs
+      :modelValue="tabIndex"
+      :tabs="tabs"
+      @update:modelValue="changeTabTo"
+      class="[&_[role='tab']]:px-0 [&_[role='tablist']]:px-5 [&_[role='tablist']]:gap-7.5 [&_[role='tablist']]:flex-shrink-0 flex flex-col min-h-0 flex-1"
+    >
+      <template #tab-panel="{ tab }">
+        <div v-if="ticket.doc?.name" class="flex-1 overflow-y-auto min-h-0">
       <TicketAgentActivities
-        v-if="Boolean(activities.data)"
         ref="ticketAgentActivitiesRef"
-        :activities="filterActivities(tab.name as TicketTab)"
+        :activities="filterActivities(tab.name)"
         :title="tab.label"
-        :ticket-status="ticket.doc.status"
-        @email:reply="
-          (e) => {
-            communicationAreaRef.replyToEmail(e);
-          }
-        "
-        @update="
-          () => {
-            activities.reload();
-            ticketAgentActivitiesRef.scrollToLatestActivity();
-          }
-        "
+        :ticket-status="ticket.data?.status"
+        :active-reply-email-id="tab.name === 'activity' ? activeReplyEmailId : null"
+        @update="() => ticket.reload()"
+        @email:reply="handleEmailReply"
       />
-      <div v-else class="flex items-center justify-center flex-col mt-20">
-        <LoadingIndicator :scale="8" class="text-ink-gray-5" />
-        <p class="text-xl font-medium text-ink-gray-5 absolute top-[50%]">
-          Loading...
-        </p>
-      </div>
-    </template>
-  </Tabs>
-  <!-- Comm Area -->
-  <CommunicationArea
-    ref="communicationAreaRef"
-    :ticketId="String(ticket.doc?.name)"
-    :to-emails="[ticket.doc?.raised_by]"
-    :cc-emails="[]"
-    :bcc-emails="[]"
-    :key="ticket.doc?.name"
-    @update="
-      () => {
-        activities.reload();
-        ticketAgentActivitiesRef.scrollToLatestActivity();
-      }
-    "
-  />
+        </div>
+
+        <div v-else class="flex items-center justify-center flex-col mt-20">
+          <LoadingIndicator :scale="8" class="text-ink-gray-5" />
+          <p class="text-xl font-medium text-ink-gray-5 absolute top-[50%]">
+            Loading...
+          </p>
+        </div>
+      </template>
+    </Tabs>
+
+<CommunicationArea
+  ref="communicationAreaRef"
+  class="border-t"
+  @reload="() => {
+    activeReplyEmailId.value = null;
+    reloadAndScrollLatest();
+  }"
+  @close="() => {
+    activeReplyEmailId.value = null;
+  }"
+/>
+</div>
 </template>
+
 
 <script setup lang="ts">
 import {
@@ -67,7 +61,10 @@ import {
 } from "@/types";
 import { LoadingIndicator, Tabs } from "frappe-ui";
 import { storeToRefs } from "pinia";
-import { computed, ComputedRef, defineAsyncComponent, inject, ref } from "vue";
+import { computed, ComputedRef, defineAsyncComponent, inject, nextTick, ref } from "vue";
+const ticketAgentActivitiesRef = ref(null);
+const communicationAreaRef = ref(null);
+const activeReplyEmailId = ref<string | null>(null);
 import TicketAgentActivities from "../ticket/TicketAgentActivities.vue";
 
 const CommunicationArea = defineAsyncComponent(
@@ -77,8 +74,7 @@ const CommunicationArea = defineAsyncComponent(
 const ticket = inject(TicketSymbol);
 const activities = inject(ActivitiesSymbol);
 
-const ticketAgentActivitiesRef = ref(null);
-const communicationAreaRef = ref(null);
+
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
 
@@ -112,6 +108,20 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
 });
 
 const { tabIndex, changeTabTo } = useActiveTabManager(tabs);
+
+async function reloadAndScrollLatest() {
+  activities?.value?.reload?.();
+  await nextTick();
+  await nextTick();
+  requestAnimationFrame(() => {
+    ticketAgentActivitiesRef.value?.scrollToLatestActivity?.();
+  });
+}
+
+function handleEmailReply(e: any) {
+  activeReplyEmailId.value = e?.name || null;
+  communicationAreaRef.value?.replyToEmail?.(e);
+}
 
 // TODO: refactor for pagination
 // can be done once we sort out the backend

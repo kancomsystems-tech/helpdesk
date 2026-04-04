@@ -1,107 +1,99 @@
 <template>
-  <div
-    :id="`communication-${name}`"
-    v-bind="$attrs"
-    class="grow cursor-pointer border-transparent bg-white rounded-md shadow text-base leading-6 transition-all duration-300 ease-in-out"
-  >
-    <div
-      class="flex items-center justify-between gap-2"
-      :class="isMobileView && 'items-start'"
-    >
-      <!-- email design for mobile -->
-      <div v-if="isMobileView" class="flex items-center gap-2 text-sm">
-        <div class="leading-tight">
-          <p>{{ sender.full_name || "Guest" }}</p>
-          <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
-            <p class="text-xs md:text-sm text-gray-600">
-              {{ timeAgo(creation) }}
-            </p>
-          </Tooltip>
-          <p class="sm:flex hidden text-sm text-gray-600" v-if="sender.name">
-            {{ "<" + sender.name + ">" }}
-          </p>
-        </div>
-      </div>
-      <!-- email design for desktop -->
-      <div v-else class="flex items-center gap-1">
-        <span>{{ sender.full_name || "Guest" }}</span>
-        <span class="sm:flex hidden text-sm text-gray-600" v-if="sender.name">{{
-          "<" + sender.name + ">"
-        }}</span>
-      </div>
 
-      <div class="flex gap-0.5 items-center">
-        <Badge
-          v-if="status.label"
-          :label="__(status.label)"
-          variant="subtle"
-          :theme="status.color"
-          class="mr-1.5"
-        />
-        <Tooltip
-          :text="dateFormat(creation, dateTooltipFormat)"
-          v-if="!isMobileView"
-        >
+<div
+  :id="`communication-${name}`"
+  v-bind="$attrs"
+  class="grow cursor-pointer border-transparent bg-white rounded-md shadow text-base leading-6 transition-all duration-300 ease-in-out"
+>
+
+  <!-- HEADER -->
+  <div
+    class="flex items-center justify-between gap-2"
+    :class="isMobileView && 'items-start'"
+  >
+
+    <!-- mobile -->
+    <div v-if="isMobileView" class="flex items-center gap-2 text-sm">
+      <div class="leading-tight">
+        <p>{{ sender.full_name || "Guest" }}</p>
+        <Tooltip :text="dateFormat(creation, dateTooltipFormat)">
           <p class="text-xs md:text-sm text-gray-600">
             {{ timeAgo(creation) }}
           </p>
         </Tooltip>
-        <Button variant="ghost" class="text-gray-700" @click="reply">
-          <ReplyIcon class="h-4 w-4" />
-        </Button>
-        <Button variant="ghost" class="text-gray-700" @click="replyAll">
-          <ReplyAllIcon class="h-4 w-4" />
-        </Button>
-        <Dropdown
-          v-if="showSplitOption"
-          :placement="'right'"
-          :options="[
-            {
-              label: 'Split Ticket',
-              icon: LucideSplit,
-              onClick: () => (showSplitModal = true),
-            },
-          ]"
-        >
-          <Button
-            icon="more-horizontal"
-            class="text-gray-600"
-            variant="ghost"
-          />
-        </Dropdown>
+        <p class="sm:flex hidden text-sm text-gray-600" v-if="sender.name">
+          {{ "<" + sender.name + ">" }}
+        </p>
       </div>
     </div>
-    <!-- <div class="text-sm leading-5 text-gray-600">
-      {{ subject }}
-    </div> -->
-    <div class="text-sm leading-5 text-gray-600">
-      <span v-if="to" class="text-2xs mr-1 font-bold text-gray-500">TO:</span>
-      <span v-if="to"> {{ to }} </span>
-      <span v-if="cc">, </span>
-      <span v-if="cc" class="text-2xs mr-1 font-bold text-gray-500"> CC: </span>
-      <span v-if="cc">{{ cc }}</span>
-      <span v-if="bcc">, </span>
-      <span v-if="bcc" class="text-2xs mr-1 font-bold text-gray-500">
-        BCC:
+
+    <!-- desktop -->
+    <div v-else class="flex items-center gap-1">
+      <span>{{ sender.full_name || "Guest" }}</span>
+      <span class="sm:flex hidden text-sm text-gray-600" v-if="sender.name">
+        {{ "<" + sender.name + ">" }}
       </span>
-      <span v-if="bcc">{{ bcc }}</span>
     </div>
-    <div class="border-0 border-t my-3 border-outline-gray-modals" />
-    <EmailContent :content="content" />
-    <div class="flex flex-wrap gap-2">
-      <AttachmentItem
-        v-for="a in attachments"
-        :key="a.file_url"
-        :label="a.file_name"
-        :url="a.file_url"
+
+    <div class="flex gap-0.5 items-center">
+      <Badge
+        v-if="status.label"
+        :label="__(status.label)"
+        variant="subtle"
+        :theme="status.color"
+        class="mr-1.5"
       />
+      <Tooltip
+        :text="dateFormat(creation, dateTooltipFormat)"
+        v-if="!isMobileView"
+      >
+        <p class="text-xs md:text-sm text-gray-600">
+          {{ timeAgo(creation) }}
+        </p>
+      </Tooltip>
+
+      <Button variant="ghost" class="text-gray-700" @click="reply">
+        <ReplyIcon class="h-4 w-4" />
+      </Button>
+      <Button variant="ghost" class="text-gray-700" @click="replyAll">
+        <ReplyAllIcon class="h-4 w-4" />
+      </Button>
     </div>
+
   </div>
+
+  <!-- TO / CC -->
+  <div class="text-sm leading-5 text-gray-600">
+    <span v-if="to" class="text-2xs mr-1 font-bold text-gray-500">TO:</span>
+    <span v-if="to"> {{ to }} </span>
+    <span v-if="cc">, </span>
+    <span v-if="cc" class="text-2xs mr-1 font-bold text-gray-500"> CC: </span>
+    <span v-if="cc">{{ cc }}</span>
+  </div>
+
+  <!-- BODY -->
+  <div class="border-0 border-t my-3 border-outline-gray-modals" />
+  <EmailContent :content="content" />
+
+  <!-- ATTACHMENTS -->
+  <div class="flex flex-wrap gap-2">
+    <AttachmentItem
+      v-for="a in attachments"
+      :key="a.file_url"
+      :label="a.file_name"
+      :url="a.file_url"
+    />
+  </div>
+
+  <!-- MODAL -->
   <TicketSplitModal
     v-model="showSplitModal"
     :ticket_id="name"
     :communication_id="name"
   />
+
+</div>
+
 </template>
 
 <script setup lang="ts">
@@ -124,6 +116,10 @@ const props = defineProps({
   showSplitOption: {
     type: Boolean,
     default: false,
+  },
+  activeReplyEmailId: {
+    type: String,
+    default: null,
   },
 });
 
@@ -166,9 +162,15 @@ const status = computed(() => {
 const reply = () => {
   const user = auth.user.value;
   emit("reply", {
-    content: content,
-    to: user === sender.name ? to : sender.name,
-  });
+  name,
+  content: content,
+  to: user === sender.name ? to : sender.name,
+  cc,
+  bcc,
+  sender: sender.full_name || sender.name,
+  date: creation,
+  subject,
+});
 };
 
 const replyAll = () => {
@@ -216,10 +218,14 @@ const replyAll = () => {
   }
 
   emit("reply", {
+    name,
     content: content,
     to: _to,
     cc: _cc.filter(Boolean),
     bcc: _bcc.filter(Boolean),
+    sender: sender.full_name || sender.name,
+    date: creation,
+    subject,
   });
 };
 

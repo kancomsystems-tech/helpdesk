@@ -668,41 +668,27 @@ export const HandleExcelPaste = Extension.create({
       new Plugin({
         key: new PluginKey("handleExcelPaste"),
         props: {
-          handlePaste(view, event) {
+ handlePaste(view, event) {
   const clipboardData = event.clipboardData;
   if (!clipboardData) return false;
 
   const html = clipboardData.getData("text/html") || "";
-  const text = clipboardData.getData("text/plain") || "";
-  const types = Array.from(clipboardData.types || []);
-
-  // Debug
-  console.log("Paste types:", types);
-  console.log("Paste html preview:", html.slice(0, 300));
-  console.log("Paste text preview:", text.slice(0, 200));
-
-  // Only try custom handling when HTML exists
   if (!html) return false;
 
   const tempDoc = new DOMParser().parseFromString(html, "text/html");
   const table = tempDoc.querySelector("table") as HTMLTableElement | null;
 
-  // If no table, let normal paste continue
-  if (!table) {
-    return false;
-  }
+  // Let normal paste handle non-table content
+  if (!table) return false;
 
   const cleanHTML = buildCleanTableHTMLFromPastedTable(table);
-
-  if (!cleanHTML) {
-    return false;
-  }
+  if (!cleanHTML) return false;
 
   let json;
   try {
     json = generateJSON(cleanHTML, excelPasteExtensions);
   } catch (e) {
-    console.error("Excel paste JSON generation failed", e);
+    console.error("Excel paste JSON generation failed", e, cleanHTML);
     return false;
   }
 
@@ -720,56 +706,20 @@ export const HandleExcelPaste = Extension.create({
     })
     .filter(Boolean);
 
-  if (!nodes.length) {
-    return false;
-  }
+  if (!nodes.length) return false;
 
-  // Only now block native paste
   event.preventDefault();
 
-  let totalInsertedSize = 0;
-  nodes.forEach((n: any) => {
-    totalInsertedSize += n.nodeSize;
-  });
-
   const insertTr = tr.replaceWith(selection.from, selection.to, nodes);
-  dispatch(insertTr);
 
-  requestAnimationFrame(() => {
-    const currentState = view.state;
-    const followUpTr = currentState.tr;
+  insertTr.insert(
+    insertTr.selection.to,
+    schema.nodes.paragraph.create()
+  );
 
-    let insertedEnd: number | null = null;
-    currentState.doc.forEach((node, nodeOffset) => {
-      if (
-        nodeOffset >= selection.from &&
-        nodeOffset < selection.from + totalInsertedSize
-      ) {
-        insertedEnd = nodeOffset + node.nodeSize;
-      }
-    });
-
-    if (insertedEnd === null) return;
-
-    if (insertedEnd >= currentState.doc.content.size) {
-      followUpTr.insert(
-        currentState.doc.content.size,
-        currentState.schema.nodes.paragraph.create()
-      );
-    }
-
-    const targetPos = Math.min(
-      insertedEnd + 1,
-      followUpTr.doc.content.size - 1
-    );
-    const $target = followUpTr.doc.resolve(targetPos);
-    followUpTr.setSelection(TextSelection.near($target, 1));
-    followUpTr.scrollIntoView();
-    view.dispatch(followUpTr);
-  });
-
+  dispatch(insertTr.scrollIntoView());
   return true;
-},
+          },
         },
       }),
     ];
