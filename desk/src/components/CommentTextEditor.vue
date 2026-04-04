@@ -47,9 +47,8 @@
               }"
               @success="(f) => attachments.push(f)"
             >
-              <template #default="{ openFileSelector, uploading }">
-                {{ void (loading = uploading) }}
-                <Button
+              <template #default="{ openFileSelector }">
+                 <Button
                   theme="gray"
                   variant="ghost"
                   @click="openFileSelector()"
@@ -84,13 +83,7 @@
               :label="label"
               :disabled="isDisabled"
               :loading="loading"
-              @click="
-                () => {
-                  loading = true;
-                  submitComment();
-                  newComment = '';
-                }
-              "
+              @click="submitComment"
             />
           </div>
         </div>
@@ -188,6 +181,12 @@ async function submitComment() {
   if (isContentEmpty(newComment.value)) {
     return false;
   }
+
+  const content = newComment.value;
+  const currentAttachments = [...attachments.value];
+
+  loading.value = true;
+
   const comment = createResource({
     url: "run_doc_method",
     makeParams: () => ({
@@ -195,8 +194,8 @@ async function submitComment() {
       dn: props.ticketId,
       method: "new_comment",
       args: {
-        content: newComment.value,
-        attachments: attachments.value,
+        content,
+        attachments: currentAttachments,
       },
     }),
     onSuccess: () => {
