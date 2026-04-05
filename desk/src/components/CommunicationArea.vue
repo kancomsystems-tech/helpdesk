@@ -137,12 +137,6 @@ function submitComment() {
   }
 }
 
-function submitComment() {
-  if (commentTextEditorRef.value.submitComment()) {
-    emit("update");
-  }
-}
-
 function splitIfString(str: string | string[]) {
   if (typeof str === "string") {
     return str.split(",");
