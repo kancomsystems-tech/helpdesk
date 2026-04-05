@@ -65,31 +65,32 @@
       @keydown.ctrl.enter.capture.stop="submitComment"
       @keydown.meta.enter.capture.stop="submitComment"
     >
-      <CommentTextEditor
-        ref="commentTextEditorRef"
-        :label="
-          isMobileView
-            ? 'Comment'
-            : isMac
-            ? 'Comment (⌘ + ⏎)'
-            : 'Comment (Ctrl + ⏎)'
-        "
-        :ticketId="ticketId"
-        :editable="showCommentBox"
-        :doctype="doctype"
-        placeholder="@John could you please look into this?"
-        @submit="
-          () => {
-            showCommentBox = false;
-            emit('update');
-          }
-        "
-        @discard="
-          () => {
-            showCommentBox = false;
-          }
-        "
-      />
+    <CommentTextEditor
+      v-if="ticketId"
+      ref="commentTextEditorRef"
+      :label="
+        isMobileView
+          ? 'Comment'
+          : isMac
+          ? 'Comment (⌘ + ⏎)'
+          : 'Comment (Ctrl + ⏎)'
+      "
+      :ticketId="ticketId"
+      :editable="showCommentBox"
+      :doctype="doctype"
+      placeholder="@John could you please look into this?"
+      @submit="
+        () => {
+          showCommentBox = false;
+          emit('update');
+        }
+      "
+      @discard="
+        () => {
+          showCommentBox = false;
+        }
+      "
+    />
     </div>
   </div>
 </template>
@@ -129,8 +130,9 @@ function toggleCommentBox() {
   showCommentBox.value = !showCommentBox.value;
 }
 
-function submitEmail() {
-  if (emailEditorRef.value.submitMail()) {
+function submitComment() {
+  if (!props.ticketId) return;
+  if (commentTextEditorRef.value.submitComment()) {
     emit("update");
   }
 }

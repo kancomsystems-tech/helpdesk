@@ -178,8 +178,8 @@ function removeAttachment(attachment) {
 }
 
 async function submitComment() {
-  if (isContentEmpty(newComment.value)) {
-    return false;
+  if (isContentEmpty(newComment.value) || !props.ticketId) {
+  return false;
   }
 
   const content = newComment.value;
