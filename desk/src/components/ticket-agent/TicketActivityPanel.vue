@@ -1,31 +1,51 @@
 <template>
   <div class="h-full flex flex-col overflow-hidden">
-    <Tabs
-      :modelValue="tabIndex"
-      :tabs="tabs"
-      @update:modelValue="changeTabTo"
-      class="[&_[role='tab']]:px-0 [&_[role='tablist']]:px-5 [&_[role='tablist']]:gap-7.5 [&_[role='tablist']]:flex-shrink-0 flex flex-col min-h-0 flex-1"
-    >
-      <template #tab-panel="{ tab }">
-        <div v-if="ticket.doc?.name" class="flex-1 overflow-y-auto min-h-0">
-      <TicketAgentActivities
-        ref="ticketAgentActivitiesRef"
-        :activities="filterActivities(tab.name)"
-        :title="tab.label"
-        :ticket-status="ticket.data?.status"
-        :active-reply-email-id="tab.name === 'activity' ? activeReplyEmailId : null"
-        @update="() => ticket.reload()"
-        @email:reply="handleEmailReply"
-      />
-        </div>
+  <Tabs
+    :modelValue="tabIndex"
+    :tabs="tabs"
+    @update:modelValue="changeTabTo"
+    :class="[
+      '[&_[role='\"'\"'tab'\"'\"']]:px-0 [&_[role='\"'\"'tablist'\"'\"']]:px-5 [&_[role='\"'\"'tablist'\"'\"']]:gap-7.5 [&_[role='\"'\"'tablist'\"'\"']]:flex-shrink-0 flex flex-col min-h-0',
+      isActivitiesCollapsed ? 'flex-none' : 'flex-1'
+    ]"
+  >
+    <template #tab-panel="{ tab }">
+      <div class="flex justify-end px-5 py-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          :icon="isActivitiesCollapsed ? 'chevron-down' : 'chevron-up'"
+          @click="isActivitiesCollapsed = !isActivitiesCollapsed"
+        />
+      </div>
 
-        <div v-else class="flex items-center justify-center flex-col mt-20">
-          <LoadingIndicator :scale="8" class="text-ink-gray-5" />
-          <p class="text-xl font-medium text-ink-gray-5 absolute top-[50%]">
-            Loading...
-          </p>
+      <div
+        v-if="ticket.doc?.name"
+        :class="isActivitiesCollapsed ? 'h-0 overflow-hidden' : 'flex-1 min-h-0'"
+      >
+        <div class="h-full overflow-y-auto">
+          <TicketAgentActivities
+            ref="ticketAgentActivitiesRef"
+            :activities="filterActivities(tab.name)"
+            :title="tab.label"
+            :ticket-status="ticket.data?.status"
+            :active-reply-email-id="
+              tab.name === 'activity' ? activeReplyEmailId : null
+            "
+            @update="() => ticket.reload()"
+            @email:reply="handleEmailReply"
+          />
         </div>
-      </template>
+      </div>
+
+      <div v-else class="flex items-center justify-center flex-col mt-20">
+        <LoadingIndicator :scale="8" class="text-ink-gray-5" />
+        <p class="text-xl font-medium text-ink-gray-5 absolute top-[50%]">
+          Loading...
+        </p>
+      </div>
+    </template>  
+    
     </Tabs>
 
 <CommunicationArea
@@ -65,6 +85,7 @@ import { computed, ComputedRef, defineAsyncComponent, inject, nextTick, ref } fr
 const ticketAgentActivitiesRef = ref(null);
 const communicationAreaRef = ref(null);
 const activeReplyEmailId = ref<string | null>(null);
+const isActivitiesCollapsed = ref(false);
 import TicketAgentActivities from "../ticket/TicketAgentActivities.vue";
 
 const CommunicationArea = defineAsyncComponent(
