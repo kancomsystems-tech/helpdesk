@@ -1,5 +1,11 @@
 <template>
-  <div class="flex !w-[382px] flex-col justify-between border-l">
+  <div
+    :class="[
+      'flex flex-col justify-between border-l transition-all duration-200',
+      isCollapsed ? '!w-12' : '!w-[382px]'
+    ]"
+  >
+    <!-- HEADER -->
     <div
       class="flex h-10.5 items-center border-b px-5 py-2.5 text-lg font-medium text-ink-gray-9 justify-between"
     >
@@ -8,44 +14,59 @@
         @click="
           copyToClipboard(ticket.name, `'${ticket.name}' copied to clipboard`)
         "
-        >#{{ ticket.name }}
-      </span>
-      <Dropdown
-        v-if="showMergeOption"
-        placement="right"
-        :options="[
-          {
-            label: __('Merge Ticket'),
-            onClick: () => (showMergeModal = true),
-            icon: LucideMerge,
-            condition: () => !ticket.is_merged,
-          },
-        ]"
       >
-        <Button icon="more-horizontal" class="text-gray-600" variant="ghost" />
-      </Dropdown>
+        #{{ ticket.name }}
+      </span>
+
+      <div class="flex items-center gap-1">
+        <Button
+          variant="ghost"
+          icon="chevron-left"
+          class="text-gray-600"
+          @click="isCollapsed = !isCollapsed"
+        />
+        <Dropdown
+          v-if="showMergeOption"
+          placement="right"
+          :options="[
+            {
+              label: __('Merge Ticket'),
+              onClick: () => (showMergeModal = true),
+              icon: LucideMerge,
+              condition: () => !ticket.is_merged,
+            },
+          ]"
+        >
+          <Button icon="more-horizontal" class="text-gray-600" variant="ghost" />
+        </Dropdown>
+      </div>
     </div>
-    <TicketAgentContact
-      :contact="ticket.contact"
-      :ticketId="ticket.name"
-      @email:open="(e) => emit('email:open', e)"
-    />
-    <!-- feedback component -->
-    <TicketFeedback
-      v-if="ticket.feedback_rating"
-      class="py-3 !px-6 !gap-3 text-base text-gray-600"
-      :ticket="ticket"
-    />
-    <!-- ticket details -->
-    <TicketAgentDetails :ticket="ticket" />
-    <!-- fields -->
-    <TicketAgentFields :ticket="ticket" @update="update" />
-    <TicketMergeModal
-      :ticket="ticket"
-      v-if="showMergeModal"
-      v-model="showMergeModal"
-      @update="emit('reload')"
-    />
+
+    <!-- BODY -->
+    <div v-show="!isCollapsed">
+      <TicketAgentContact
+        :contact="ticket.contact"
+        :ticketId="ticket.name"
+        @email:open="(e) => emit('email:open', e)"
+      />
+
+      <TicketFeedback
+        v-if="ticket.feedback_rating"
+        class="py-3 !px-6 !gap-3 text-base text-gray-600"
+        :ticket="ticket"
+      />
+
+      <TicketAgentDetails :ticket="ticket" />
+
+      <TicketAgentFields :ticket="ticket" @update="update" />
+
+      <TicketMergeModal
+        :ticket="ticket"
+        v-if="showMergeModal"
+        v-model="showMergeModal"
+        @update="emit('reload')"
+      />
+    </div>
   </div>
 </template>
 
@@ -75,6 +96,7 @@ function update(val = null) {
   emit("update", val);
 }
 
+const isCollapsed = ref(false);
 const showMergeModal = ref(false);
 
 const showMergeOption = computed(() => {

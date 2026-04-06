@@ -186,18 +186,10 @@ const props = defineProps({
 });
 
 watch(
-  () => showEmailBox.value,
-  (value) => {
-    if (value) {
-      emailEditorRef.value?.editor?.commands?.focus();
-    }
-  }
-);
-
-watch(
   () => showCommentBox.value,
   (value) => {
     if (value) {
+      commentBoxRef.value?.scrollIntoView?.({ block: "nearest" });
       commentTextEditorRef.value?.editor?.commands?.focus();
     }
   }
