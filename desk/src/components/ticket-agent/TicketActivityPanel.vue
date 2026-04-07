@@ -12,17 +12,8 @@
         :activities="filterActivities(tab.name as TicketTab)"
         :title="tab.label"
         :ticket-status="ticket.doc.status"
-        @email:reply="
-          (e) => {
-            communicationAreaRef.replyToEmail(e);
-          }
-        "
-        @update="
-          () => {
-            activities.reload();
-            ticketAgentActivitiesRef.scrollToLatestActivity();
-          }
-        "
+        @email:reply="handleReply"
+        @update="handleUpdate"
       />
       <div v-else class="flex items-center justify-center flex-col mt-20">
         <LoadingIndicator :scale="8" class="text-ink-gray-5" />
@@ -241,12 +232,22 @@ const _activities = computed(() => {
   return data;
 });
 
+function handleReply(e) {
+  communicationAreaRef.value?.replyToEmail(e);
+}
+
+function handleUpdate() {
+  activities.reload();
+  ticketAgentActivitiesRef.value?.scrollToLatestActivity();
+}
+
 function filterActivities(eventType: TicketTab) {
   if (eventType === "activity") {
     return _activities.value;
   }
   return _activities.value.filter((activity) => activity.type === eventType);
 }
+
 </script>
 
 <style scoped></style>
