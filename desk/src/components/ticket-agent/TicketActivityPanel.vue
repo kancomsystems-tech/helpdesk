@@ -1,27 +1,57 @@
 <template>
-  <Tabs
-    :modelValue="tabIndex"
-    :tabs="tabs"
-    @update:modelValue="changeTabTo"
-    class="[&_[role='tab']]:px-0 [&_[role='tablist']]:px-5 [&_[role='tablist']]:gap-7.5 [&_[role='tablist']]:flex-shrink-0"
-  >
-    <template #tab-panel="{ tab }">
-      <TicketAgentActivities
-        v-if="Boolean(activities.data)"
-        ref="ticketAgentActivitiesRef"
-        :activities="filterActivities(tab.name as TicketTab)"
-        :title="tab.label"
-        :ticket-status="ticket.doc.status"
-        @email:reply="handleReply"
-        @update="handleUpdate"
+  <div class="flex h-full min-h-0 flex-col">
+    <Tabs
+      :modelValue="tabIndex"
+      :tabs="tabs"
+      @update:modelValue="changeTabTo"
+      class="shrink-0 [&_[role='tab']]:px-0 [&_[role='tablist']]:px-5 [&_[role='tablist']]:gap-7.5 [&_[role='tablist']]:flex-shrink-0"
+    >
+      <template #tab-panel="{ tab }">
+        <div
+          v-if="Boolean(activities.data)"
+          :class="
+            tab.name === 'activity' && isActivityCollapsed
+              ? 'shrink-0'
+              : 'flex-1 min-h-0'
+          "
+        >
+          <TicketAgentActivities
+            ref="ticketAgentActivitiesRef"
+            :activities="filterActivities(tab.name as TicketTab)"
+            :title="tab.label"
+            :ticket-status="ticket.doc.status"
+            @email:reply="handleReply"
+            @update="handleUpdate"
+            @collapse-change="isActivityCollapsed = $event"
+          />
+        </div>
+        <div v-else class="flex items-center justify-center flex-col mt-20">
+          <LoadingIndicator :scale="8" class="text-ink-gray-5" />
+          <p class="text-xl font-medium text-ink-gray-5 absolute top-[50%]">
+            Loading...
+          </p>
+        </div>
+      </template>
+    </Tabs>
+
+    <div class="flex-1 min-h-0">
+      <CommunicationArea
+        ref="communicationAreaRef"
+        :ticketId="String(ticket.doc?.name)"
+        :to-emails="[ticket.doc?.raised_by]"
+        :cc-emails="[]"
+        :bcc-emails="[]"
+        :key="ticket.doc?.name"
+        @update="
+          () => {
+            activities.reload();
+            ticketAgentActivitiesRef.scrollToLatestActivity();
+          }
+        "
       />
-      <div v-else class="flex items-center justify-center flex-col mt-20">
-        <LoadingIndicator :scale="8" class="text-ink-gray-5" />
-        <p class="text-xl font-medium text-ink-gray-5 absolute top-[50%]">
-          Loading...
-        </p>
-      </div>
-    </template>
+    </div>
+  </div>
+</template>
   </Tabs>
   <!-- Comm Area -->
   <CommunicationArea
@@ -241,9 +271,12 @@ function handleUpdate() {
   ticketAgentActivitiesRef.value?.scrollToLatestActivity();
 }
 
+const isActivityCollapsed = ref(false);
 function filterActivities(eventType: TicketTab) {
   if (eventType === "activity") {
-    return _activities.value;
+    return _activities.value.filter(
+      (activity) => !["email", "comment"].includes(activity.type)
+    );
   }
   return _activities.value.filter((activity) => activity.type === eventType);
 }

@@ -1,6 +1,20 @@
 <template>
-  <ActivityHeader :title="title" />
+  <div class="flex items-center justify-between px-6 md:px-10 pt-4">
+    <ActivityHeader :title="title" />
+    <button
+      v-if="title === 'Activity'"
+      class="text-sm text-gray-500 hover:text-gray-700"
+      @click="
+        isActivityCollapsed = !isActivityCollapsed;
+        emit('collapse-change', isActivityCollapsed);
+      "
+    >
+      {{ isActivityCollapsed ? "Show" : "Hide" }}
+    </button>
+  </div>
+
   <FadedScrollableDiv
+    v-if="!(title === 'Activity' && isActivityCollapsed)"
     class="flex flex-col flex-1 overflow-y-auto"
     :mask-length="20"
   >
@@ -10,6 +24,7 @@
       :key="activity.key"
       class="activity"
     >
+    
         <!-- single activity -->
         <div
           class="w-full px-6 md:px-10 grid grid-cols-[30px_minmax(auto,_1fr)] gap-2 sm:gap-4"
@@ -124,6 +139,7 @@ import {
   h,
   inject,
   nextTick,
+  ref,
   watch,
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -148,10 +164,15 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["email:reply", "update"]);
+const emit = defineEmits(["email:reply", "update", "collapse-change"]);
+const isActivityCollapsed = ref(false);
 
 const visibleActivities = computed(() => {
   return props.activities.filter((activity) => {
+    if (props.title === "Emails") {
+      return true;
+    }
+
     return !(
       activity.type === "email" &&
       activity.name === props.activeReplyEmailId
