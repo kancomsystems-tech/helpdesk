@@ -14,7 +14,7 @@
   </div>
 
   <FadedScrollableDiv
-    v-if="!(title === 'Activity' && isActivityCollapsed)"
+    v-if="true"
     class="flex flex-col flex-1 overflow-y-auto"
     :mask-length="20"
   >

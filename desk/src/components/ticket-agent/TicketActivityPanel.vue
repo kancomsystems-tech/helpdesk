@@ -1,40 +1,30 @@
 <template>
-  <div class="flex h-full min-h-0 flex-col">
-    <Tabs
-      :modelValue="tabIndex"
-      :tabs="tabs"
-      @update:modelValue="changeTabTo"
-      class="shrink-0 [&_[role='tab']]:px-0 [&_[role='tablist']]:px-5 [&_[role='tablist']]:gap-7.5 [&_[role='tablist']]:flex-shrink-0"
-    >
-      <template #tab-panel="{ tab }">
-        <div
-          v-if="Boolean(activities.data)"
-          :class="
-            tab.name === 'activity' && isActivityCollapsed
-              ? 'shrink-0'
-              : 'flex-1 min-h-0'
-          "
-        >
-          <TicketAgentActivities
-            ref="ticketAgentActivitiesRef"
-            :activities="filterActivities(tab.name as TicketTab)"
-            :title="tab.label"
-            :ticket-status="ticket.doc.status"
-            @email:reply="handleReply"
-            @update="handleUpdate"
-            @collapse-change="isActivityCollapsed = $event"
-          />
-        </div>
-        <div v-else class="flex items-center justify-center flex-col mt-20">
-          <LoadingIndicator :scale="8" class="text-ink-gray-5" />
-          <p class="text-xl font-medium text-ink-gray-5 absolute top-[50%]">
-            Loading...
-          </p>
-        </div>
-      </template>
-    </Tabs>
+  <div class="flex flex-col h-full min-h-0 overflow-hidden">
+    <!-- Activity / Emails / Comments -->
+    <div class="flex-1 min-h-0 overflow-hidden">
+      <Tabs
+        :modelValue="tabIndex"
+        :tabs="tabs"
+        @update:modelValue="changeTabTo"
+        class="flex h-full min-h-0 flex-col [&_[role='tab']]:px-0 [&_[role='tablist']]:px-5 [&_[role='tablist']]:gap-7.5 [&_[role='tablist']]:flex-shrink-0"
+      >
+        <template #tab-panel="{ tab }">
+          <div class="flex-1 min-h-0 overflow-auto">
+            <TicketAgentActivities
+              ref="ticketAgentActivitiesRef"
+              :activities="filterActivities(tab.name as TicketTab)"
+              :title="tab.label"
+              :ticket-status="ticket.doc.status"
+              @email:reply="handleReply"
+              @update="handleUpdate"
+            />
+          </div>
+        </template>
+      </Tabs>
+    </div>
 
-    <div class="flex-1 min-h-0">
+    <!-- Reply editor -->
+    <div class="border-t shrink-0 relative z-10 bg-white">
       <CommunicationArea
         ref="communicationAreaRef"
         :ticketId="String(ticket.doc?.name)"
@@ -45,29 +35,12 @@
         @update="
           () => {
             activities.reload();
-            ticketAgentActivitiesRef.scrollToLatestActivity();
+            ticketAgentActivitiesRef?.scrollToLatestActivity();
           }
         "
       />
     </div>
   </div>
-</template>
-  </Tabs>
-  <!-- Comm Area -->
-  <CommunicationArea
-    ref="communicationAreaRef"
-    :ticketId="String(ticket.doc?.name)"
-    :to-emails="[ticket.doc?.raised_by]"
-    :cc-emails="[]"
-    :bcc-emails="[]"
-    :key="ticket.doc?.name"
-    @update="
-      () => {
-        activities.reload();
-        ticketAgentActivitiesRef.scrollToLatestActivity();
-      }
-    "
-  />
 </template>
 
 <script setup lang="ts">
@@ -95,8 +68,8 @@ const CommunicationArea = defineAsyncComponent(
   () => import("@/components/CommunicationArea.vue")
 );
 
-const ticket = inject(TicketSymbol);
-const activities = inject(ActivitiesSymbol);
+const ticket = inject(TicketSymbol)!;
+const activities = inject(ActivitiesSymbol)!;
 
 const ticketAgentActivitiesRef = ref(null);
 const communicationAreaRef = ref(null);
@@ -262,8 +235,18 @@ const _activities = computed(() => {
   return data;
 });
 
+
+import { nextTick } from "vue";
+
 function handleReply(e) {
   communicationAreaRef.value?.replyToEmail(e);
+
+  nextTick(() => {
+    document.querySelector(".comm-area")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  });
 }
 
 function handleUpdate() {
@@ -271,11 +254,12 @@ function handleUpdate() {
   ticketAgentActivitiesRef.value?.scrollToLatestActivity();
 }
 
-const isActivityCollapsed = ref(false);
+
+
 function filterActivities(eventType: TicketTab) {
   if (eventType === "activity") {
     return _activities.value.filter(
-      (activity) => !["email", "comment"].includes(activity.type)
+      (activity) => activity.type !== "email" && activity.type !== "comment"
     );
   }
   return _activities.value.filter((activity) => activity.type === eventType);

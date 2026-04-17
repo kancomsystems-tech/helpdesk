@@ -8,7 +8,7 @@
       </div>
 
       <!-- Sidepanel with Resizer -->
-      <TicketSidebar />
+      <TicketSidebar v-if="!showEmailBox && !showCommentBox" />
     </div>
     <SetContactPhoneModal
       v-model="showPhoneModal"

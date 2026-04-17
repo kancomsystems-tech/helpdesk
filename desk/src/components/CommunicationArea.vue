@@ -1,9 +1,9 @@
 <template>
-  <div class="comm-area">
+  <div class="comm-area flex flex-col min-h-0">
     <div
       class="flex justify-between gap-3 border-t px-6 md:px-10 py-4 md:py-2.5"
     >
-      <div class="flex gap-1.5 items-center">
+        <div class="flex gap-1.5 items-center">
         <Button
           ref="sendEmailRef"
           variant="ghost"

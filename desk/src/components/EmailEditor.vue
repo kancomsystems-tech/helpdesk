@@ -1,6 +1,6 @@
 <template>
   <TextEditor
-    class="flex flex-col max-h-[40vh] sm:max-h-[45vh] md:max-h-[50vh] overflow-y-auto"
+    class="flex flex-col overflow-y-auto max-h-full"
     ref="editorRef"
     :editor-class="[
       'prose-sm max-w-full mx-6 md:mx-10 py-3',
@@ -82,13 +82,12 @@
     </div>
 
   </div>
-</template>
-  <template #editor>
-  <div class="flex-1 overflow-y-auto min-h-[350px]">
-    <EditorContent :editor="editor" />
+</template>  
+<template #editor>
+  <div class="overflow-y-auto min-h-[140px] w-full">
+    <EditorContent class="w-full" :editor="editor" />
 
     <div v-if="quotedContent">
-
       <!-- HEADER -->
       <div class="mx-6 md:mx-10 mt-3 text-xs text-gray-600 whitespace-pre-line">
         <div v-if="quotedMeta">
@@ -107,11 +106,10 @@
         contenteditable="false"
         class="prose !max-w-full mx-6 md:mx-10 my-2 border-l-4 border-gray-300 pl-4 text-sm focus:outline-none"
       ></div>
-
     </div>
-
   </div>
 </template>
+
     <template #bottom>
   <div class="sticky bottom-0 z-10 bg-white border-t shadow-sm">
 
@@ -598,7 +596,9 @@ const hasDraft = computed(() => {
 </script>
 <style scoped>
 :deep(.ProseMirror) {
-  min-height: 300px;
+  min-height: 120px;
+  width: 100%;
+  max-width: 100%;
 }
 
 :deep(.ProseMirror table) {
