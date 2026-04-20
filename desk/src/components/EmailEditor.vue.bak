@@ -1,6 +1,6 @@
 <template>
   <TextEditor
-    class="flex flex-col max-h-full"
+    class="flex flex-col overflow-y-auto max-h-full"
     ref="editorRef"
     :editor-class="[
       'prose-sm max-w-full mx-6 md:mx-10 py-3',
