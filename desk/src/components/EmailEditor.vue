@@ -84,7 +84,7 @@
   </div>
 </template>  
 <template #editor>
-  <div class="flex-1 min-h-0 overflow-auto w-full">
+  <div class="flex flex-col flex-1 min-h-0 overflow-auto w-full">
     <EditorContent class="w-full" :editor="editor" />
 
     <div v-if="quotedContent">
