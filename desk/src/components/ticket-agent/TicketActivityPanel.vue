@@ -24,7 +24,7 @@
     </div>
 
     <!-- Reply editor -->
-    <div class="border-t relative bg-white flex flex-col min-h-0">
+    <div class="border-t relative bg-white flex flex-col flex-1 min-h-0">
       <CommunicationArea
         ref="communicationAreaRef"
         :ticketId="String(ticket.doc?.name)"

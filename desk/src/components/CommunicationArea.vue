@@ -1,5 +1,5 @@
 <template>
-  <div class="comm-area flex flex-col min-h-0">
+  <div class="comm-area flex flex-col flex-1 min-h-0">
     <div
       class="flex justify-between gap-3 border-t px-6 md:px-10 py-4 md:py-2.5"
     >
