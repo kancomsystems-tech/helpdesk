@@ -23,7 +23,6 @@
       v-for="(activity, i) in visibleActivities"
       :key="activity.key"
       class="activity"
-      :class="activity.type === 'history' ? 'text-xs text-gray-400 [&_.mb-4]:mb-1 [&_.mb-5]:mb-2' : ''"
     >
     
         <!-- single activity -->
