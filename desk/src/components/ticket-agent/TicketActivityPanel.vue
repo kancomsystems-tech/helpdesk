@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col h-full min-h-0 overflow-hidden">
     <!-- Reply editor -->
-    <div class="border-t relative bg-white flex flex-col shrink-0">
+    <div class="border-t relative bg-white flex flex-col flex-1 basis-[60%] min-h-0">
       <CommunicationArea
         ref="communicationAreaRef"
         :ticketId="String(ticket.doc?.name)"
@@ -19,7 +19,7 @@
     </div>
 
     <!-- Activity / Emails / Comments -->
-    <div class="flex-1 min-h-0 overflow-hidden">
+    <div class="min-h-0 overflow-hidden basis-[40%]">
       <Tabs
         :modelValue="tabIndex"
         :tabs="tabs"
@@ -61,7 +61,7 @@ import {
 } from "@/types";
 import { LoadingIndicator, Tabs } from "frappe-ui";
 import { storeToRefs } from "pinia";
-import { computed, ComputedRef, defineAsyncComponent, inject, ref } from "vue";
+import { computed, ComputedRef, defineAsyncComponent, inject, onMounted, ref } from "vue";
 import TicketAgentActivities from "../ticket/TicketAgentActivities.vue";
 
 const CommunicationArea = defineAsyncComponent(
@@ -106,6 +106,10 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
 });
 
 const { tabIndex, changeTabTo } = useActiveTabManager(tabs);
+
+onMounted(() => {
+  changeTabTo(1);
+});
 
 // TODO: refactor for pagination
 // can be done once we sort out the backend
