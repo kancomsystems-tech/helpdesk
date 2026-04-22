@@ -1,5 +1,23 @@
 <template>
   <div class="flex flex-col h-full min-h-0 overflow-hidden">
+    <!-- Reply editor -->
+    <div class="border-t relative bg-white flex flex-col shrink-0">
+      <CommunicationArea
+        ref="communicationAreaRef"
+        :ticketId="String(ticket.doc?.name)"
+        :to-emails="[ticket.doc?.raised_by]"
+        :cc-emails="[]"
+        :bcc-emails="[]"
+        :key="ticket.doc?.name"
+        @update="
+          () => {
+            activities.reload();
+            ticketAgentActivitiesRef?.scrollToLatestActivity();
+          }
+        "
+      />
+    </div>
+
     <!-- Activity / Emails / Comments -->
     <div class="flex-1 min-h-0 overflow-hidden">
       <Tabs
@@ -21,24 +39,6 @@
           </div>
         </template>
       </Tabs>
-    </div>
-
-    <!-- Reply editor -->
-    <div class="border-t relative bg-white flex flex-col flex-1 min-h-0">
-      <CommunicationArea
-        ref="communicationAreaRef"
-        :ticketId="String(ticket.doc?.name)"
-        :to-emails="[ticket.doc?.raised_by]"
-        :cc-emails="[]"
-        :bcc-emails="[]"
-        :key="ticket.doc?.name"
-        @update="
-          () => {
-            activities.reload();
-            ticketAgentActivitiesRef?.scrollToLatestActivity();
-          }
-        "
-      />
     </div>
   </div>
 </template>
