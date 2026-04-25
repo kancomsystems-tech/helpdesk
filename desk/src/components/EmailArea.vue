@@ -87,15 +87,32 @@
       <span v-if="bcc">{{ bcc }}</span>
     </div>
     <div class="border-0 border-t my-3 border-outline-gray-modals" />
-    <EmailContent :content="content" />
-    <div class="flex flex-wrap gap-2">
-      <AttachmentItem
-        v-for="a in attachments"
-        :key="a.file_url"
-        :label="a.file_name"
-        :url="a.file_url"
-      />
+    <div
+      v-if="!isExpanded"
+      class="text-sm leading-5 text-gray-600 line-clamp-2"
+      @click="isExpanded = true"
+    >
+      {{ cleanPreview(content) }}
     </div>
+    <template v-else>
+      <div>
+        <button
+          class="mb-2 text-xs text-gray-500 hover:text-gray-700"
+          @click.stop="isExpanded = false"
+        >
+          Collapse
+        </button>
+        <EmailContent :content="content" />
+        <div class="flex flex-wrap gap-2">
+          <AttachmentItem
+            v-for="a in attachments"
+            :key="a.file_url"
+            :label="a.file_name"
+            :url="a.file_url"
+          />
+        </div>
+      </div>
+    </template>
   </div>
   <TicketSplitModal
     v-model="showSplitModal"
@@ -147,6 +164,26 @@ const auth = storeToRefs(useAuthStore());
 const { isMobileView } = useScreenSize();
 
 const showSplitModal = ref(false);
+const isExpanded = ref(false);
+
+function cleanPreview(html: string) {
+  if (!html) return "";
+
+  let cleaned = html
+    .replace(/^(\s*<p>(\s|&nbsp;|<br\s*\/?>)*<\/p>\s*)+/gi, "")
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<script[\s\S]*?<\/script>/gi, "");
+
+  cleaned = cleaned.split(/On earlier email, message was:/i)[0];
+
+  cleaned = cleaned
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return cleaned;
+}
 
 const status = computed(() => {
   let _status = deliveryStatus;

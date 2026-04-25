@@ -17,12 +17,22 @@
         </Button>
         <Button
           variant="ghost"
-          label="Comment"
-          :class="[showCommentBox ? '!bg-gray-300 hover:!bg-gray-200' : '']"
-          @click="toggleCommentBox()"
+          label="Reply All"
+          :class="[showEmailBox ? '!bg-gray-300 hover:!bg-gray-200' : '']"
+          @click="toggleEmailBox()"
         >
           <template #prefix>
-            <CommentIcon class="h-4" />
+            <EmailIcon class="h-4" />
+          </template>
+        </Button>
+        <Button
+          variant="ghost"
+          label="Forward"
+          :class="[showEmailBox ? '!bg-gray-300 hover:!bg-gray-200' : '']"
+          @click="toggleEmailBox()"
+        >
+          <template #prefix>
+            <EmailIcon class="h-4" />
           </template>
         </Button>
         <TypingIndicator :ticketId="ticketId" />

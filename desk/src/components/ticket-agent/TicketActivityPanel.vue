@@ -90,14 +90,9 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
       icon: ActivityIcon,
     },
     {
-      name: "email",
-      label: "Emails",
+      name: "reply",
+      label: "Reply",
       icon: EmailIcon,
-    },
-    {
-      name: "comment",
-      label: "Comments",
-      icon: CommentIcon,
     },
   ];
 
@@ -185,7 +180,7 @@ const _activities = computed(() => {
     ...commentProps,
     ...historyProps,
     ...callProps,
-  ].sort((a, b) => new Date(a.creation) - new Date(b.creation));
+  ].sort((a, b) => new Date(b.creation) - new Date(a.creation));
   const data = [];
   let i = 0;
 
