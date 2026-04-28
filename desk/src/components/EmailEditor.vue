@@ -2,7 +2,7 @@
   <TextEditor
     ref="editorRef"
     :editor-class="[
-      'prose-sm max-w-full mx-6 md:mx-10 py-3 leading-5 [&_p]:my-1 [&_p]:leading-5',
+      'prose-sm max-w-full mx-6 md:mx-10 py-3',
       getFontFamily(newEmail),
       '[&_p.reply-to-content]:hidden',
     ]"
@@ -66,7 +66,7 @@
     </template>
 
     <template #editor>
-      <div class="flex-1 min-h-[22rem] max-h-[65vh] overflow-y-auto [&_.ProseMirror]:outline-none">
+      <div class="overflow-y-auto min-h-[12rem] max-h-[50vh]">
         <EditorContent :editor="editor" />
 
       </div>
@@ -301,7 +301,7 @@ const sendMail = createResource({
       to: toEmailsClone.value.join(","),
       cc: ccEmailsClone.value?.join(","),
       bcc: bccEmailsClone.value?.join(","),
-      message: compactOutgoingEmail(newEmail.value),
+      message: newEmail.value,
     },
   }),
   onSuccess: () => {
@@ -314,13 +314,6 @@ const sendMail = createResource({
   },
   debounce: 300,
 });
-
-function compactOutgoingEmail(html) {
-  return html
-    .replace(/<\/p>\s*<p>/gi, "<br>")
-    .replace(/^<p>/i, "")
-    .replace(/<\/p>$/i, "");
-}
 
 function submitMail() {
   if (isContentEmpty(newEmail.value)) {
@@ -358,22 +351,6 @@ async function removeAttachment(attachment) {
   await removeAttachmentFromServer(attachment.name);
 }
 
-function cleanReplyQuote(html: string) {
-  return html
-    .split(/On .* wrote:/i)[0]
-    .split(/On earlier email/i)[0]
-    .replace(/<style[\s\S]*?<\/style>/gi, "")
-    .replace(/<script[\s\S]*?<\/script>/gi, "")
-    .replace(/<p>\s*<\/p>/gi, "")
-    .replace(/<p>(\s|&nbsp;|<br\s*\/?>)*<\/p>/gi, "")
-    .replace(/<\/p>\s*<p>/gi, "<br>")
-    .replace(/<\/div>\s*<div[^>]*>/gi, "<br>")
-    .replace(/<(p|div)[^>]*>/gi, "")
-    .replace(/<\/(p|div)>/gi, "")
-    .replace(/&nbsp;/g, " ")
-    .trim();
-}
-
 function addToReply(
   body: string,
   toEmails: string[],
@@ -384,15 +361,17 @@ function addToReply(
   ccEmailsClone.value = ccEmails;
   bccEmailsClone.value = bccEmails;
 
-  const cleanBody = cleanReplyQuote(body || "");
+  const replyHeader = [
+    "<p><br></p>",
+    "<hr>",
+    '<p style="color:#555;">On earlier email, message was:</p>',
+    toEmails?.length ? `<p><strong>To:</strong> ${toEmails.join(", ")}</p>` : "",
+    ccEmails?.length ? `<p><strong>Cc:</strong> ${ccEmails.join(", ")}</p>` : "",
+  ].join("");
 
   const replyContent = `
-    <p><br></p>
-    <hr>
-    <p style="color:#555;font-size:12px;">On earlier email:</p>
-    <blockquote style="border-left:2px solid #d1d5db;margin:6px 0;padding-left:10px;color:#4b5563;font-size:13px;line-height:1.35;">
-      ${cleanBody}
-    </blockquote>
+    ${replyHeader}
+    ${body || ""}
   `;
 
   editorRef.value.editor.chain().setContent(replyContent).run();
