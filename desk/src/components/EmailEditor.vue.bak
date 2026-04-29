@@ -391,7 +391,7 @@ function addToReply(
   const quoteHeader = [
     "<p><br></p>",
     "<hr>",
-    `<p style="color:#555;font-size:13px;line-height:1.35;">On ${formattedDate}, ${originalEmail.from || "sender"}${quoteRecipients ? ` (${quoteRecipients})` : ""} wrote:</p>`,
+    `<p style="color:#555;font-size:13px;line-height:1.35;">On ${originalEmail.date || "earlier email"}, ${originalEmail.from || "sender"}${quoteRecipients ? ` (${quoteRecipients})` : ""} wrote:</p>`,
   ].join("");
 
   const replyContent = `

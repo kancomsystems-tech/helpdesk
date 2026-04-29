@@ -166,13 +166,7 @@ function replyToEmail(data: object) {
     data.content,
     splitIfString(data.to),
     splitIfString(data.cc),
-    splitIfString(data.bcc),
-    {
-      from: data.from,
-      to: splitIfString(data.originalTo),
-      cc: splitIfString(data.originalCc),
-      date: data.originalDate,
-    }
+    splitIfString(data.bcc)
   );
 }
 

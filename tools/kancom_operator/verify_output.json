@@ -1,0 +1,29 @@
+{
+  "issue_id": "excel-paste-preserve-safe-highlights-001",
+  "repo_root": "/home/frappe/kancom-clean-v16-bench/apps/helpdesk",
+  "repo_root_exists": true,
+  "branch_expected": "kancom/gmail-reply-clean",
+  "branch_actual": "kancom/gmail-reply-clean",
+  "branch_matches": true,
+  "claims_result": [
+    {
+      "id": "tiptap-extensions-file",
+      "type": "file_exists",
+      "path": "desk/src/tiptap-extensions.ts",
+      "ok": true
+    }
+  ],
+  "patches_result": [
+    {
+      "id": "p1-preserve-background-highlight-case-insensitive",
+      "path": "desk/src/tiptap-extensions.ts",
+      "file_exists": true,
+      "old_found": true,
+      "old_match_count": 1,
+      "appliable": true,
+      "reason": "Patch target found exactly once"
+    }
+  ],
+  "overall_status": "PASS",
+  "summary": []
+}

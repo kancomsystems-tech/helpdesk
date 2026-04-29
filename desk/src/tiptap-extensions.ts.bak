@@ -462,10 +462,11 @@ function stripTablePresentationStyles(root: HTMLElement) {
         const safeStyles = style
           .split(";")
           .map((s) => s.trim())
-          .filter((s) => {
-            const prop = s.split(":")[0]?.trim().toLowerCase();
-            return ["background", "background-color", "color", "font-weight"].includes(prop);
-          })
+          .filter((s) =>
+            s.startsWith("background-color") ||
+            s.startsWith("color") ||
+            s.startsWith("font-weight")
+          )
           .join("; ");
 
         if (safeStyles) {

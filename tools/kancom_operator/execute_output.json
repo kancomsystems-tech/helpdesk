@@ -1,0 +1,33 @@
+{
+  "issue_id": "excel-paste-preserve-safe-highlights-001",
+  "repo_root": "/home/frappe/kancom-clean-v16-bench/apps/helpdesk",
+  "branch_expected": "kancom/gmail-reply-clean",
+  "branch_actual": "kancom/gmail-reply-clean",
+  "patch_results": [
+    {
+      "id": "p1-preserve-background-highlight-case-insensitive",
+      "path": "desk/src/tiptap-extensions.ts",
+      "file_exists": true,
+      "backup_path": "/home/frappe/kancom-clean-v16-bench/apps/helpdesk/desk/src/tiptap-extensions.ts.bak",
+      "old_found": true,
+      "old_match_count": 1,
+      "applied": true,
+      "reason": "Patch applied successfully"
+    }
+  ],
+  "files_changed": [
+    "desk/src/tiptap-extensions.ts"
+  ],
+  "diffs": {
+    "desk/src/tiptap-extensions.ts": "diff --git a/desk/src/tiptap-extensions.ts b/desk/src/tiptap-extensions.ts\nindex 1ad9cdf..c3de140 100644\n--- a/desk/src/tiptap-extensions.ts\n+++ b/desk/src/tiptap-extensions.ts\n@@ -128,7 +128,7 @@ export const ComponentUtils: Extension = Extension.create({\n             parseHTML: (el) => el.getAttribute(\"style\"),\n             renderHTML: () => ({\n               style:\n-                \"border-collapse: collapse; width: 100%; border: 1px solid #d1d5db;\",\n+                \"border-collapse: collapse; width: 100%; max-width: 100%; table-layout: fixed; border: 1px solid #d1d5db;\",\n             }),\n           },\n         },\n@@ -153,7 +153,7 @@ export const ComponentUtils: Extension = Extension.create({\n             parseHTML: (el) => el.getAttribute(\"style\"),\n             renderHTML: () => ({\n               style:\n-                \"border: 1px solid #d1d5db; padding: 6px 8px; vertical-align: top; text-align: left;\",\n+                \"border: 1px solid #d1d5db; padding: 3px 6px; vertical-align: top; text-align: left; overflow-wrap: anywhere; line-height: 1.25;\",\n             }),\n           },\n         },\n@@ -424,6 +424,8 @@ async function resolveExcelStyles(html: string): Promise<ResolvedExcelPaste> {\n           });\n       });\n \n+      // Remove Excel table presentation so only structure + computed formatting survives\n+      stripTablePresentationStyles(body);\n       // Remove CSS classes and <style> block so generateJSON sees clean HTML\n       body.querySelectorAll(\"*\").forEach((el) => el.removeAttribute(\"class\"));\n       iframeDoc.querySelectorAll(\"style\").forEach((s) => s.remove());\n@@ -449,6 +451,34 @@ function wrapChildren(doc: Document, el: HTMLElement, tag: string) {\n   el.appendChild(wrapper);\n }\n \n+function stripTablePresentationStyles(root: HTMLElement) {\n+  root\n+    .querySelectorAll(\"table, colgroup, col, tbody, thead, tr, td, th\")\n+    .forEach((el) => {\n+      const htmlEl = el as HTMLElement;\n+\n+      const style = htmlEl.getAttribute(\"style\");\n+      if (style) {\n+        const safeStyles = style\n+          .split(\";\")\n+          .map((s) => s.trim())\n+          .filter((s) => {\n+            const prop = s.split(\":\")[0]?.trim().toLowerCase();\n+            return [\"background\", \"background-color\", \"color\", \"font-weight\"].includes(prop);\n+          })\n+          .join(\"; \");\n+\n+        if (safeStyles) {\n+          htmlEl.setAttribute(\"style\", safeStyles);\n+        } else {\n+          htmlEl.removeAttribute(\"style\");\n+        }\n+      }\n+\n+      htmlEl.removeAttribute(\"class\");\n+    });\n+}\n+\n // Post-process Tiptap JSON to inject textStyle marks (color, fontSize, backgroundColor)\n // and paragraph attrs (textAlign) that generateJSON cannot infer from semantic HTML alone.\n // stylesByCell is keyed \"r{rowIdx}:c{colIdx}\" matching table structure."
+  },
+  "command_results": [
+    {
+      "command": "bench build --app helpdesk",
+      "exit_code": 0,
+      "status": "SUCCESS",
+      "tail_output": "warning ../../package.json: No license field\nwarning ../../../package.json: No license field\n[unplugin-vue-components] component \"Autocomplete\"(/home/frappe/kancom-clean-v16-bench/apps/helpdesk/desk/src/components/frappe-ui/Autocomplete.vue) has naming conflicts with other components, ignored.\nwarnings when minifying css:\n\u25b2 [WARNING] A nested style rule cannot start with \"li\" because it looks like the start of a declaration [css-syntax-error]\n    <stdin>:218:0:\n      218 \u2502 li {\n          \u2502 ~~\n          \u2575 :is(li)\n  To start a nested style rule with an identifier, you need to wrap the identifier in \":is(...)\" to prevent the rule from being parsed as a declaration.\n\u25b2 [WARNING] A nested style rule cannot start with \"blockquote\" because it looks like the start of a declaration [css-syntax-error]\n    <stdin>:301:0:\n      301 \u2502 blockquote {\n          \u2502 ~~~~~~~~~~\n          \u2575 :is(blockquote)\n  To start a nested style rule with an identifier, you need to wrap the identifier in \":is(...)\" to prevent the rule from being parsed as a declaration.\n(!) Some chunks are larger than 500 kBs after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit."
+    }
+  ],
+  "overall_status": "SUCCESS"
+}

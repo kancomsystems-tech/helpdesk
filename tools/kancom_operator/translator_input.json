@@ -1,0 +1,22 @@
+{
+  "issue_id": "gmail-reply-clean-001",
+  "repo_root": "/home/frappe/kancom-clean-v16-bench/apps/helpdesk",
+  "bench_root": "/home/frappe/kancom-clean-v16-bench",
+  "branch_expected": "kancom/gmail-reply-clean",
+  "build_command": "bench build --app helpdesk",
+  "goal": "Implement Gmail-style reply behavior on clean Frappe Helpdesk v1.22.2 base. Keep existing Frappe visual style. Activity tab stays. Replace Emails/Comments tabs with Reply tab. Reply tab contains Reply, Reply All, Forward. Single editable editor with divider and selected original email HTML below. No separate quoted block. No Excel paste changes yet.",
+  "focus_files": [
+    "desk/src/components/ticket-agent/TicketActivityPanel.vue",
+    "desk/src/components/CommunicationArea.vue",
+    "desk/src/components/EmailEditor.vue",
+    "desk/src/components/ticket/TicketAgentActivities.vue",
+    "desk/src/components/EmailArea.vue"
+  ],
+  "rules": [
+    "Do not redesign UI.",
+    "Do not touch Excel paste/table customizations now.",
+    "Keep Activity ordering/rendering stable.",
+    "Patch in small steps.",
+    "Verify exact old text before applying."
+  ]
+}

@@ -88,6 +88,11 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
       label: "Activity",
       icon: ActivityIcon,
     },
+    {
+      name: "reply",
+      label: "Reply",
+      icon: EmailIcon,
+    },
   ];
 
   if (isCallingEnabled.value) {

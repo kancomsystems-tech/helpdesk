@@ -1,0 +1,20 @@
+{
+  "issue_id": "excel-paste-preserve-safe-highlights-001",
+  "repo_root": "/home/frappe/kancom-clean-v16-bench/apps/helpdesk",
+  "branch_expected": "kancom/gmail-reply-clean",
+  "claims": [
+    {
+      "id": "tiptap-extensions-file",
+      "type": "file_exists",
+      "path": "desk/src/tiptap-extensions.ts"
+    }
+  ],
+  "patches": [
+    {
+      "id": "p1-preserve-background-highlight-case-insensitive",
+      "path": "desk/src/tiptap-extensions.ts",
+      "old": "          .split(\";\")\n          .map((s) => s.trim())\n          .filter((s) =>\n            s.startsWith(\"background-color\") ||\n            s.startsWith(\"color\") ||\n            s.startsWith(\"font-weight\")\n          )\n          .join(\"; \");",
+      "new": "          .split(\";\")\n          .map((s) => s.trim())\n          .filter((s) => {\n            const prop = s.split(\":\")[0]?.trim().toLowerCase();\n            return [\"background\", \"background-color\", \"color\", \"font-weight\"].includes(prop);\n          })\n          .join(\"; \");"
+    }
+  ]
+}

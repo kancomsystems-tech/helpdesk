@@ -278,10 +278,6 @@ const forward = () => {
     to: "__FORWARD_EMPTY_TO__",
     cc: [],
     bcc: [],
-    from: sender.name,
-    originalTo: to,
-    originalCc: cc,
-    originalDate: creation,
   });
 };
 
