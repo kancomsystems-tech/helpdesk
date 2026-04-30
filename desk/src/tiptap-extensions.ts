@@ -426,6 +426,8 @@ async function resolveExcelStyles(html: string): Promise<ResolvedExcelPaste> {
 
       // Remove Excel table presentation so only structure + computed formatting survives
       stripTablePresentationStyles(body);
+      // Remove <colgroup>/<col> so Tiptap cannot infer column widths from them
+      body.querySelectorAll("colgroup").forEach((cg) => cg.remove());
       // Remove CSS classes and <style> block so generateJSON sees clean HTML
       body.querySelectorAll("*").forEach((el) => el.removeAttribute("class"));
       iframeDoc.querySelectorAll("style").forEach((s) => s.remove());
@@ -633,25 +635,6 @@ export const HandleExcelPaste = Extension.create({
               // then insert the enriched content into the editor
               resolveExcelStyles(html).then(
                 ({ html: normalizedHTML, stylesByCell, cellMetaByCell }) => {
-                  // Extract column widths from <col> elements (pt → px)
-                  const tempDoc = new DOMParser().parseFromString(
-                    html,
-                    "text/html"
-                  );
-                  const colWidths: number[] = [];
-                  tempDoc.querySelectorAll("col").forEach((col) => {
-                    const span = parseInt(col.getAttribute("span") || "1", 10);
-                    const styleWidth =
-                      (col.getAttribute("style") || "").match(
-                        /width:\s*([\d.]+(?:pt|px)?)/i
-                      )?.[1] ?? null;
-                    const widthPx =
-                      convertExcelWidthToPx(styleWidth) ??
-                      convertExcelWidthToPx(col.getAttribute("width"));
-                    for (let i = 0; i < span; i++) {
-                      colWidths.push(widthPx || 100);
-                    }
-                  });
 
                   let json = generateJSON(normalizedHTML, excelPasteExtensions);
 
@@ -662,36 +645,21 @@ export const HandleExcelPaste = Extension.create({
                     cellMetaByCell
                   );
 
-                  // Inject colwidth into each tableCell based on its column index
-                  if (colWidths.length) {
-                    (json.content || []).forEach((node: any) => {
-                      if (node.type !== "table") return;
-                      (node.content || []).forEach((row: any) => {
-                        if (row.type !== "tableRow") return;
-                        (row.content || []).forEach(
-                          (cell: any, colIdx: number) => {
-                            if (
-                              cell.type !== "tableCell" &&
-                              cell.type !== "tableHeader"
-                            )
-                              return;
-                            const span = cell.attrs?.colspan || 1;
-                            const widths = colWidths.slice(
-                              colIdx,
-                              colIdx + span
-                            );
-                            const widthValues = widths.filter(Boolean);
-                            if (widthValues.length) {
-                              cell.attrs = {
-                                ...cell.attrs,
-                                colwidth: widthValues,
-                              };
-                            }
-                          }
-                        );
-                      });
-                    });
-                  }
+                  const stripColwidthFromNode = (node: any): any => {
+                    if (!node || typeof node !== "object") return node;
+
+                    const next = { ...node };
+                    if (next.attrs?.colwidth) {
+                      const { colwidth, ...restAttrs } = next.attrs;
+                      next.attrs = restAttrs;
+                    }
+                    if (next.content) {
+                      next.content = next.content.map(stripColwidthFromNode);
+                    }
+                    return next;
+                  };
+
+                  json = stripColwidthFromNode(json);
 
                   const { state, dispatch } = view;
                   const { tr, selection, schema } = state;

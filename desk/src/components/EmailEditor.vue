@@ -2,7 +2,7 @@
   <TextEditor
     ref="editorRef"
     :editor-class="[
-      'prose-sm max-w-full mx-6 md:mx-10 py-3 [&_table]:w-full [&_table]:max-w-full [&_table]:table-fixed [&_td]:break-words [&_th]:break-words',
+      'prose-sm max-w-full mx-6 md:mx-10 py-3 [&_table]:w-full [&_table]:max-w-full [&_table]:table-fixed [&_td]:break-words [&_th]:break-words [&_td:first-child]:min-w-[40px] [&_th:first-child]:min-w-[40px]',
       getFontFamily(newEmail),
       '[&_p.reply-to-content]:hidden',
     ]"

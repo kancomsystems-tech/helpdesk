@@ -5,7 +5,7 @@
       :extensions="[ComponentUtils, HandleExcelPaste]"
       v-bind="$attrs"
       :editor-class="[
-        'prose-f max-h-64 max-w-none overflow-auto my-4 min-h-[5rem] [&_table]:w-full [&_table]:max-w-full [&_table]:table-fixed [&_td]:break-words [&_th]:break-words',
+        'prose-f max-h-64 max-w-none overflow-auto my-4 min-h-[5rem] [&_table]:w-full [&_table]:max-w-full [&_table]:table-fixed [&_td]:break-words [&_th]:break-words [&_td:first-child]:min-w-[40px] [&_th:first-child]:min-w-[40px]',
         getFontFamily(modelValue),
       ]"
       bubble-menu
