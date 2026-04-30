@@ -124,7 +124,7 @@ function toggleEmailBox() {
   if (showCommentBox.value) {
     showCommentBox.value = false;
   }
-  showEmailBox.value = !showEmailBox.value;
+  showEmailBox.value = true;
 }
 
 function toggleCommentBox() {
@@ -233,11 +233,7 @@ defineExpose({
 
 onClickOutside(
   emailBoxRef,
-  () => {
-    if (showEmailBox.value) {
-      showEmailBox.value = false;
-    }
-  },
+  () => {},
   {
     ignore: [".tippy-box", ".tippy-content"],
   }

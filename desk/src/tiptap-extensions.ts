@@ -424,6 +424,16 @@ async function resolveExcelStyles(html: string): Promise<ResolvedExcelPaste> {
           });
       });
 
+      // Unwrap accidental links inside table cells (e.g. Sr.No -> http://Sr.No)
+      body.querySelectorAll("td a, th a").forEach((link) => {
+        const parent = link.parentNode;
+        if (!parent) return;
+        while (link.firstChild) {
+          parent.insertBefore(link.firstChild, link);
+        }
+        parent.removeChild(link);
+      });
+
       // Remove Excel table presentation so only structure + computed formatting survives
       stripTablePresentationStyles(body);
       // Remove <colgroup>/<col> so Tiptap cannot infer column widths from them
@@ -602,6 +612,91 @@ function injectStylesIntoJSON(
   return { ...json, content: (json.content || []).map(walkNode) };
 }
 
+function escapeHtml(text = "") {
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;");
+}
+
+function normalizeCellText(text = "") {
+  return String(text)
+    .replace(/\u00a0/g, " ")
+    .replace(/\r/g, "")
+    .replace(/\n+/g, " ")
+    .replace(/\t+/g, " ")
+    .replace(/[ ]{2,}/g, " ")
+    .trim();
+}
+
+function buildCleanTableHTMLFromPastedTable(table: HTMLTableElement) {
+  const rows = Array.from(table.querySelectorAll("tr"))
+    .map((tr) =>
+      Array.from(tr.querySelectorAll("th, td")).map((cell) => ({
+        text: normalizeCellText(cell.textContent || ""),
+        colspan: parseInt(cell.getAttribute("colspan") || "1", 10) || 1,
+        rowspan: parseInt(cell.getAttribute("rowspan") || "1", 10) || 1,
+        tag: cell.tagName.toLowerCase(),
+      }))
+    )
+    .filter((row) => row.length > 0);
+
+  if (!rows.length) return "";
+
+  const firstRowLooksHeader =
+    rows[0].some((c) => c.tag === "th") ||
+    rows[0].filter((c) => c.text).length >=
+      Math.max(2, Math.ceil(rows[0].length * 0.6));
+
+  const tableStyle = [
+    "border-collapse:collapse",
+    "width:100%",
+    "max-width:100%",
+    "table-layout:fixed",
+  ].join(";");
+
+  const thStyle = [
+    "border:1px solid #d1d5db",
+    "padding:2px 4px",
+    "text-align:left",
+    "vertical-align:top",
+    "background-color:#f3f4f6",
+    "font-weight:600",
+    "line-height:1.1",
+    "white-space:normal",
+    "word-break:normal",
+    "overflow-wrap:break-word",
+  ].join(";");
+
+  const tdStyle = [
+    "border:1px solid #d1d5db",
+    "padding:2px 4px",
+    "text-align:left",
+    "vertical-align:top",
+    "line-height:1.1",
+    "white-space:normal",
+    "word-break:normal",
+    "overflow-wrap:break-word",
+  ].join(";");
+
+  let html = `<table style="${tableStyle}">`;
+  rows.forEach((row, rowIdx) => {
+    html += "<tr>";
+    row.forEach((cell) => {
+      const useTh = firstRowLooksHeader && rowIdx === 0;
+      const tag = useTh ? "th" : "td";
+      const colspan = cell.colspan > 1 ? ` colspan="${cell.colspan}"` : "";
+      const rowspan = cell.rowspan > 1 ? ` rowspan="${cell.rowspan}"` : "";
+      const style = useTh ? thStyle : tdStyle;
+      html += `<${tag}${colspan}${rowspan} style="${style}">${escapeHtml(cell.text)}</${tag}>`;
+    });
+    html += "</tr>";
+  });
+  html += "</table>";
+  return html;
+}
+
 // Handle pasting from excel properly
 export const HandleExcelPaste = Extension.create({
   name: "handleExcelPaste",
@@ -615,127 +710,42 @@ export const HandleExcelPaste = Extension.create({
             const clipboardData = event.clipboardData;
             if (!clipboardData) return false;
 
-            const types = Array.from(clipboardData.types);
-            const hasFile = types.includes("Files");
-            const hasHtml = types.includes("text/html");
-            const hasText = types.includes("text/plain");
-            const hasRtf = types.includes("text/rtf");
+            const html = clipboardData.getData("text/html") || "";
+            if (!html) return false;
 
-            if (hasFile && hasHtml && hasText && hasRtf) {
-              event.preventDefault();
-              const html = clipboardData.getData("text/html");
-              const text = clipboardData.getData("text/plain");
+            const tempDoc = new DOMParser().parseFromString(html, "text/html");
+            const table = tempDoc.querySelector("table") as HTMLTableElement | null;
+            if (!table) return false;
 
-              if (!html) {
-                view.pasteText(text);
-                return true;
-              }
+            const cleanHTML = buildCleanTableHTMLFromPastedTable(table);
+            if (!cleanHTML) return false;
 
-              // Async: use iframe + getComputedStyle to fully resolve Excel CSS classes,
-              // then insert the enriched content into the editor
-              resolveExcelStyles(html).then(
-                ({ html: normalizedHTML, stylesByCell, cellMetaByCell }) => {
-
-                  let json = generateJSON(normalizedHTML, excelPasteExtensions);
-
-                  // Inject colors, fontSize, textAlign from computed styles
-                  json = injectStylesIntoJSON(
-                    json,
-                    stylesByCell,
-                    cellMetaByCell
-                  );
-
-                  const stripColwidthFromNode = (node: any): any => {
-                    if (!node || typeof node !== "object") return node;
-
-                    const next = { ...node };
-                    if (next.attrs?.colwidth) {
-                      const { colwidth, ...restAttrs } = next.attrs;
-                      next.attrs = restAttrs;
-                    }
-                    if (next.content) {
-                      next.content = next.content.map(stripColwidthFromNode);
-                    }
-                    return next;
-                  };
-
-                  json = stripColwidthFromNode(json);
-
-                  const { state, dispatch } = view;
-                  const { tr, selection, schema } = state;
-                  const nodes = (json.content || [])
-                    .map((n: any) => {
-                      try {
-                        return schema.nodeFromJSON(n);
-                      } catch {
-                        return null;
-                      }
-                    })
-                    .filter(Boolean);
-
-                  if (!nodes.length) return;
-                  let totalInsertedSize = 0;
-                  nodes.forEach((n: any) => {
-                    totalInsertedSize += n.nodeSize;
-                  });
-
-                  const insertTr = tr.replaceWith(
-                    selection.from,
-                    selection.to,
-                    nodes
-                  );
-                  dispatch(insertTr);
-
-                  // After the table is inserted, ensure there is a paragraph after it
-                  // and move the cursor there. We do this in a separate transaction so
-                  // we can walk the already-updated document and find the exact node
-                  // position after the last inserted top-level node.
-                  requestAnimationFrame(() => {
-                    const currentState = view.state;
-                    const followUpTr = currentState.tr;
-
-                    // Walk top-level nodes to find the end of the inserted block.
-                    let tableEnd: number | null = null;
-                    let offset = 0;
-                    currentState.doc.forEach((node, nodeOffset) => {
-                      if (
-                        nodeOffset >= selection.from &&
-                        nodeOffset < selection.from + totalInsertedSize
-                      ) {
-                        tableEnd = nodeOffset + node.nodeSize;
-                      }
-                      offset = nodeOffset;
-                    });
-
-                    if (tableEnd === null) return;
-
-                    // If nothing exists after the table, insert an empty paragraph.
-                    const needsParagraph =
-                      tableEnd >= currentState.doc.content.size;
-                    if (needsParagraph) {
-                      followUpTr.insert(
-                        currentState.doc.content.size,
-                        currentState.schema.nodes.paragraph.create()
-                      );
-                    }
-
-                    // Resolve the position just inside the paragraph after the table.
-                    const targetPos = Math.min(
-                      tableEnd + 1,
-                      followUpTr.doc.content.size - 1
-                    );
-                    const $target = followUpTr.doc.resolve(targetPos);
-                    followUpTr.setSelection(TextSelection.near($target, 1));
-                    followUpTr.scrollIntoView();
-                    view.dispatch(followUpTr);
-                  });
-                }
-              );
-
-              return true;
+            let json;
+            try {
+              json = generateJSON(cleanHTML, excelPasteExtensions);
+            } catch {
+              return false;
             }
 
-            return false;
+            const { state, dispatch } = view;
+            const { tr, selection, schema } = state;
+            const nodes = (json.content || [])
+              .map((n: any) => {
+                try {
+                  return schema.nodeFromJSON(n);
+                } catch {
+                  return null;
+                }
+              })
+              .filter(Boolean);
+
+            if (!nodes.length) return false;
+
+            event.preventDefault();
+            const insertTr = tr.replaceWith(selection.from, selection.to, nodes);
+            insertTr.insert(insertTr.selection.to, schema.nodes.paragraph.create());
+            dispatch(insertTr.scrollIntoView());
+            return true;
           },
         },
       }),
