@@ -158,7 +158,7 @@ const {
   attachments,
   content,
   name,
-  deliveryStatus,
+  
 } = props.activity;
 
 const emit = defineEmits(["reply"]);
@@ -190,7 +190,7 @@ function cleanPreview(html: string) {
 }
 
 const status = computed(() => {
-  let _status = deliveryStatus;
+  let _status = props.activity.deliveryStatus;
   let indicator_color = "red";
   if (["Sent", "Clicked"].includes(_status)) {
     indicator_color = "green";

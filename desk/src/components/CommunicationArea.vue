@@ -54,6 +54,7 @@
           () => {
             showEmailBox = false;
             emit('update');
+            setTimeout(() => window.location.reload(), 1500);
           }
         "
         @discard="
