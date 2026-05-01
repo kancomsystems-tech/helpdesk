@@ -37,3 +37,12 @@ helpdesk/public/node_modules
 helpdesk/www/helpdesk/index.html
 desk/components.d.ts
 desk/stats.html
+
+
+
+# Kancom local artifacts
+*.bak
+tools/kancom_operator/*.json
+tools/kancom_probe/*.png
+tools/kancom_probe/*.json
+
