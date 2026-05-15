@@ -27,6 +27,13 @@ export const agentPortalSidebarOptions = [
     to: "ContactList",
   },
   {
+    label: __("Kancom Requests"),
+    icon: LucideTicket,
+    onClick: () => {
+      window.location.href = "/kancom-request";
+    },
+  },
+  {
     label: __("Call Logs"),
     icon: PhoneIcon,
     to: "CallLogs",
