@@ -220,7 +220,7 @@ const customerPortalDropdown = computed(() => [
 
 function openSetupModal() {
   settingsModalMode.value = "setup";
-  setActiveSettingsTab("Profile");
+  setActiveSettingsTab("Agents");
   showSettingsModal.value = true;
   sidebarOpened.value = false;
 }
