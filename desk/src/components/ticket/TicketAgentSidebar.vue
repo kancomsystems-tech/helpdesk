@@ -20,11 +20,6 @@
             icon: LucideMerge,
             condition: () => !ticket.is_merged,
           },
-          {
-            label: __('Split Ticket'),
-            onClick: showSplitComingSoon,
-            icon: LucideSplit,
-          },
         ]"
       >
         <Button icon="more-horizontal" class="text-gray-600" variant="ghost" />
@@ -57,10 +52,8 @@
 <script setup lang="ts">
 import { Ticket } from "@/types";
 import { copyToClipboard } from "@/utils";
-import { toast } from "frappe-ui";
 import { computed, ref } from "vue";
 import LucideMerge from "~icons/lucide/merge";
-import LucideSplit from "~icons/lucide/split";
 import { __ } from "@/translation";
 import TicketAgentContact from "./TicketAgentContact.vue";
 import TicketAgentDetails from "./TicketAgentDetails.vue";
@@ -83,10 +76,6 @@ function update(val = null) {
 }
 
 const showMergeModal = ref(false);
-
-function showSplitComingSoon() {
-  toast.info(__("Split Ticket coming soon"));
-}
 
 const showMergeOption = computed(() => {
   return (
