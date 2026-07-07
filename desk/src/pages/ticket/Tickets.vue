@@ -36,6 +36,11 @@
         ({ export_type, export_all }) => exportRows(export_type, export_all)
       "
     />
+    <BulkAssignDialog
+      v-model="showBulkAssignDialog"
+      :selected-tickets="selectedTickets"
+      @assigned="reset(true)"
+    />
     <ViewModal
       v-if="viewDialog.show"
       v-model="viewDialog"
@@ -54,6 +59,7 @@ import {
 } from "@/components/icons";
 import ExportModal from "@/components/ticket/ExportModal.vue";
 import WorkbenchHeader from "@/kancom/ticketList/WorkbenchHeader.vue";
+import BulkAssignDialog from "@/kancom/ticketList/BulkAssignDialog.vue";
 import {
   kancomWorkbenchColumns,
   kancomWorkbenchRows,
@@ -100,10 +106,11 @@ const {
 } = useView("HD Ticket");
 
 const { $dialog, $socket } = globalStore();
-const { isManager, userId } = useAuthStore();
+const { isAdmin, isManager, userId } = useAuthStore();
 
 const listViewRef = ref(null);
 const showExportModal = ref(false);
+const showBulkAssignDialog = ref(false);
 
 const { getStatus } = useTicketStatusStore();
 const { getUser } = useUserStore();
@@ -116,8 +123,22 @@ const workbenchVisibilityMetrics = computed(() =>
   getWorkbenchVisibilityMetrics(loadedWorkbenchRows.value, getStatus)
 );
 
-const listSelections = ref(new Set());
+const listSelections = ref(new Set<string>());
+const selectedTickets = computed(() => Array.from(listSelections.value));
+const canBulkAssign = computed(
+  () => !isCustomerPortal.value && (isManager || isAdmin)
+);
+
 const selectBannerActions = [
+  {
+    label: __("Bulk Assign"),
+    icon: "user-check",
+    onClick: (selections: Set<string>) => {
+      listSelections.value = new Set(selections);
+      showBulkAssignDialog.value = true;
+    },
+    condition: () => canBulkAssign.value,
+  },
   {
     label: __("Export"),
     icon: "download",
