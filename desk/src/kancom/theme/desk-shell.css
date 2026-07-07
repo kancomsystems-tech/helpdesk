@@ -1,0 +1,524 @@
+.kancom-desk-shell {
+  --kancom-blue: #0a66c2;
+  --kancom-blue-strong: #084f9a;
+  --kancom-blue-soft: #e8f3ff;
+  --kancom-blue-softer: #f3f8ff;
+  --kancom-blue-border: #b8dcff;
+  --kancom-shell-bg: #eef4fa;
+  --kancom-sidebar-bg: #edf6ff;
+  --kancom-sidebar-edge: #c5ddf4;
+  --kancom-border: #d5e2ee;
+  --kancom-surface: #ffffff;
+  --kancom-surface-muted: #f8fbff;
+  --kancom-text: #17324d;
+  --kancom-muted: #5a7289;
+}
+
+.kancom-desk-shell {
+  background: var(--kancom-shell-bg);
+  color: var(--kancom-text);
+}
+
+.kancom-desk-shell > .select-none.border-r,
+.kancom-desk-shell .w-\[230px\].border-r {
+  background: linear-gradient(180deg, #eaf4ff 0%, var(--kancom-sidebar-bg) 54%, #f6fbff 100%) !important;
+  border-color: var(--kancom-sidebar-edge) !important;
+  box-shadow: 1px 0 0 rgba(10, 102, 194, 0.05), 10px 0 28px rgba(23, 50, 77, 0.06);
+}
+
+.kancom-desk-shell > .select-none.border-r {
+  max-height: 100vh;
+  min-height: 0;
+}
+
+.kancom-desk-shell > .select-none.border-r > .overflow-y-auto {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.kancom-desk-shell > .select-none.border-r > .grow {
+  display: none;
+}
+
+.kancom-desk-shell > .select-none.border-r > .flex.flex-col.gap-2 {
+  flex: 0 0 auto;
+  position: sticky;
+  bottom: 0;
+  margin-top: 8px;
+  padding-top: 8px;
+  background: linear-gradient(180deg, rgba(237, 246, 255, 0.86), #f6fbff 72%);
+  border-top: 1px solid rgba(10, 102, 194, 0.1);
+}
+
+.kancom-desk-shell > .select-none.border-r > .mb-2,
+.kancom-desk-shell .w-\[230px\].border-r > .p-1 {
+  border-bottom: 1px solid rgba(10, 102, 194, 0.12);
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+}
+
+.kancom-desk-shell > .flex-1,
+.kancom-desk-shell > .flex-1.flex,
+.kancom-desk-shell > div.flex-1 {
+  background: radial-gradient(circle at top left, rgba(10, 102, 194, 0.08), transparent 360px), var(--kancom-shell-bg);
+}
+
+.kancom-desk-shell #app-header {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+}
+
+.kancom-desk-shell .border-b {
+  border-color: var(--kancom-border) !important;
+}
+
+.kancom-desk-shell > .flex-1 > .border-b,
+.kancom-desk-shell > div.flex-1 > .border-b,
+.kancom-desk-shell .h-12.border-b {
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 1px 0 rgba(10, 102, 194, 0.08), 0 8px 20px rgba(23, 50, 77, 0.04);
+}
+
+.kancom-desk-shell header {
+  min-height: 44px;
+}
+
+.kancom-desk-shell .select-none.border-r .shadow-sm.bg-white,
+.kancom-desk-shell .w-\[230px\].border-r .shadow-sm.bg-white {
+  position: relative;
+  background: var(--kancom-surface) !important;
+  border: 1px solid var(--kancom-blue-border);
+  box-shadow: 0 6px 18px rgba(10, 102, 194, 0.12) !important;
+  color: var(--kancom-blue-strong) !important;
+}
+
+.kancom-desk-shell .select-none.border-r .shadow-sm.bg-white::before,
+.kancom-desk-shell .w-\[230px\].border-r .shadow-sm.bg-white::before {
+  content: "";
+  position: absolute;
+  inset: 5px auto 5px 4px;
+  width: 3px;
+  border-radius: 999px;
+  background: var(--kancom-blue);
+}
+
+.kancom-desk-shell .select-none.border-r .shadow-sm.bg-white svg,
+.kancom-desk-shell .w-\[230px\].border-r .shadow-sm.bg-white svg {
+  color: var(--kancom-blue);
+}
+
+.kancom-desk-shell .select-none.border-r [class*="hover:bg-gray-100"],
+.kancom-desk-shell .w-\[230px\].border-r [class*="hover:bg-gray-100"] {
+  border: 1px solid transparent;
+}
+
+.kancom-desk-shell .select-none.border-r [class*="hover:bg-gray-100"]:hover,
+.kancom-desk-shell .w-\[230px\].border-r [class*="hover:bg-gray-100"]:hover {
+  background: rgba(255, 255, 255, 0.72) !important;
+  border-color: rgba(10, 102, 194, 0.12);
+}
+
+.kancom-desk-shell .select-none.border-r nav,
+.kancom-desk-shell .w-\[230px\].border-r nav {
+  gap: 2px;
+}
+
+.kancom-desk-shell button {
+  border-radius: 7px;
+}
+
+.kancom-desk-shell button[variant="solid"],
+.kancom-desk-shell .bg-surface-gray-7,
+.kancom-desk-shell .bg-ink-gray-9 {
+  letter-spacing: 0;
+}
+
+.kancom-desk-shell button:hover {
+  transition: background-color 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .quick-filters,
+.kancom-desk-shell .kancom-travel-requests-workbench .flex.items-center.justify-between.gap-2.px-5 {
+  background: rgba(255, 255, 255, 0.68);
+  border-bottom: 1px solid rgba(213, 226, 238, 0.7);
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .quick-filters .form-control,
+.kancom-desk-shell .kancom-travel-requests-workbench input,
+.kancom-desk-shell .kancom-travel-requests-workbench select {
+  border-color: rgba(10, 102, 194, 0.16);
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .list-rows,
+.kancom-desk-shell .kancom-travel-requests-workbench #list-rows {
+  background: var(--kancom-surface);
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .list-rows,
+.kancom-desk-shell .kancom-travel-requests-workbench #list-rows {
+  border-color: var(--kancom-border);
+  border-radius: 10px;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench div.sm\:mx-5.mx-3 {
+  border-radius: 10px 10px 0 0;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .list-rows [class*="hover:bg"],
+.kancom-desk-shell .kancom-travel-requests-workbench #list-rows [class*="hover:bg"] {
+  transition: background-color 120ms ease, box-shadow 120ms ease;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .list-rows [class*="hover:bg"]:hover,
+.kancom-desk-shell .kancom-travel-requests-workbench #list-rows [class*="hover:bg"]:hover {
+  background: var(--kancom-blue-softer) !important;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench div.sm\:mx-5.mx-3 {
+  background: var(--kancom-surface-muted);
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .text-ink-gray-5,
+.kancom-desk-shell .kancom-travel-requests-workbench .text-gray-700 {
+  color: var(--kancom-muted);
+}
+
+.kancom-desk-shell [data-headlessui-state],
+.kancom-desk-shell [role="menu"] {
+  border-color: var(--kancom-border);
+}
+
+
+.kancom-desk-shell {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench.kancom-workbench-header {
+  --kancom-workbench-font-xs: 11px;
+  --kancom-workbench-font-sm: 12px;
+  --kancom-workbench-font-md: 13px;
+  width: 100%;
+  padding: 10px 20px 9px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 251, 255, 0.92));
+  border-bottom: 1px solid rgba(10, 102, 194, 0.12);
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench {
+  --kancom-workbench-font-xs: 11px;
+  --kancom-workbench-font-sm: 12px;
+  --kancom-workbench-font-md: 13px;
+  color: var(--kancom-text);
+  font-size: var(--kancom-workbench-font-md);
+  font-weight: 400;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .kancom-workbench-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .kancom-workbench-eyebrow {
+  margin: 0 0 2px;
+  color: #6f859b;
+  font-size: var(--kancom-workbench-font-xs);
+  font-weight: 650;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .kancom-workbench-title {
+  margin: 0;
+  color: var(--kancom-text);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .kancom-workbench-subtitle {
+  margin: 3px 0 0;
+  color: var(--kancom-muted);
+  font-size: var(--kancom-workbench-font-sm);
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .kancom-visibility-strip {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .kancom-visibility-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  padding: 4px 9px;
+  border: 1px solid rgba(10, 102, 194, 0.15);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--kancom-text);
+  box-shadow: 0 1px 2px rgba(23, 50, 77, 0.04);
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .kancom-visibility-card.is-risk {
+  border-color: rgba(217, 119, 6, 0.24);
+  background: rgba(255, 251, 235, 0.9);
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .kancom-visibility-label {
+  color: var(--kancom-muted);
+  font-size: var(--kancom-workbench-font-sm);
+  font-weight: 550;
+  line-height: 1;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .kancom-visibility-value {
+  color: var(--kancom-blue-strong);
+  font-size: var(--kancom-workbench-font-md);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .kancom-visibility-card.is-risk .kancom-visibility-value {
+  color: #a16207;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .kancom-visibility-scope {
+  color: #7b8fa3;
+  font-size: var(--kancom-workbench-font-xs);
+  font-weight: 500;
+  line-height: 1;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .kancom-new-request-link {
+  flex: 0 0 auto;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .kancom-new-request-link button {
+  background: var(--kancom-blue) !important;
+  border-color: var(--kancom-blue) !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 18px rgba(10, 102, 194, 0.22);
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .kancom-new-request-link button:hover {
+  background: var(--kancom-blue-strong) !important;
+  border-color: var(--kancom-blue-strong) !important;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .kancom-workbench-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .kancom-workbench-chip {
+  height: 26px;
+  padding: 0 9px;
+  border: 1px solid rgba(10, 102, 194, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--kancom-text);
+  font-size: var(--kancom-workbench-font-sm);
+  font-weight: 550;
+  line-height: 1;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .kancom-workbench-chip:not(:disabled):hover {
+  background: var(--kancom-blue-softer);
+  border-color: var(--kancom-blue-border);
+  color: var(--kancom-blue-strong);
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .kancom-workbench-chip.is-active {
+  background: var(--kancom-blue);
+  border-color: var(--kancom-blue);
+  color: #ffffff;
+  box-shadow: 0 5px 14px rgba(10, 102, 194, 0.18);
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .kancom-workbench-chip.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .kancom-owner-cell {
+  color: var(--kancom-text);
+  font-size: var(--kancom-workbench-font-md);
+  font-weight: 400;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .kancom-request-cell {
+  color: #102a43;
+  font-size: var(--kancom-workbench-font-md);
+  font-weight: 500;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .flex.items-center.justify-between.gap-2.px-5 {
+  padding-top: 10px;
+  padding-bottom: 12px;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .flex.items-center.justify-between.gap-2.px-5 button {
+  min-height: 28px;
+  border-color: rgba(10, 102, 194, 0.14) !important;
+  background: rgba(255, 255, 255, 0.84) !important;
+  color: var(--kancom-text) !important;
+  font-size: var(--kancom-workbench-font-md);
+  font-weight: 500;
+  box-shadow: 0 1px 2px rgba(23, 50, 77, 0.04);
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .flex.items-center.justify-between.gap-2.px-5 button:hover {
+  background: var(--kancom-blue-softer) !important;
+  border-color: var(--kancom-blue-border) !important;
+  color: var(--kancom-blue-strong) !important;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .flex.items-center.justify-between.gap-2.px-5 svg {
+  color: var(--kancom-blue-strong);
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .quick-filters > div {
+  min-width: 132px;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .quick-filters input::placeholder {
+  color: #6a8096;
+  font-size: var(--kancom-workbench-font-md);
+  font-weight: 400;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .quick-filters input,
+.kancom-desk-shell .kancom-travel-requests-workbench .quick-filters .form-control {
+  color: var(--kancom-text);
+  font-size: var(--kancom-workbench-font-md);
+  font-weight: 400;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .list-rows,
+.kancom-desk-shell .kancom-travel-requests-workbench #list-rows {
+  color: var(--kancom-text);
+  font-size: var(--kancom-workbench-font-md);
+  font-weight: 400;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .list-rows span,
+.kancom-desk-shell .kancom-travel-requests-workbench #list-rows span {
+  font-size: var(--kancom-workbench-font-md);
+  font-weight: 400;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench div.sm\:mx-5.mx-3 {
+  color: var(--kancom-muted);
+  font-size: var(--kancom-workbench-font-sm);
+  font-weight: 600;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench div.sm\:mx-5.mx-3 span {
+  color: #49657e;
+  font-size: var(--kancom-workbench-font-sm);
+  font-weight: 600;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .kancom-request-cell {
+  font-weight: 500;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .kancom-owner-cell {
+  font-weight: 400;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .border-t {
+  color: var(--kancom-muted);
+  font-size: var(--kancom-workbench-font-md);
+  font-weight: 400;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .border-t button,
+.kancom-desk-shell .kancom-travel-requests-workbench .border-t span {
+  font-size: var(--kancom-workbench-font-md);
+  font-weight: 450;
+}
+
+@media (max-width: 640px) {
+  .kancom-desk-shell .kancom-travel-requests-workbench.kancom-workbench-header {
+    padding: 12px 14px;
+  }
+
+  .kancom-desk-shell .kancom-travel-requests-workbench .kancom-workbench-titlebar {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .kancom-desk-shell .kancom-travel-requests-workbench .kancom-new-request-link {
+    width: 100%;
+  }
+}
+
+
+.kancom-desk-shell .kancom-travel-requests-workbench .kancom-workbench-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 0 0 auto;
+  gap: 8px;
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .kancom-workbench-views-button {
+  max-width: 180px;
+  min-height: 28px;
+  border-color: rgba(10, 102, 194, 0.16) !important;
+  background: rgba(255, 255, 255, 0.88) !important;
+  color: var(--kancom-text) !important;
+  font-size: var(--kancom-workbench-font-md);
+  font-weight: 500;
+  box-shadow: 0 1px 2px rgba(23, 50, 77, 0.04);
+}
+
+.kancom-desk-shell .kancom-travel-requests-workbench .kancom-workbench-views-button:hover {
+  background: var(--kancom-blue-softer) !important;
+  border-color: var(--kancom-blue-border) !important;
+  color: var(--kancom-blue-strong) !important;
+}
+
+.kancom-desk-shell .kancom-workbench-view-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-width: 210px;
+  width: 100%;
+  height: 30px;
+  padding: 0 8px;
+  border-radius: 6px;
+  color: var(--kancom-text);
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+}
+
+.kancom-desk-shell .kancom-workbench-view-item:hover {
+  background: var(--kancom-blue-softer);
+  color: var(--kancom-blue-strong);
+}
+
+.kancom-desk-shell .kancom-workbench-view-action {
+  width: 22px !important;
+  height: 22px !important;
+  opacity: 0;
+}
+
+.kancom-desk-shell .kancom-workbench-view-item:hover .kancom-workbench-view-action,
+.kancom-desk-shell .kancom-workbench-view-action:focus-visible {
+  opacity: 1;
+}

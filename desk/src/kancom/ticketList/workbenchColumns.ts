@@ -1,0 +1,42 @@
+export const kancomWorkbenchColumns = [
+  { label: "ID", type: "Int", key: "name", width: "4.25rem" },
+  { label: "Request", type: "Data", key: "subject", width: "14rem" },
+  { label: "Raised By", type: "Data", key: "raised_by", width: "12rem" },
+  {
+    label: "Client",
+    type: "Link",
+    key: "customer",
+    options: "HD Customer",
+    width: "8rem",
+  },
+  { label: "Status", type: "Select", key: "status", width: "7.25rem" },
+  { label: "Owner", type: "Text", key: "_assign", width: "9.5rem" },
+  {
+    label: "Priority",
+    type: "Link",
+    key: "priority",
+    options: "HD Ticket Priority",
+    width: "6rem",
+  },
+  { label: "SLA", type: "Data", key: "agreement_status", width: "7rem" },
+  { label: "Received", type: "Datetime", key: "creation", width: "9.25rem" },
+  { label: "Updated", type: "Datetime", key: "modified", width: "9.25rem" },
+];
+
+export const kancomWorkbenchRows = [
+  "name",
+  "subject",
+  "raised_by",
+  "customer",
+  "status",
+  "_assign",
+  "priority",
+  "agreement_status",
+  "creation",
+  "modified",
+  "response_by",
+  "resolution_by",
+  "first_responded_on",
+  "resolution_date",
+  "_seen",
+];

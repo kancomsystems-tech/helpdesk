@@ -1,26 +1,16 @@
 <template>
-  <div>
+  <div class="kancom-travel-requests-workbench">
     <LayoutHeader>
-      <template #left-header>
-        <ViewBreadcrumbs
-          :label="__('Tickets')"
-          :route-name="isCustomerPortal ? 'TicketsCustomer' : 'TicketsAgent'"
-          :options="dropdownOptions"
-          :dropdown-actions="viewActions"
-          :current-view="currentView"
-        />
-      </template>
-      <template #right-header>
-        <RouterLink
-          :to="{ name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew' }"
-        >
-          <Button label="Create" theme="gray" variant="solid">
-            <template #prefix>
-              <LucidePlus class="h-4 w-4" />
-            </template>
-          </Button>
-        </RouterLink>
-      </template>
+      <WorkbenchHeader
+        :create-route="{ name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew' }"
+        :chips="workbenchChips"
+        :active-chip="activeWorkbenchChip"
+        :metrics="workbenchVisibilityMetrics"
+        :view-options="dropdownOptions"
+        :view-actions="viewActions"
+        :current-view="currentView"
+        @chip-click="handleWorkbenchChip"
+      />
     </LayoutHeader>
     <ListViewBuilder
       ref="listViewRef"
@@ -58,23 +48,41 @@
 import { LayoutHeader, ListViewBuilder } from "@/components";
 import {
   EditIcon,
-  IndicatorIcon,
   PinIcon,
   TicketIcon,
   UnpinIcon,
 } from "@/components/icons";
 import ExportModal from "@/components/ticket/ExportModal.vue";
-import ViewBreadcrumbs from "@/components/ViewBreadcrumbs.vue";
+import WorkbenchHeader from "@/kancom/ticketList/WorkbenchHeader.vue";
+import {
+  kancomWorkbenchColumns,
+  kancomWorkbenchRows,
+} from "@/kancom/ticketList/workbenchColumns";
+import {
+  getWorkbenchChipFilters,
+  workbenchChips,
+  type WorkbenchChip,
+} from "@/kancom/ticketList/workbenchFilters";
+import { getWorkbenchVisibilityMetrics } from "@/kancom/ticketList/visibilityMetrics";
+import {
+  renderDateTimeCell,
+  renderOwnerCell,
+  renderRequestCell,
+  renderResponseByCell,
+  renderResolutionByCell,
+  renderSlaCell,
+  renderStatusCell,
+} from "@/kancom/ticketList/renderers";
 import ViewModal from "@/components/ViewModal.vue";
 import { currentView, useView } from "@/composables/useView";
-import { dayjs } from "@/dayjs";
 import { useAuthStore } from "@/stores/auth";
 import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
+import { useUserStore } from "@/stores/user";
 import { __ } from "@/translation";
 import { View } from "@/types";
 import { getIcon, isCustomerPortal } from "@/utils";
-import { Badge, FeatherIcon, toast, Tooltip, usePageMeta } from "frappe-ui";
+import { FeatherIcon, toast, usePageMeta } from "frappe-ui";
 import { computed, h, onMounted, onUnmounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -98,6 +106,15 @@ const listViewRef = ref(null);
 const showExportModal = ref(false);
 
 const { getStatus } = useTicketStatusStore();
+const { getUser } = useUserStore();
+const activeWorkbenchChip = ref("control_view");
+
+const loadedWorkbenchRows = computed(
+  () => listViewRef.value?.list?.data?.data ?? []
+);
+const workbenchVisibilityMetrics = computed(() =>
+  getWorkbenchVisibilityMetrics(loadedWorkbenchRows.value, getStatus)
+);
 
 const listSelections = ref(new Set());
 const selectBannerActions = [
@@ -113,50 +130,48 @@ const selectBannerActions = [
 
 const options = {
   doctype: "HD Ticket",
+  columns: kancomWorkbenchColumns,
+  rows: kancomWorkbenchRows,
+  order_by: "modified desc",
+  ignoreDefaultView: true,
+  ignoreSavedColumns: true,
+  wrapperClass: "kancom-travel-requests-workbench",
+  fieldLabels: {
+    name: "Request ID",
+    subject: "Search Request",
+    customer: "Client",
+    modified: "Updated",
+  },
   columnConfig: {
     subject: {
-      custom: ({ row, item }) => {
-        const seenBy = row._seen ? JSON.parse(row._seen) : [];
-        const isSeen = seenBy.includes(userId || "");
-        return h(
-          "span",
-          {
-            class: ["truncate flex-1", !isSeen && "font-semibold"],
-          },
-          item
-        );
-      },
+      custom: ({ row, item }) => renderRequestCell({ row, item, userId }),
     },
     status: {
-      custom: ({ item }) => {
-        const status = getStatus(item);
-        const label = isCustomerPortal.value
-          ? status?.["label_customer"]
-          : status?.["label_agent"];
-        return h(
-          "div",
-          { class: "flex items-center space-x-2 justify-start w-full" },
-          [
-            h(IndicatorIcon, { class: status?.["parsed_color"] }),
-            h("span", { class: "truncate flex-1" }, label),
-          ]
-        );
-      },
+      custom: ({ item }) =>
+        renderStatusCell({
+          item,
+          getStatus,
+          isCustomerPortal: isCustomerPortal.value,
+        }),
+    },
+    _assign: {
+      custom: ({ item }) => renderOwnerCell({ item, getUser }),
     },
     agreement_status: {
-      custom: ({ item }) => {
-        return h(Badge, {
-          label: item,
-          theme: slaStatusColorMap[item],
-          variant: "outline",
-        });
-      },
+      custom: ({ item }) => renderSlaCell({ item }),
+    },
+    creation: {
+      custom: ({ item }) => renderDateTimeCell({ item }),
+    },
+    modified: {
+      custom: ({ item }) => renderDateTimeCell({ item }),
     },
     response_by: {
-      custom: ({ row, item }) => handle_response_by_field(row, item),
+      custom: ({ row, item }) => renderResponseByCell({ row, item }),
     },
     resolution_by: {
-      custom: ({ row, item }) => handle_resolution_by_field(row, item),
+      custom: ({ row, item }) =>
+        renderResolutionByCell({ row, item, getStatus }),
     },
   },
   isCustomerPortal: isCustomerPortal.value,
@@ -164,7 +179,8 @@ const options = {
   showSelectBanner: true,
   selectBannerActions,
   emptyState: {
-    title: __("No Tickets Found"),
+    title: __("No Travel Requests Found"),
+    actionLabel: __("New Request"),
     icon: h(TicketIcon, {
       class: "h-10 w-10",
     }),
@@ -173,69 +189,15 @@ const options = {
     name: isCustomerPortal.value ? "TicketCustomer" : "TicketAgent",
     prop: "ticketId",
   },
-  hideColumnSetting: false,
+  hideColumnSetting: true,
 };
 
-function handle_response_by_field(row: any, item: string) {
-  if (!row.first_responded_on && dayjs(item).isBefore(new Date())) {
-    return h(Badge, {
-      label: __("Failed"),
-      theme: "red",
-      variant: "outline",
-    });
-  }
-  if (row.first_responded_on && dayjs(row.first_responded_on).isBefore(item)) {
-    return h(Badge, {
-      label: __("Fulfilled"),
-      theme: "green",
-      variant: "outline",
-    });
-  } else if (dayjs(row.first_responded_on).isAfter(item)) {
-    return h(Badge, {
-      label: __("Failed"),
-      theme: "red",
-      variant: "outline",
-    });
-  } else {
-    return h(
-      Tooltip,
-      {
-        text: dayjs(item).long(),
-      },
-      () => dayjs.tz(item).fromNow()
-    );
-  }
-}
+function handleWorkbenchChip(chip: WorkbenchChip) {
+  const filters = getWorkbenchChipFilters(chip, userId);
+  if (!filters) return;
 
-function handle_resolution_by_field(row: any, item: string) {
-  const status = getStatus(row.status) || {};
-  if (status.category === "Paused") {
-    return h(Badge, {
-      label: __("Paused"),
-      theme: "blue",
-      variant: "outline",
-    });
-  } else if (row.resolution_date && dayjs(row.resolution_date).isBefore(item)) {
-    return h(Badge, {
-      label: __("Fulfilled"),
-      theme: "green",
-      variant: "outline",
-    });
-  } else if (dayjs(row.resolution_date).isAfter(item)) {
-    return h(Badge, {
-      label: __("Failed"),
-      theme: "red",
-      variant: "outline",
-    });
-  } else {
-    return h(
-      Tooltip,
-      {
-        text: dayjs(item).long(),
-      },
-      () => dayjs.tz(item).fromNow()
-    );
-  }
+  activeWorkbenchChip.value = chip.key;
+  listViewRef.value?.applyFilters(filters);
 }
 
 async function exportRows(
@@ -271,13 +233,6 @@ function reset(reload = false) {
   if (reload) listViewRef.value.reload();
 }
 
-const slaStatusColorMap = {
-  Fulfilled: "green",
-  Failed: "red",
-  "Resolution Due": "orange",
-  "First Response Due": "orange",
-  Paused: "blue",
-};
 
 let viewDialog = reactive({
   show: false,
@@ -295,7 +250,7 @@ const dropdownOptions = computed(() => {
       group: __("Default Views"),
       items: [
         {
-          label: __("List View"),
+          label: __("Control View"),
           icon: "align-justify",
           onClick: () =>
             router.push({
@@ -510,8 +465,8 @@ function handleView(viewInfo, action) {
     view = {
       ...selectedView,
       filters: JSON.stringify(selectedView.filters),
-      columns: JSON.stringify(selectedView.columns),
-      rows: JSON.stringify(selectedView.rows),
+      columns: JSON.stringify(kancomWorkbenchColumns),
+      rows: JSON.stringify(kancomWorkbenchRows),
       label: viewInfo.label,
       icon: viewInfo.icon,
       public: false,
@@ -521,13 +476,13 @@ function handleView(viewInfo, action) {
     view = {
       dt: "HD Ticket",
       type: "list",
-      label: viewInfo.label ?? __("List"),
+      label: viewInfo.label ?? __("Control View"),
       icon: viewInfo.icon ?? "",
       route_name: router.currentRoute.value.name as string,
       order_by: listViewRef.value?.list?.params.order_by,
       filters: JSON.stringify(listViewRef.value?.list?.params.filters),
-      columns: JSON.stringify(listViewRef.value?.list?.data.columns),
-      rows: JSON.stringify(listViewRef.value?.list?.data?.rows),
+      columns: JSON.stringify(kancomWorkbenchColumns),
+      rows: JSON.stringify(kancomWorkbenchRows),
       is_customer_portal: isCustomerPortal.value,
     };
   }
@@ -535,7 +490,7 @@ function handleView(viewInfo, action) {
   // createView
   createView(view, (d) => {
     currentView.value = {
-      label: d.label || __("List"),
+      label: d.label || __("Control View"),
       icon: getIcon(d.icon),
     };
     router.push({
@@ -565,7 +520,7 @@ function resetState() {
 onMounted(() => {
   if (!route.query.view) {
     currentView.value = {
-      label: __("List"),
+      label: __("Control View"),
       icon: LucideAlignJustify,
     };
   }
@@ -584,7 +539,7 @@ onUnmounted(() => {
 
 usePageMeta(() => {
   return {
-    title: __("Tickets"),
+    title: __("Travel Requests Workbench"),
   };
 });
 </script>

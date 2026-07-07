@@ -40,7 +40,7 @@
               <SidebarLink
                 v-if="!isCustomerPortal"
                 class="relative"
-                label="Dashboard"
+                :label="kancomSidebarLabels.dashboard"
                 :icon="LucideLayoutDashboard"
                 :to="'Dashboard'"
                 :is-active="isActiveTab('Dashboard')"
@@ -104,6 +104,7 @@
       </TransitionChild>
     </Dialog>
   </TransitionRoot>
+  <SettingsModal v-model="showSettingsModal" />
 </template>
 
 <script setup lang="ts">
@@ -113,12 +114,13 @@ import {
   TransitionChild,
   TransitionRoot,
 } from "@headlessui/vue";
-import { computed, markRaw, onMounted } from "vue";
+import { computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 import { Section } from "@/components";
 import SidebarLink from "@/components/SidebarLink.vue";
 import UserMenu from "@/components/UserMenu.vue";
+import SettingsModal from "@/components/Settings/SettingsModal.vue";
 import { useNotificationStore } from "@/stores/notification";
 
 import { mobileSidebarOpened as sidebarOpened } from "@/composables/mobile";
@@ -129,13 +131,21 @@ import LucideLayoutDashboard from "~icons/lucide/layout-dashboard";
 
 import { useAuthStore } from "@/stores/auth";
 import { isCustomerPortal } from "@/utils";
-import Apps from "../Apps.vue";
 import {
   agentPortalSidebarOptions,
   customerPortalSidebarOptions,
 } from "./layoutSettings";
 import { useTelephonyStore } from "@/stores/telephony";
 import { storeToRefs } from "pinia";
+import {
+  kancomAdminSetupNavigation,
+  kancomSecondaryNavigation,
+  kancomSidebarLabels,
+} from "@/kancom/shell/navigation";
+import {
+  setActiveSettingsTab,
+  showSettingsModal,
+} from "../Settings/settingsModal";
 const { pinnedViews, publicViews } = useView();
 
 const notificationStore = useNotificationStore();
@@ -207,31 +217,56 @@ const customerPortalDropdown = computed(() => [
   },
 ]);
 
+function openSettingsTab(tabName: string) {
+  setActiveSettingsTab(tabName as Parameters<typeof setActiveSettingsTab>[0]);
+  showSettingsModal.value = true;
+  sidebarOpened.value = false;
+}
+
+const adminSetupItems = computed(() =>
+  kancomAdminSetupNavigation.items.map((item) => ({
+    label: item.label,
+    icon: item.icon,
+    onClick: () => openSettingsTab(item.settingsTab),
+  }))
+);
+
 const agentPortalDropdown = computed(() => [
   {
-    component: markRaw(Apps),
-  },
-  {
-    label: "Customer portal",
-    icon: "users",
+    label: kancomSecondaryNavigation.knowledgeBase.label,
+    icon: kancomSecondaryNavigation.knowledgeBase.icon,
     onClick: () => {
-      const path = router.resolve({ name: "TicketsCustomer" });
-      window.open(path.href);
+      sidebarOpened.value = false;
+      router.push({ name: kancomSecondaryNavigation.knowledgeBase.routeName });
     },
   },
   {
-    icon: "life-buoy",
-    label: "Support",
-    onClick: () => window.open("https://t.me/frappedesk"),
+    label: kancomSecondaryNavigation.contacts.label,
+    icon: kancomSecondaryNavigation.contacts.icon,
+    onClick: () => {
+      sidebarOpened.value = false;
+      router.push({ name: kancomSecondaryNavigation.contacts.routeName });
+    },
   },
   {
-    icon: "book-open",
-    label: "Docs",
-    onClick: () => window.open("https://docs.frappe.io/helpdesk"),
+    label: kancomSecondaryNavigation.kancomRequests.label,
+    icon: kancomSecondaryNavigation.kancomRequests.icon,
+    onClick: () => {
+      window.location.href = kancomSecondaryNavigation.kancomRequests.path;
+    },
   },
   {
-    label: "Log out",
-    icon: "log-out",
+    group: kancomAdminSetupNavigation.group,
+    items: adminSetupItems.value,
+  },
+  {
+    label: kancomSecondaryNavigation.docs.label,
+    icon: kancomSecondaryNavigation.docs.icon,
+    onClick: () => window.open(kancomSecondaryNavigation.docs.url),
+  },
+  {
+    label: kancomSecondaryNavigation.logout.label,
+    icon: kancomSecondaryNavigation.logout.icon,
     onClick: () => authStore.logout(),
   },
 ]);

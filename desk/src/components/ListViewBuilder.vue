@@ -1,9 +1,10 @@
 <template>
-  <!-- View Controls -->
-  <div
-    class="flex items-center justify-between gap-2 px-5 pb-4 pt-3 pl-6"
-    v-if="showViewControls"
-  >
+  <div :class="options.wrapperClass">
+    <!-- View Controls -->
+    <div
+      class="flex items-center justify-between gap-2 px-5 pb-4 pt-3 pl-6"
+      v-if="showViewControls"
+    >
     <QuickFilters v-if="!isMobileView" class="flex-1" />
     <div class="flex items-start gap-2 justify-end h-full" v-if="!isMobileView">
       <Button
@@ -28,8 +29,8 @@
     </div>
   </div>
 
-  <!-- List View -->
-  <ListView
+    <!-- List View -->
+    <ListView
     v-if="list.data?.data.length > 0"
     class="flex-1"
     :columns="columns"
@@ -79,8 +80,8 @@
     </ListSelectBanner>
   </ListView>
 
-  <!-- List Footer -->
-  <div
+    <!-- List Footer -->
+    <div
     class="p-20 border-t sm:px-5 px-3 py-2"
     v-if="list.data?.data.length > 0"
   >
@@ -99,20 +100,39 @@
       "
     />
   </div>
-  <!-- Loading State -->
-  <div
+    <!-- Loading State -->
+    <div
     v-else-if="list.loading"
     class="w-full h-full flex items-center justify-center -mt-48"
   >
     <LoadingIndicator :scale="10" />
   </div>
-  <!-- Empty State -->
-  <EmptyState
-    v-else
-    :title="emptyState.title"
-    :icon="emptyState.icon"
-    @emptyStateAction="emit('emptyStateAction')"
-  />
+    <!-- Empty State -->
+    <div
+      v-else-if="emptyState.actionLabel"
+      class="flex h-full items-center justify-center"
+    >
+      <div
+        class="flex flex-col items-center gap-3 text-xl font-medium text-ink-gray-4"
+      >
+        <component v-if="emptyState.icon" :is="emptyState.icon" class="h-10 w-10" />
+        <span>{{ emptyState.title }}</span>
+        <Button
+          :label="emptyState.actionLabel"
+          @click="emit('emptyStateAction')"
+          variant="subtle"
+        >
+          <template #prefix><FeatherIcon name="plus" class="h-4" /></template>
+        </Button>
+      </div>
+    </div>
+    <EmptyState
+      v-else
+      :title="emptyState.title"
+      :icon="emptyState.icon"
+      @emptyStateAction="emit('emptyStateAction')"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -177,6 +197,7 @@ interface P {
       // type of a h componnt
       icon?: string | VNode;
       title: string;
+      actionLabel?: string;
     };
     hideViewControls?: boolean;
     hideColumnSetting?: boolean;
@@ -188,6 +209,13 @@ interface P {
     default_page_length?: number;
     isCustomerPortal?: boolean;
     rowRoute?: Record<string, string>;
+    columns?: Array<any>;
+    rows?: Array<string>;
+    order_by?: string;
+    ignoreDefaultView?: boolean;
+    ignoreSavedColumns?: boolean;
+    fieldLabels?: Record<string, string>;
+    wrapperClass?: string;
   };
 }
 
@@ -217,6 +245,10 @@ const defaultOptions = reactive({
   default_page_length: 20,
   isCustomerPortal: false,
   hideColumnSetting: true,
+  ignoreDefaultView: false,
+  ignoreSavedColumns: false,
+  fieldLabels: {},
+  wrapperClass: "",
   rowRoute: {
     name: "",
     prop: "",
@@ -287,12 +319,12 @@ const defaultParams = reactive({
   doctype: options.value.doctype,
   filters: {},
   default_filters: options.value.defaultFilters,
-  order_by: "modified desc",
+  order_by: options.value.order_by || "modified desc",
   page_length: pageLengthCount.value,
   page_length_count: pageLengthCount.value,
   view: options.value.view,
-  columns: [],
-  rows: [],
+  columns: options.value.columns || [],
+  rows: options.value.rows || [],
   show_customer_portal_fields: options.value.isCustomerPortal,
   is_default: false,
 });
@@ -322,6 +354,7 @@ const list = createResource({
 const exposeFunctions = {
   list,
   reload,
+  applyFilters,
   unselectAll: () => {},
 };
 
@@ -396,6 +429,10 @@ function handleFetchFromField(column) {
   column.key = isFetchFromField ? isFetchFromField[2] : column.key;
 }
 
+function getFieldLabel(fieldname: string, fallback: string) {
+  return options.value.fieldLabels?.[fieldname] || fallback;
+}
+
 function handleColumnConfig(column) {
   if (!options.value?.columnConfig) return column;
   const columnConfig = options.value.columnConfig;
@@ -417,9 +454,9 @@ const filterableFields = createResource({
   transform: (data) => {
     data = data.map((field) => {
       return {
-        label: field.label,
-        value: field.fieldname,
         ...field,
+        label: getFieldLabel(field.fieldname, field.label),
+        value: field.fieldname,
       };
     });
     return data;
@@ -433,6 +470,12 @@ const sortableFields = createResource({
     doctype: options.value.doctype,
     show_customer_portal_fields: defaultParams.show_customer_portal_fields,
   },
+  transform: (data) => {
+    return data.map((field) => ({
+      ...field,
+      label: getFieldLabel(field.value, field.label),
+    }));
+  },
 });
 
 const quickFilters = createResource({
@@ -443,8 +486,13 @@ const quickFilters = createResource({
     show_customer_portal_fields: defaultParams.show_customer_portal_fields,
   },
   transform: (data) => {
-    if (Boolean(data.length)) return;
-    data = [{ name: "name", label: "Name", fieldtype: "Data" }];
+    if (!Boolean(data.length)) {
+      data = [{ name: "name", label: "Name", fieldtype: "Data" }];
+    }
+    data = data.map((field) => ({
+      ...field,
+      label: getFieldLabel(field.name, field.label),
+    }));
     return data;
   },
 });
@@ -574,12 +622,12 @@ function updateColumns(obj) {
 function reload(reset: boolean = false) {
   if (reset) {
     defaultParams.filters = options.value.defaultFilters || {};
-    defaultParams.order_by = "modified desc";
+    defaultParams.order_by = options.value.order_by || "modified desc";
     defaultParams.page_length = options.value.default_page_length;
     pageLengthCount.value = options.value.default_page_length;
     defaultParams.page_length_count = pageLengthCount.value;
-    defaultParams.columns = [];
-    defaultParams.rows = [];
+    defaultParams.columns = options.value.columns || [];
+    defaultParams.rows = options.value.rows || [];
     defaultParams.is_default = true;
   }
   list.reload({ ...defaultParams });
@@ -644,8 +692,12 @@ function handleViewChanges() {
   }
   defaultParams.filters = currentView.filters;
   defaultParams.order_by = currentView.order_by || "modified desc";
-  defaultParams.columns = currentView.columns;
-  defaultParams.rows = currentView.rows;
+  defaultParams.columns = options.value.ignoreSavedColumns
+    ? options.value.columns || []
+    : currentView.columns;
+  defaultParams.rows = options.value.ignoreSavedColumns
+    ? options.value.rows || []
+    : currentView.rows;
 
   list.submit({ ...defaultParams });
 }
@@ -655,7 +707,7 @@ function findCurrentView() {
   if (route.query.view) {
     currentView = findView(route.query.view as string).value;
     defaultParams.is_default = false;
-  } else if (defaultView.value) {
+  } else if (!options.value.ignoreDefaultView && defaultView.value) {
     currentView = defaultView.value;
     defaultParams.is_default = true;
   }

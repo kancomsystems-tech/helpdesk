@@ -2,9 +2,6 @@
   <Dialog :options="options">
     <template #body-main>
       <div class="flex flex-col items-center gap-4 p-6">
-        <div class="text-xl font-medium text-gray-900">
-          {{ customer.doc?.name }}
-        </div>
         <Avatar
           size="lg"
           :label="customer.doc?.name"
@@ -27,15 +24,44 @@
             @click="updateImage(null)"
           />
         </div>
-        <form class="w-full" @submit.prevent="update">
+        <div class="w-full space-y-4">
+          <Input
+            v-model="clientName"
+            label="Client Name"
+            placeholder="Acme Travel Pvt Ltd"
+          />
           <Input v-model="domain" label="Domain" placeholder="example.com" />
-        </form>
+          <div class="space-y-1.5">
+            <label class="block text-sm text-ink-gray-7">Serviced By Agent</label>
+            <Autocomplete
+              :model-value="servicedByAgent"
+              :options="agentOptions"
+              placeholder="Select agent"
+              size="sm"
+              @update:model-value="selectServicedByAgent"
+            />
+          </div>
+          <div class="space-y-1.5">
+            <label class="block text-sm text-ink-gray-7">Status</label>
+            <select v-model="status" class="form-select w-full">
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          </div>
+          <Input
+            v-model="notes"
+            label="Notes"
+            placeholder="Internal routing or service notes"
+          />
+        </div>
       </div>
     </template>
   </Dialog>
 </template>
 
 <script setup lang="ts">
+import { Autocomplete } from "@/components";
+import { useAgentStore } from "@/stores/agent";
 import {
   Avatar,
   createDocumentResource,
@@ -43,7 +69,7 @@ import {
   FileUploader,
   toast,
 } from "frappe-ui";
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 
 const props = defineProps({
   name: {
@@ -53,14 +79,68 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["customer-updated"]);
+const { agents } = useAgentStore();
+
+const agentOptions = computed(() =>
+  (agents.data || []).map((agent) => ({
+    label: agent.agent_name || agent.name,
+    value: agent.name,
+  }))
+);
+
+const clientName = computed({
+  get() {
+    return customer.doc?.customer_name || customer.doc?.name;
+  },
+  set(value: string) {
+    customer.doc.customer_name = value;
+  },
+});
 
 const domain = computed({
   get() {
     return customer.doc?.domain;
   },
-  set(d: string) {
-    customer.doc.domain = d;
+  set(value: string) {
+    customer.doc.domain = value;
   },
+});
+
+const servicedByAgent = computed({
+  get() {
+    return customer.doc?.serviced_by_agent;
+  },
+  set(value: string) {
+    customer.doc.serviced_by_agent = value;
+  },
+});
+
+const status = computed({
+  get() {
+    return customer.doc?.status || "Active";
+  },
+  set(value: string) {
+    customer.doc.status = value;
+  },
+});
+
+const notes = computed({
+  get() {
+    return customer.doc?.notes;
+  },
+  set(value: string) {
+    customer.doc.notes = value;
+  },
+});
+
+function selectServicedByAgent(option) {
+  servicedByAgent.value = option?.value || "";
+}
+
+onMounted(() => {
+  if (!agents.data?.length && !agents.list?.promise) {
+    agents.fetch();
+  }
 });
 
 const customer = createDocumentResource({
@@ -69,16 +149,16 @@ const customer = createDocumentResource({
   auto: true,
   setValue: {
     onSuccess() {
-      toast.success("Customer updated");
+      toast.success("Client updated");
     },
     onError() {
-      toast.error("Error updating customer");
+      toast.error("Error updating client");
     },
   },
 });
 
 const options = computed(() => ({
-  title: customer.doc?.name,
+  title: customer.doc?.name ? `Edit Client: ${customer.doc.name}` : "Edit Client",
   actions: [
     {
       label: "Save",
@@ -91,7 +171,11 @@ const options = computed(() => ({
 
 async function update() {
   await customer.setValue.submit({
+    customer_name: clientName.value,
     domain: domain.value,
+    serviced_by_agent: servicedByAgent.value,
+    status: status.value,
+    notes: notes.value,
   });
   emit("customer-updated");
 }

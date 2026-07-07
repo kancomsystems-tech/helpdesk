@@ -1,53 +1,30 @@
 import LucideBookOpen from "~icons/lucide/book-open";
-import LucideContact2 from "~icons/lucide/contact-2";
 import LucideTicket from "~icons/lucide/ticket";
 import { OrganizationsIcon } from "../icons";
-import PhoneIcon from "../icons/PhoneIcon.vue";
 import { __ } from "@/translation";
+import { kancomShellLabels } from "@/kancom/shell/labels";
 
 export const agentPortalSidebarOptions = [
   {
-    label: __("Tickets"),
+    label: __(kancomShellLabels.tickets),
     icon: LucideTicket,
     to: "TicketsAgent",
   },
   {
-    label: __("Knowledge Base"),
-    icon: LucideBookOpen,
-    to: "AgentKnowledgeBase",
-  },
-  {
-    label: __("Customers"),
+    label: __(kancomShellLabels.customers),
     icon: OrganizationsIcon,
     to: "CustomerList",
-  },
-  {
-    label: __("Contacts"),
-    icon: LucideContact2,
-    to: "ContactList",
-  },
-  {
-    label: __("Kancom Requests"),
-    icon: LucideTicket,
-    onClick: () => {
-      window.location.href = "/kancom-request";
-    },
-  },
-  {
-    label: __("Call Logs"),
-    icon: PhoneIcon,
-    to: "CallLogs",
   },
 ];
 
 export const customerPortalSidebarOptions = [
   {
-    label: __("Tickets"),
+    label: __(kancomShellLabels.tickets),
     icon: LucideTicket,
     to: "TicketsCustomer",
   },
   {
-    label: __("Knowledge Base"),
+    label: __(kancomShellLabels.knowledgeBase),
     icon: LucideBookOpen,
     to: "CustomerKnowledgeBase",
   },

@@ -25,7 +25,7 @@
     <SidebarLink
       v-if="!isCustomerPortal"
       class="relative my-0.5 min-h-7"
-      :label="__('Dashboard')"
+      :label="__(kancomSidebarLabels.dashboard)"
       :icon="LucideLayoutDashboard"
       :to="'Dashboard'"
       :is-active="isActiveTab('Dashboard')"
@@ -145,7 +145,6 @@
       :isSidebarCollapsed="!isExpanded"
     />
     <SettingsModal v-model="showSettingsModal" />
-    <ShortcutsModal v-model="showShortcutsModal" />
     <HelpModal
       v-if="showHelpModal"
       v-model="showHelpModal"
@@ -170,15 +169,11 @@
 <script setup lang="ts">
 import HDLogo from "@/assets/logos/HDLogo.vue";
 import { Section, SidebarLink } from "@/components";
-import Apps from "@/components/Apps.vue";
 import CP from "@/components/command-palette/CP.vue";
-import { FrappeCloudIcon, InviteCustomer } from "@/components/icons";
-import ShortcutsModal from "@/components/modals/ShortcutsModal.vue";
+import { InviteCustomer } from "@/components/icons";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
 import UserMenu from "@/components/UserMenu.vue";
 import { useDevice } from "@/composables";
-import { confirmLoginToFrappeCloud } from "@/composables/fc";
-import { useScreenSize } from "@/composables/screen";
 import { currentView, useView } from "@/composables/useView";
 import { showNewContactModal } from "@/pages/desk/contact/dialogState";
 import {
@@ -213,12 +208,16 @@ import {
 
 import { useShortcut } from "@/composables/shortcuts";
 import { __ } from "@/translation";
+import {
+  kancomAdminSetupNavigation,
+  kancomSecondaryNavigation,
+  kancomSidebarLabels,
+} from "@/kancom/shell/navigation";
 import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
 import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
 import LucideBell from "~icons/lucide/bell";
 import FileText from "~icons/lucide/file-text";
 import Globe from "~icons/lucide/globe";
-import LucideKeyboard from "~icons/lucide/keyboard";
 import LucideMail from "~icons/lucide/mail";
 import MailOpen from "~icons/lucide/mail-open";
 import MessageCircle from "~icons/lucide/message-circle";
@@ -233,8 +232,6 @@ import {
   showSettingsModal,
 } from "../Settings/settingsModal";
 
-const { isMobileView } = useScreenSize();
-
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
@@ -244,7 +241,6 @@ const device = useDevice();
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
 
-const showShortcutsModal = ref(false);
 const showCommandPalette = ref(false);
 
 const { pinnedViews, publicViews } = useView();
@@ -327,51 +323,55 @@ const customerPortalDropdown = computed(() => [
   },
 ]);
 
+function openSettingsTab(tabName: string) {
+  setActiveSettingsTab(tabName as Parameters<typeof setActiveSettingsTab>[0]);
+  showSettingsModal.value = true;
+}
+
+const adminSetupItems = computed(() =>
+  kancomAdminSetupNavigation.items.map((item) => ({
+    label: __(item.label),
+    icon: item.icon,
+    onClick: () => openSettingsTab(item.settingsTab),
+  }))
+);
+
 const agentPortalDropdown = computed(() => [
   {
-    component: markRaw(Apps),
+    label: __(kancomSecondaryNavigation.knowledgeBase.label),
+    icon: kancomSecondaryNavigation.knowledgeBase.icon,
+    onClick: () =>
+      router.push({ name: kancomSecondaryNavigation.knowledgeBase.routeName }),
   },
   {
-    label: __("Customer portal"),
-    icon: "users",
+    label: __(kancomSecondaryNavigation.contacts.label),
+    icon: kancomSecondaryNavigation.contacts.icon,
+    onClick: () =>
+      router.push({ name: kancomSecondaryNavigation.contacts.routeName }),
+  },
+  {
+    label: __(kancomSecondaryNavigation.kancomRequests.label),
+    icon: kancomSecondaryNavigation.kancomRequests.icon,
     onClick: () => {
-      const path = router.resolve({ name: "TicketsCustomer" });
-      window.open(path.href);
+      window.location.href = kancomSecondaryNavigation.kancomRequests.path;
     },
   },
   {
-    icon: "life-buoy",
-    label: __("Support"),
-    onClick: () => window.open("https://t.me/frappedesk"),
+    group: __(kancomAdminSetupNavigation.group),
+    items: adminSetupItems.value,
   },
   {
-    icon: "book-open",
-    label: __("Docs"),
-    onClick: () => window.open("https://docs.frappe.io/helpdesk"),
-  },
-  {
-    label: __("Login to Frappe Cloud"),
-    icon: FrappeCloudIcon,
-    onClick: () => confirmLoginToFrappeCloud(),
-    condition: () => !isMobileView.value && window.is_fc_site,
-  },
-  {
-    label: __("Shortcuts"),
-    icon: h(LucideKeyboard),
-    onClick: () => (showShortcutsModal.value = true),
-  },
-  {
-    label: __("Settings"),
-    icon: "settings",
-    onClick: () => (showSettingsModal.value = true),
+    label: __(kancomSecondaryNavigation.docs.label),
+    icon: kancomSecondaryNavigation.docs.icon,
+    onClick: () => window.open(kancomSecondaryNavigation.docs.url),
   },
   {
     group: __("Danger"),
     hideLabel: true,
     items: [
       {
-        label: __("Log out"),
-        icon: "log-out",
+        label: __(kancomSecondaryNavigation.logout.label),
+        icon: kancomSecondaryNavigation.logout.icon,
         onClick: () => authStore.logout(),
       },
     ],

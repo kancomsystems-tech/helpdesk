@@ -1,27 +1,43 @@
 <template>
   <div>
-    <Dialog
-      v-model="model"
-      :options="{ title: 'Add New Customer', size: 'sm' }"
-    >
+    <Dialog v-model="model" :options="{ title: 'Add New Client', size: 'sm' }">
       <template #body-content>
         <div class="space-y-4">
-          <div class="space-y-1">
-            <Input
-              v-model="state.customer"
-              label="Customer Name"
-              type="text"
-              placeholder="Tesla Inc."
+          <Input
+            v-model="state.customer"
+            label="Client Name"
+            type="text"
+            placeholder="Acme Travel Pvt Ltd"
+          />
+          <Input
+            v-model="state.domain"
+            label="Domain"
+            type="text"
+            placeholder="example.com"
+          />
+          <div class="space-y-1.5">
+            <label class="block text-sm text-ink-gray-7">Serviced By Agent</label>
+            <Autocomplete
+              :model-value="state.serviced_by_agent"
+              :options="agentOptions"
+              placeholder="Select agent"
+              size="sm"
+              @update:model-value="selectServicedByAgent"
             />
           </div>
-          <div class="space-y-1">
-            <Input
-              v-model="state.domain"
-              label="Domain"
-              type="text"
-              placeholder="eg: tesla.com, mycompany.com"
-            />
+          <div class="space-y-1.5">
+            <label class="block text-sm text-ink-gray-7">Status</label>
+            <select v-model="state.status" class="form-select w-full">
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
           </div>
+          <Input
+            v-model="state.notes"
+            label="Notes"
+            type="text"
+            placeholder="Internal routing or service notes"
+          />
           <div class="float-right flex space-x-2">
             <Button
               label="Add"
@@ -37,31 +53,51 @@
 </template>
 
 <script setup lang="ts">
+import { Autocomplete } from "@/components";
+import { useAgentStore } from "@/stores/agent";
 import { Dialog, Input, createResource, toast } from "frappe-ui";
-import { reactive } from "vue";
+import { computed, onMounted, reactive } from "vue";
 
 const emit = defineEmits(["customerCreated"]);
 const model = defineModel<boolean>();
 
+const { agents } = useAgentStore();
+
 const state = reactive({
   customer: "",
   domain: "",
+  serviced_by_agent: "",
+  status: "Active",
+  notes: "",
+});
+
+const agentOptions = computed(() =>
+  (agents.data || []).map((agent) => ({
+    label: agent.agent_name || agent.name,
+    value: agent.name,
+  }))
+);
+
+function selectServicedByAgent(option) {
+  state.serviced_by_agent = option?.value || "";
+}
+
+onMounted(() => {
+  if (!agents.data?.length && !agents.list?.promise) {
+    agents.fetch();
+  }
 });
 
 const customerResource = createResource({
   url: "frappe.client.insert",
   method: "POST",
-  data: {
-    doc: {
-      doctype: "HD Customer",
-      customer_name: state.customer,
-      domain: state.domain,
-    },
-  },
   onSuccess: () => {
     state.customer = "";
     state.domain = "";
-    toast.success("Customer created");
+    state.serviced_by_agent = "";
+    state.status = "Active";
+    state.notes = "";
+    toast.success("Client created");
     emit("customerCreated");
   },
   onError: (err) => {
@@ -71,7 +107,7 @@ const customerResource = createResource({
 
 function addCustomer() {
   if (!state.customer) {
-    toast.error("Customer name is required");
+    toast.error("Client name is required");
     return;
   }
   customerResource.submit({
@@ -79,6 +115,9 @@ function addCustomer() {
       doctype: "HD Customer",
       customer_name: state.customer,
       domain: state.domain,
+      serviced_by_agent: state.serviced_by_agent,
+      status: state.status,
+      notes: state.notes,
     },
   });
 }

@@ -1,4 +1,5 @@
 @import "frappe-ui/style.css";
+@import "./kancom/theme/desk-shell.css";
 
 @tailwind base;
 @tailwind components;

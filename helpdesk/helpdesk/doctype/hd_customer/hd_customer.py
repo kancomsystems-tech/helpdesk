@@ -10,22 +10,36 @@ class HDCustomer(Document):
     def default_list_data():
         columns = [
             {
-                "label": "Name",
-                "key": "name",
-                "width": "17rem",
+                "label": "Client",
+                "key": "customer_name",
+                "width": "14rem",
                 "type": "Data",
             },
             {
                 "label": "Domain",
                 "key": "domain",
-                "width": "24rem",
+                "width": "14rem",
                 "type": "Data",
+            },
+            {
+                "label": "Serviced By Agent",
+                "key": "serviced_by_agent",
+                "width": "14rem",
+                "type": "Link",
+                "options": "HD Agent",
+            },
+            {
+                "label": "Status",
+                "key": "status",
+                "width": "8rem",
+                "type": "Select",
             },
             {
                 "label": "Created On",
                 "key": "creation",
-                "width": "8rem",
+                "width": "9rem",
                 "type": "Datetime",
             },
         ]
-        return {"columns": columns}
+        rows = ["name", "customer_name", "domain", "serviced_by_agent", "status", "creation", "image"]
+        return {"columns": columns, "rows": rows}

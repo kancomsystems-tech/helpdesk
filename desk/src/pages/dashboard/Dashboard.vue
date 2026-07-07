@@ -237,16 +237,38 @@ const loading = computed(() => {
 
 function getChartType(chart: any) {
   chart.colors = colors;
-  if (chart["type"] === "axis") {
+  const config = withVisibleChartLabels(chart);
+  if (config["type"] === "axis") {
     return h(AxisChart, {
-      config: chart,
+      config,
     });
   }
-  if (chart["type"] === "pie") {
+  if (config["type"] === "pie") {
     return h(DonutChart, {
-      config: chart,
+      config,
     });
   }
+}
+
+function withVisibleChartLabels(config: any) {
+  if (config.type === "axis") {
+    return {
+      ...config,
+      series: config.series?.map((series: any) => ({
+        ...series,
+        showDataLabels: true,
+      })),
+    };
+  }
+
+  if (config.type === "pie") {
+    return {
+      ...config,
+      showInlineLabels: true,
+    };
+  }
+
+  return config;
 }
 
 function getLastXDays(range: number = 30): string {
