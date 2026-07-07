@@ -144,6 +144,7 @@ import {
 } from "@/kancom/shell/navigation";
 import {
   setActiveSettingsTab,
+  settingsModalMode,
   showSettingsModal,
 } from "../Settings/settingsModal";
 const { pinnedViews, publicViews } = useView();
@@ -217,19 +218,12 @@ const customerPortalDropdown = computed(() => [
   },
 ]);
 
-function openSettingsTab(tabName: string) {
-  setActiveSettingsTab(tabName as Parameters<typeof setActiveSettingsTab>[0]);
+function openSetupModal() {
+  settingsModalMode.value = "setup";
+  setActiveSettingsTab("Profile");
   showSettingsModal.value = true;
   sidebarOpened.value = false;
 }
-
-const adminSetupItems = computed(() =>
-  kancomAdminSetupNavigation.items.map((item) => ({
-    label: item.label,
-    icon: item.icon,
-    onClick: () => openSettingsTab(item.settingsTab),
-  }))
-);
 
 const agentPortalDropdown = computed(() => [
   {
@@ -256,8 +250,9 @@ const agentPortalDropdown = computed(() => [
     },
   },
   {
-    group: kancomAdminSetupNavigation.group,
-    items: adminSetupItems.value,
+    label: kancomAdminSetupNavigation.group,
+    icon: "settings",
+    onClick: openSetupModal,
   },
   {
     label: kancomSecondaryNavigation.docs.label,

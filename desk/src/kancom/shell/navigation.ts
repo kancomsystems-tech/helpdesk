@@ -36,8 +36,13 @@ export const kancomSecondaryNavigation = {
 };
 
 export const kancomAdminSetupNavigation = {
-  group: "Admin Setup",
+  group: "Setup",
   items: [
+    {
+      label: "Profile",
+      icon: "user",
+      settingsTab: "Profile",
+    },
     {
       label: "Agents",
       icon: "user",
@@ -54,7 +59,7 @@ export const kancomAdminSetupNavigation = {
       settingsTab: "Assignment Rules",
     },
     {
-      label: "SLA Rules",
+      label: "SLA Policies",
       icon: "shield",
       settingsTab: "SLA Policies",
     },

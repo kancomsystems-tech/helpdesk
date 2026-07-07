@@ -1,4 +1,4 @@
-import { computed, h, markRaw, ref } from "vue";
+import { computed, h, markRaw, ref, watch } from "vue";
 import Agents from "./Agents.vue";
 import EmailConfig from "./EmailConfig.vue";
 import TeamsConfig from "./Teams/TeamsConfig.vue";
@@ -28,6 +28,19 @@ import SettingsGear from "~icons/lucide/settings";
 import SavedReplyIcon from "../icons/SavedReplyIcon.vue";
 
 export const showSettingsModal = ref(false);
+export const settingsModalMode = ref<"full" | "setup">("full");
+
+const kancomSetupTabNames = [
+  "Profile",
+  "Agents",
+  "Teams",
+  "Assignment Rules",
+  "SLA Policies",
+  "Saved Replies",
+] as const;
+
+const isKancomSetupTab = (label: string) =>
+  kancomSetupTabNames.some((tabName) => label === __(tabName));
 
 const auth = useAuthStore();
 
@@ -139,10 +152,16 @@ export const tabs = computed(() => {
     if (tab.items) {
       tab.items = tab.items.filter((item) => {
         if (item.condition && !item.condition()) return false;
+        if (
+          settingsModalMode.value === "setup" &&
+          !isKancomSetupTab(item.label)
+        ) {
+          return false;
+        }
         return true;
       });
     }
-    return true;
+    return Boolean(tab.items?.length);
   });
 });
 
@@ -176,3 +195,9 @@ export const setActiveSettingsTab = (tabName: TabName) => {
         .find((tab) => tab.label == __(tabName))) ||
     tabs.value[0].items[0];
 };
+
+watch(showSettingsModal, (show) => {
+  if (!show) {
+    settingsModalMode.value = "full";
+  }
+});

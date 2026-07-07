@@ -229,6 +229,7 @@ import LucideUserPlus from "~icons/lucide/user-plus";
 import { useTelephonyStore } from "@/stores/telephony";
 import {
   setActiveSettingsTab,
+  settingsModalMode,
   showSettingsModal,
 } from "../Settings/settingsModal";
 
@@ -323,18 +324,11 @@ const customerPortalDropdown = computed(() => [
   },
 ]);
 
-function openSettingsTab(tabName: string) {
-  setActiveSettingsTab(tabName as Parameters<typeof setActiveSettingsTab>[0]);
+function openSetupModal() {
+  settingsModalMode.value = "setup";
+  setActiveSettingsTab("Profile");
   showSettingsModal.value = true;
 }
-
-const adminSetupItems = computed(() =>
-  kancomAdminSetupNavigation.items.map((item) => ({
-    label: __(item.label),
-    icon: item.icon,
-    onClick: () => openSettingsTab(item.settingsTab),
-  }))
-);
 
 const agentPortalDropdown = computed(() => [
   {
@@ -357,8 +351,9 @@ const agentPortalDropdown = computed(() => [
     },
   },
   {
-    group: __(kancomAdminSetupNavigation.group),
-    items: adminSetupItems.value,
+    label: __(kancomAdminSetupNavigation.group),
+    icon: "settings",
+    onClick: openSetupModal,
   },
   {
     label: __(kancomSecondaryNavigation.docs.label),
