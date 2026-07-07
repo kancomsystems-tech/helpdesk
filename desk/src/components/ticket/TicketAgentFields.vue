@@ -5,6 +5,9 @@
       :key="field.fieldname"
       :field="field"
       :value="ticket[field.fieldname]"
+      :class="{
+        'kancom-ticket-detail-select-field': isProductOrCategoryField(field),
+      }"
       @change="(data) => update(data.fieldname, data.value)"
     />
   </div>
@@ -27,6 +30,17 @@ const props = defineProps({
 const fields = computed(() => {
   return props.ticket.fields;
 });
+
+function isProductOrCategoryField(field: Field) {
+  const fieldname = String(field.fieldname || "").toLowerCase();
+  const label = String(field.label || "").toLowerCase();
+  return (
+    fieldname === "product" ||
+    fieldname === "category" ||
+    label === "product" ||
+    label === "category"
+  );
+}
 
 function update(field: Field["fieldname"], value: FieldValue, event = null) {
   if (field === "subject" && value === "") {
@@ -66,5 +80,31 @@ function update(field: Field["fieldname"], value: FieldValue, event = null) {
 :deep(.form-control button svg) {
   color: white;
   width: 0;
+}
+
+:deep(.kancom-ticket-detail-select-field .form-control input:not([type="checkbox"])),
+:deep(.kancom-ticket-detail-select-field .form-control textarea),
+:deep(.kancom-ticket-detail-select-field .form-control button) {
+  min-height: 28px;
+  border: 1px solid var(--outline-gray-3) !important;
+  border-radius: 6px;
+  background: white !important;
+  color: var(--ink-gray-9);
+  padding: 4px 8px;
+  line-height: 20px;
+}
+
+:deep(.kancom-ticket-detail-select-field .form-control textarea) {
+  resize: none;
+  overflow: hidden;
+}
+
+:deep(.kancom-ticket-detail-select-field .form-control button) {
+  gap: 6px;
+}
+
+:deep(.kancom-ticket-detail-select-field .form-control button svg) {
+  width: 14px;
+  color: var(--ink-gray-5);
 }
 </style>

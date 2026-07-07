@@ -112,6 +112,7 @@ import {
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import LucideMerge from "~icons/lucide/merge";
+import LucideSplit from "~icons/lucide/split";
 import { IndicatorIcon } from "../icons";
 import TicketNavigation from "./TicketNavigation.vue";
 import TicketSLA from "./TicketSLA.vue";
@@ -190,6 +191,9 @@ function updateField(fieldname: string, value: string, callback = () => {}) {
 }
 
 const showMergeModal = ref(false);
+function showSplitComingSoon() {
+  toast.info(__("Split Ticket coming soon"));
+}
 const showMergeOption = computed(() => {
   return (
     !ticket.value.doc.is_merged &&
@@ -205,6 +209,11 @@ const defaultActions = computed(() => {
       icon: LucideMerge,
       condition: () => !ticket.value.doc.is_merged,
       onClick: () => (showMergeModal.value = true),
+    });
+    items.push({
+      label: __("Split Ticket"),
+      icon: LucideSplit,
+      onClick: showSplitComingSoon,
     });
   }
   return [
