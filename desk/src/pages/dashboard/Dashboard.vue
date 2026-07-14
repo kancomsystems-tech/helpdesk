@@ -52,7 +52,7 @@
           </template>
         </DateRangePicker>
         <Link
-          v-if="isManager"
+          v-if="canViewFullDashboard"
           class="form-control w-48"
           doctype="HD Team"
           :placeholder="__('Team')"
@@ -65,7 +65,7 @@
           </template>
         </Link>
         <Link
-          v-if="isManager"
+          v-if="canViewFullDashboard"
           class="form-control w-48"
           doctype="HD Agent"
           :placeholder="__('Agent')"
@@ -152,13 +152,15 @@ import {
 } from "frappe-ui";
 import { computed, h, onMounted, reactive, ref, watch } from "vue";
 
-const { isManager, userId } = useAuthStore();
+const { isAdmin, isManager, userId } = useAuthStore();
 
 const filters = reactive({
   period: getLastXDays(),
   agent: null,
   team: null,
 });
+
+const canViewFullDashboard = computed(() => isManager || isAdmin);
 
 const colors = [
   "#318AD8",
@@ -403,12 +405,12 @@ watch(
 );
 
 onMounted(() => {
-  if (!isManager) {
+  if (!canViewFullDashboard.value) {
     // when filters are updated, resources are reloaded coz of the watcher
     filters.agent = userId;
     return;
   }
-  // If not managers call the resources
+  // Managers and admins can see the full dashboard by default.
   numberCards.reload();
   masterData.reload();
   trendData.reload();
