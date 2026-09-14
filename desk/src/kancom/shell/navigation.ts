@@ -99,6 +99,32 @@ export const kancomSecondaryNavigation = {
   },
 };
 
+export type KancomSetupPersona =
+  | "administrator"
+  | "operations_head"
+  | "team_leader"
+  | "agent"
+  | null;
+
+const operationalSetupTabs: Partial<
+  Record<KancomSetupPersona & string, string[]>
+> = {
+  team_leader: ["Profile", "Saved Replies"],
+  operations_head: ["Profile", "Teams", "Saved Replies"],
+};
+
+export function getKancomSetupTabs(
+  persona: KancomSetupPersona,
+  hasManagedConfiguration: boolean,
+  hasNativeManagement: boolean
+) {
+  if (hasNativeManagement) {
+    return kancomAdminSetupNavigation.items.map((item) => item.label);
+  }
+  if (!hasManagedConfiguration || !persona) return [];
+  return operationalSetupTabs[persona] || [];
+}
+
 export const kancomAdminSetupNavigation = {
   group: "Setup",
   items: [

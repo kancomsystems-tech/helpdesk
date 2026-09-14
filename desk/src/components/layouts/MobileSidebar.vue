@@ -184,14 +184,15 @@ import { HelpModal, minimize, showHelpModal } from "frappe-ui/frappe";
 import { useAuthStore } from "@/stores/auth";
 import { isCustomerPortal } from "@/utils";
 import {
-  agentPortalSidebarOptions,
   customerPortalSidebarOptions,
+  getAgentPortalSidebarOptions,
 } from "./layoutSettings";
 import { useTelephonyStore } from "@/stores/telephony";
 import { storeToRefs } from "pinia";
 import { useProductContextStore } from "@/kancom/product/store";
 import {
   filterCapabilityNavigation,
+  getKancomSetupTabs,
   kancomAdminSetupNavigation,
   kancomSecondaryNavigation,
   travelosBrand,
@@ -221,7 +222,7 @@ const visibleTravelosModuleNavigation = computed(() =>
 const allViews = computed(() => {
   let items = isCustomerPortal.value
     ? customerPortalSidebarOptions
-    : agentPortalSidebarOptions;
+    : getAgentPortalSidebarOptions(productContextStore.hasCapability);
 
   if (!isCallingEnabled.value) {
     items = items.filter((item) => item.label !== "Call Logs");
@@ -282,10 +283,18 @@ const customerPortalDropdown = computed(() => [
 
 function openSetupModal() {
   settingsModalMode.value = "setup";
-  setActiveSettingsTab("Agents");
+  setActiveSettingsTab("Saved Replies");
   showSettingsModal.value = true;
   sidebarOpened.value = false;
 }
+
+const visibleSetupTabs = computed(() =>
+  getKancomSetupTabs(
+    productContextStore.context?.persona || null,
+    productContextStore.hasCapability("managed_configuration"),
+    authStore.isAdmin || authStore.isManager
+  )
+);
 
 const agentPortalDropdown = computed(() => [
   {
@@ -304,25 +313,16 @@ const agentPortalDropdown = computed(() => [
       router.push({ name: kancomSecondaryNavigation.contacts.routeName });
     },
   },
-  ...(productContextStore.hasCapability(
-    kancomSecondaryNavigation.kancomRequests.capability
-  )
+  // Kancom Requests stays hidden until its destination is implemented.
+  ...(visibleSetupTabs.value.length
     ? [
         {
-          label: kancomSecondaryNavigation.kancomRequests.label,
-          icon: kancomSecondaryNavigation.kancomRequests.icon,
-          onClick: () => {
-            window.location.href =
-              kancomSecondaryNavigation.kancomRequests.path;
-          },
+          label: kancomAdminSetupNavigation.group,
+          icon: "settings",
+          onClick: openSetupModal,
         },
       ]
     : []),
-  {
-    label: kancomAdminSetupNavigation.group,
-    icon: "settings",
-    onClick: openSetupModal,
-  },
   {
     label: kancomSecondaryNavigation.docs.label,
     icon: kancomSecondaryNavigation.docs.icon,

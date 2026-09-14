@@ -23,6 +23,8 @@ import SavedReplies from "./SavedReplies/SavedReplies.vue";
 import Profile from "./Profile/Profile.vue";
 import { Avatar } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
+import { useProductContextStore } from "@/kancom/product/store";
+import { getKancomSetupTabs } from "@/kancom/shell/navigation";
 import General from "./General/General.vue";
 import SettingsGear from "~icons/lucide/settings";
 import SavedReplyIcon from "../icons/SavedReplyIcon.vue";
@@ -30,19 +32,21 @@ import SavedReplyIcon from "../icons/SavedReplyIcon.vue";
 export const showSettingsModal = ref(false);
 export const settingsModalMode = ref<"full" | "setup">("full");
 
-const kancomSetupTabNames = [
-  "Profile",
-  "Agents",
-  "Teams",
-  "Assignment Rules",
-  "SLA Policies",
-  "Saved Replies",
-] as const;
+const auth = useAuthStore();
+const productContextStore = useProductContextStore();
+
+const canShowTeams = () =>
+  auth.isAdmin ||
+  auth.isManager ||
+  (productContextStore.context?.persona === "operations_head" &&
+    productContextStore.hasCapability("managed_configuration"));
 
 const isKancomSetupTab = (label: string) =>
-  kancomSetupTabNames.some((tabName) => label === __(tabName));
-
-const auth = useAuthStore();
+  getKancomSetupTabs(
+    productContextStore.context?.persona || null,
+    productContextStore.hasCapability("managed_configuration"),
+    auth.isAdmin || auth.isManager
+  ).some((tabName) => label === __(tabName));
 
 export const tabs = computed(() => {
   const _tabs = [
@@ -102,7 +106,7 @@ export const tabs = computed(() => {
           label: __("Teams"),
           icon: markRaw(LucideUsers),
           component: markRaw(TeamsConfig),
-          condition: () => auth.isAdmin || auth.isManager,
+          condition: canShowTeams,
         },
         {
           label: __("SLA Policies"),

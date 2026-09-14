@@ -9,48 +9,64 @@ import { OrganizationsIcon } from "../icons";
 import { __ } from "@/translation";
 import { travelosShellLabels } from "@/kancom/shell/navigation";
 
-export const agentPortalSidebarOptions = [
-  {
-    label: __("My Queues"),
-    icon: LucideLayoutDashboard,
-    to: { name: "TicketsAgent", query: { scope: "queues" } },
-  },
-  {
-    label: __(travelosShellLabels.tickets),
-    icon: LucideTicket,
-    to: "TicketsAgent",
-  },
-  {
-    label: __("Team Queues"),
-    icon: LucideUsersRound,
-    to: { name: "TicketsAgent", query: { scope: "queues" } },
-  },
-  {
-    label: __("Escalations"),
-    icon: LucideAlertTriangle,
-    to: "TicketsAgent",
-  },
-  {
-    label: __("SLA Monitor"),
-    icon: LucideCircleGauge,
-    to: "TicketsAgent",
-  },
-  {
-    label: __(travelosShellLabels.customers),
-    icon: OrganizationsIcon,
-    to: "CustomerList",
-  },
-  {
-    label: __("Reports"),
-    icon: LucideLineChart,
-    to: "AnalyticsDashboard",
-  },
-  {
-    label: __(travelosShellLabels.knowledgeBase),
-    icon: LucideBookOpen,
-    to: "AgentKnowledgeBase",
-  },
-];
+const basicReportsPath = "/app/hd-ticket/view/report";
+
+export function getAgentPortalSidebarOptions(
+  hasCapability: (capability: "analytics" | "basic_reports") => boolean
+) {
+  const reports = hasCapability("analytics")
+    ? {
+        label: __("Reports"),
+        icon: LucideLineChart,
+        to: "AnalyticsDashboard",
+      }
+    : hasCapability("basic_reports")
+    ? {
+        label: __("Reports"),
+        icon: LucideLineChart,
+        onClick: () => window.location.assign(basicReportsPath),
+      }
+    : null;
+
+  return [
+    {
+      label: __("My Queues"),
+      icon: LucideLayoutDashboard,
+      to: { name: "TicketsAgent", query: { scope: "queues" } },
+    },
+    {
+      label: __(travelosShellLabels.tickets),
+      icon: LucideTicket,
+      to: "TicketsAgent",
+    },
+    {
+      label: __("Team Queues"),
+      icon: LucideUsersRound,
+      to: { name: "TicketsAgent", query: { scope: "queues" } },
+    },
+    {
+      label: __("Escalations"),
+      icon: LucideAlertTriangle,
+      to: "TicketsAgent",
+    },
+    {
+      label: __("SLA Monitor"),
+      icon: LucideCircleGauge,
+      to: "TicketsAgent",
+    },
+    {
+      label: __(travelosShellLabels.customers),
+      icon: OrganizationsIcon,
+      to: "CustomerList",
+    },
+    ...(reports ? [reports] : []),
+    {
+      label: __(travelosShellLabels.knowledgeBase),
+      icon: LucideBookOpen,
+      to: "AgentKnowledgeBase",
+    },
+  ];
+}
 
 export const customerPortalSidebarOptions = [
   {
