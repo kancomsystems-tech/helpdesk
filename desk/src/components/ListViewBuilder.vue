@@ -686,7 +686,11 @@ function handleReload() {
 function handleViewChanges() {
   let currentView: View = findCurrentView();
   if (!currentView) {
-    router.push({ name: route.name });
+    if (route.query.view) {
+      const query = { ...route.query };
+      delete query.view;
+      router.replace({ name: route.name, query });
+    }
     reload(true);
     return;
   }
