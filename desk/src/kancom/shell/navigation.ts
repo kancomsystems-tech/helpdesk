@@ -1,3 +1,4 @@
+import type { KancomCapability } from "@/kancom/product/store";
 import { kancomShellLabels } from "./labels";
 import LucideActivity from "~icons/lucide/activity";
 import LucideBarChart3 from "~icons/lucide/bar-chart-3";
@@ -30,26 +31,41 @@ export const travelosModuleNavigation = [
     icon: LucideLayoutDashboard,
     to: { name: "Dashboard" },
     activeRoutes: ["Dashboard", "TicketsAgent", "CustomerList"],
+    capability: "operations",
   },
   {
     label: "Analytics",
     icon: LucideBarChart3,
     to: { name: "AnalyticsDashboard" },
     activeRoutes: ["AnalyticsDashboard"],
+    capability: "analytics",
   },
   {
     label: "Workforce",
     icon: LucideUsersRound,
     to: { name: "WorkforceDashboard" },
     activeRoutes: ["WorkforceDashboard"],
+    capability: "workforce",
   },
   {
     label: "Quality",
     icon: LucideShieldCheck,
     to: { name: "QualityDashboard" },
     activeRoutes: ["QualityDashboard"],
+    capability: "quality",
   },
 ] as const;
+
+export function filterCapabilityNavigation<
+  T extends { capability?: KancomCapability }
+>(
+  items: readonly T[],
+  hasCapability: (capability: KancomCapability) => boolean
+): T[] {
+  return items.filter(
+    (item) => !item.capability || hasCapability(item.capability)
+  );
+}
 
 export const kancomSecondaryNavigation = {
   knowledgeBase: {
@@ -66,6 +82,7 @@ export const kancomSecondaryNavigation = {
     label: "Kancom Requests",
     icon: "ticket",
     path: "/kancom-request",
+    capability: "kancom_requests" as KancomCapability,
   },
   settings: {
     label: "Settings",
@@ -85,31 +102,15 @@ export const kancomSecondaryNavigation = {
 export const kancomAdminSetupNavigation = {
   group: "Setup",
   items: [
-    {
-      label: "Profile",
-      icon: "user",
-      settingsTab: "Profile",
-    },
-    {
-      label: "Agents",
-      icon: "user",
-      settingsTab: "Agents",
-    },
-    {
-      label: "Teams",
-      icon: "users",
-      settingsTab: "Teams",
-    },
+    { label: "Profile", icon: "user", settingsTab: "Profile" },
+    { label: "Agents", icon: "user", settingsTab: "Agents" },
+    { label: "Teams", icon: "users", settingsTab: "Teams" },
     {
       label: "Assignment Rules",
       icon: "settings",
       settingsTab: "Assignment Rules",
     },
-    {
-      label: "SLA Policies",
-      icon: "shield",
-      settingsTab: "SLA Policies",
-    },
+    { label: "SLA Policies", icon: "shield", settingsTab: "SLA Policies" },
     {
       label: "Saved Replies",
       icon: "message-square",

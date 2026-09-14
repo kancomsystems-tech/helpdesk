@@ -1,8 +1,16 @@
 import { useScreenSize } from "@/composables/screen";
+import {
+  type KancomCapability,
+  useProductContextStore,
+} from "@/kancom/product/store";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { isCustomerPortal } from "@/utils";
-import { createRouter, createWebHistory } from "vue-router";
+import {
+  createRouter,
+  createWebHistory,
+  type RouteRecordRaw,
+} from "vue-router";
 const { isMobileView } = useScreenSize();
 
 export const LOGIN_PAGE = "/login";
@@ -17,10 +25,11 @@ declare module "vue-router" {
     onSuccessRoute?: string;
     parent?: string;
     manager?: boolean;
+    capability?: KancomCapability;
   }
 }
 
-const routes = [
+const routes: RouteRecordRaw[] = [
   // Agent Portal Routes
   {
     path: "/",
@@ -113,24 +122,25 @@ const routes = [
     name: "Dashboard",
     component: () =>
       import("@/kancom/operations/pages/OperationsDashboard.vue"),
+    meta: { capability: "operations" },
   },
   {
     path: "/analytics",
     name: "AnalyticsDashboard",
     component: () => import("@/kancom/analytics/pages/AnalyticsDashboard.vue"),
-    meta: { manager: true },
+    meta: { manager: true, capability: "analytics" },
   },
   {
     path: "/workforce",
     name: "WorkforceDashboard",
     component: () => import("@/kancom/workforce/pages/WorkforceDashboard.vue"),
-    meta: { manager: true },
+    meta: { manager: true, capability: "workforce" },
   },
   {
     path: "/quality",
     name: "QualityDashboard",
     component: () => import("@/kancom/quality/pages/QualityDashboard.vue"),
-    meta: { manager: true },
+    meta: { manager: true, capability: "quality" },
   },
   {
     path: "/call-logs",
@@ -219,9 +229,13 @@ export const router = createRouter({
 
 router.beforeEach(async (to, _, next) => {
   const authStore = useAuthStore();
+  const productContextStore = useProductContextStore();
   isCustomerPortal.value = to.meta.public || false;
   if (authStore.isLoggedIn) {
     await authStore.init();
+    if (!to.meta.public && authStore.hasDeskAccess) {
+      await productContextStore.init();
+    }
   }
 
   if (!authStore.isLoggedIn) {
@@ -232,6 +246,11 @@ router.beforeEach(async (to, _, next) => {
       (redirectURL ? `?redirect-to=/helpdesk${redirectURL}` : "/helpdesk");
   } else if (!to.meta.public && !authStore.hasDeskAccess) {
     next({ name: "TicketsCustomer" });
+  } else if (
+    to.meta.capability &&
+    !productContextStore.hasCapability(to.meta.capability)
+  ) {
+    next({ name: "TicketsAgent" });
   } else if (to.meta.manager && !(authStore.isManager || authStore.isAdmin)) {
     next({ name: "Dashboard" });
   } else if (to.name === "TicketAgent" && !authStore.isAgent) {

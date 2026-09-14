@@ -44,7 +44,7 @@
             </div>
             <div v-if="!isCustomerPortal" class="travelos-module-nav px-2">
               <SidebarLink
-                v-for="module in travelosModuleNavigation"
+                v-for="module in visibleTravelosModuleNavigation"
                 :key="module.label"
                 :label="module.label"
                 class="my-0.5 travelos-module-link"
@@ -189,7 +189,9 @@ import {
 } from "./layoutSettings";
 import { useTelephonyStore } from "@/stores/telephony";
 import { storeToRefs } from "pinia";
+import { useProductContextStore } from "@/kancom/product/store";
 import {
+  filterCapabilityNavigation,
   kancomAdminSetupNavigation,
   kancomSecondaryNavigation,
   travelosBrand,
@@ -206,8 +208,15 @@ const notificationStore = useNotificationStore();
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
+const productContextStore = useProductContextStore();
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
+const visibleTravelosModuleNavigation = computed(() =>
+  filterCapabilityNavigation(
+    travelosModuleNavigation,
+    productContextStore.hasCapability
+  )
+);
 
 const allViews = computed(() => {
   let items = isCustomerPortal.value
@@ -295,13 +304,20 @@ const agentPortalDropdown = computed(() => [
       router.push({ name: kancomSecondaryNavigation.contacts.routeName });
     },
   },
-  {
-    label: kancomSecondaryNavigation.kancomRequests.label,
-    icon: kancomSecondaryNavigation.kancomRequests.icon,
-    onClick: () => {
-      window.location.href = kancomSecondaryNavigation.kancomRequests.path;
-    },
-  },
+  ...(productContextStore.hasCapability(
+    kancomSecondaryNavigation.kancomRequests.capability
+  )
+    ? [
+        {
+          label: kancomSecondaryNavigation.kancomRequests.label,
+          icon: kancomSecondaryNavigation.kancomRequests.icon,
+          onClick: () => {
+            window.location.href =
+              kancomSecondaryNavigation.kancomRequests.path;
+          },
+        },
+      ]
+    : []),
   {
     label: kancomAdminSetupNavigation.group,
     icon: "settings",
@@ -325,7 +341,9 @@ const profileSettings = computed(() => {
     : agentPortalDropdown.value;
 });
 
-const travelosProfileName = computed(() => authStore.userName || "Kapil Manager");
+const travelosProfileName = computed(
+  () => authStore.userName || "Kapil Manager"
+);
 
 const travelosProfileRole = computed(() => {
   if (authStore.isAdmin) return "Admin";
