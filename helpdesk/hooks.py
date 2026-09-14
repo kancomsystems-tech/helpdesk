@@ -69,12 +69,12 @@ doc_events = {
 }
 
 has_permission = {
-    "HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.has_permission",
+    "HD Ticket": "kancom_custom.api.ticket_permissions.has_permission",
     "HD Saved Reply": "helpdesk.helpdesk.doctype.hd_saved_reply.hd_saved_reply.has_permission",
 }
 
 permission_query_conditions = {
-    "HD Ticket": "helpdesk.helpdesk.doctype.hd_ticket.hd_ticket.permission_query",
+    "HD Ticket": "kancom_custom.api.ticket_permissions.permission_query",
     "HD Saved Reply": "helpdesk.helpdesk.doctype.hd_saved_reply.hd_saved_reply.permission_query",
 }
 
