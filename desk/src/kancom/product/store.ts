@@ -21,9 +21,14 @@ export type KancomCapability =
   | "managed_configuration"
   | "enterprise_integrations";
 
+export type KancomAction = "bulk_assign";
+
 interface ProductContext {
   edition: "Travel Inbox" | "Direct Client" | "Enterprise";
   capabilities: KancomCapability[];
+  persona: "administrator" | "operations_head" | "team_leader" | "agent" | null;
+  managed_teams: string[];
+  actions: KancomAction[];
   teams?: string[];
 }
 
@@ -40,6 +45,9 @@ export const useProductContextStore = defineStore(
     const edition = computed(() => context.value?.edition ?? null);
     const capabilities = computed(
       () => new Set<KancomCapability>(context.value?.capabilities ?? [])
+    );
+    const actions = computed(
+      () => new Set<KancomAction>(context.value?.actions ?? [])
     );
     const loading = computed(() => contextResource.loading);
     const error = computed(() => contextResource.error);
@@ -58,11 +66,17 @@ export const useProductContextStore = defineStore(
       return capabilities.value.has(capability);
     }
 
+    function hasAction(action: KancomAction) {
+      return actions.value.has(action);
+    }
+
     return {
+      actions,
       capabilities,
       context,
       edition,
       error,
+      hasAction,
       hasCapability,
       init,
       loading,

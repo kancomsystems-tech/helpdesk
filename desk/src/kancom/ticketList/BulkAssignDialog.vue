@@ -81,15 +81,10 @@ async function assignSelectedTickets() {
 
   assigning.value = true;
   try {
-    await Promise.all(
-      props.selectedTickets.map((ticket) =>
-        call("frappe.desk.form.assign_to.add", {
-          doctype: "HD Ticket",
-          name: ticket,
-          assign_to: [selectedAgent.value],
-        })
-      )
-    );
+    await call("kancom_custom.api.ticket_actions.bulk_assign", {
+      ticket_names: props.selectedTickets,
+      assignee: selectedAgent.value,
+    });
     toast.success(
       __("Assigned {0} travel request(s) to {1}", [
         props.selectedTickets.length,

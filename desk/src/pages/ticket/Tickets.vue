@@ -58,6 +58,7 @@ import {
   UnpinIcon,
 } from "@/components/icons";
 import ExportModal from "@/components/ticket/ExportModal.vue";
+import { useProductContextStore } from "@/kancom/product/store";
 import WorkbenchHeader from "@/kancom/ticketList/WorkbenchHeader.vue";
 import BulkAssignDialog from "@/kancom/ticketList/BulkAssignDialog.vue";
 import {
@@ -94,6 +95,7 @@ import { useRoute, useRouter } from "vue-router";
 
 const router = useRouter();
 const route = useRoute();
+const productContextStore = useProductContextStore();
 
 const {
   getCurrentUserViews,
@@ -126,7 +128,7 @@ const workbenchVisibilityMetrics = computed(() =>
 const listSelections = ref(new Set<string>());
 const selectedTickets = computed(() => Array.from(listSelections.value));
 const canBulkAssign = computed(
-  () => !isCustomerPortal.value && (isManager || isAdmin)
+  () => !isCustomerPortal.value && productContextStore.hasAction("bulk_assign")
 );
 
 const selectBannerActions = [
