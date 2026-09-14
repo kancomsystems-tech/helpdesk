@@ -2,14 +2,19 @@
   <div class="kancom-travel-requests-workbench">
     <LayoutHeader>
       <WorkbenchHeader
-        :create-route="{ name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew' }"
-        :chips="workbenchChips"
+        :create-route="{
+          name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew',
+        }"
+        :chips="visibleWorkbenchChips"
         :active-chip="activeWorkbenchChip"
+        :queue-teams="queueTeams"
+        :selected-team="selectedTeam"
         :metrics="workbenchVisibilityMetrics"
         :view-options="dropdownOptions"
         :view-actions="viewActions"
         :current-view="currentView"
         @chip-click="handleWorkbenchChip"
+        @team-select="handleTeamSelect"
       />
     </LayoutHeader>
     <ListViewBuilder
@@ -51,12 +56,7 @@
 
 <script setup lang="ts">
 import { LayoutHeader, ListViewBuilder } from "@/components";
-import {
-  EditIcon,
-  PinIcon,
-  TicketIcon,
-  UnpinIcon,
-} from "@/components/icons";
+import { EditIcon, PinIcon, TicketIcon, UnpinIcon } from "@/components/icons";
 import ExportModal from "@/components/ticket/ExportModal.vue";
 import { useProductContextStore } from "@/kancom/product/store";
 import WorkbenchHeader from "@/kancom/ticketList/WorkbenchHeader.vue";
@@ -66,8 +66,11 @@ import {
   kancomWorkbenchRows,
 } from "@/kancom/ticketList/workbenchColumns";
 import {
-  getWorkbenchChipFilters,
-  workbenchChips,
+  getPrimaryWorkbenchFilters,
+  getQueueTeams,
+  getVisibleWorkbenchChips,
+  replacePrimaryWorkbenchFilters,
+  type PrimaryWorkbenchScope,
   type WorkbenchChip,
 } from "@/kancom/ticketList/workbenchFilters";
 import { getWorkbenchVisibilityMetrics } from "@/kancom/ticketList/visibilityMetrics";
@@ -90,7 +93,7 @@ import { __ } from "@/translation";
 import { View } from "@/types";
 import { getIcon, isCustomerPortal } from "@/utils";
 import { FeatherIcon, toast, usePageMeta } from "frappe-ui";
-import { computed, h, onMounted, onUnmounted, reactive, ref } from "vue";
+import { computed, h, onMounted, onUnmounted, reactive, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 const router = useRouter();
@@ -117,6 +120,12 @@ const showBulkAssignDialog = ref(false);
 const { getStatus } = useTicketStatusStore();
 const { getUser } = useUserStore();
 const activeWorkbenchChip = ref("control_view");
+const selectedTeam = ref("");
+const productContext = computed(() => productContextStore.context);
+const queueTeams = computed(() => getQueueTeams(productContext.value));
+const visibleWorkbenchChips = computed(() =>
+  getVisibleWorkbenchChips(productContext.value)
+);
 
 const loadedWorkbenchRows = computed(
   () => listViewRef.value?.list?.data?.data ?? []
@@ -216,11 +225,87 @@ const options = {
 };
 
 function handleWorkbenchChip(chip: WorkbenchChip) {
-  const filters = getWorkbenchChipFilters(chip, userId);
-  if (!filters) return;
+  if (!chip.enabled) return;
+  const scopeByChip: Partial<
+    Record<WorkbenchChip["key"], PrimaryWorkbenchScope>
+  > = {
+    control_view: "control",
+    my_assigned: "assigned",
+    my_queues: "queues",
+    triage: "triage",
+  };
+  const scope = scopeByChip[chip.key];
+  if (scope) setPrimaryScope(scope);
+}
 
-  activeWorkbenchChip.value = chip.key;
-  listViewRef.value?.applyFilters(filters);
+function handleTeamSelect(team: string) {
+  if (queueTeams.value.includes(team)) setPrimaryScope("team", team);
+}
+
+function setPrimaryScope(scope: PrimaryWorkbenchScope, team = "") {
+  const query = { ...route.query };
+  delete query.team;
+  delete query.view;
+  query.scope = scope;
+  if (scope === "team") query.team = team;
+  router.replace({ name: "TicketsAgent", query });
+}
+
+function applyPrimaryScope() {
+  if (!route.query.scope && !route.query.team && route.query.view) {
+    activeWorkbenchChip.value = "";
+    selectedTeam.value = "";
+    return;
+  }
+  const requestedScope = String(
+    route.query.scope || "control"
+  ) as PrimaryWorkbenchScope;
+  const requestedTeam = String(route.query.team || "");
+  const allowedScopes: PrimaryWorkbenchScope[] = [
+    "control",
+    "assigned",
+    "queues",
+  ];
+  if (
+    productContext.value?.persona === "operations_head" ||
+    productContext.value?.persona === "administrator"
+  ) {
+    allowedScopes.push("triage");
+  }
+  if (requestedTeam && queueTeams.value.includes(requestedTeam)) {
+    allowedScopes.push("team");
+  }
+  const scope = allowedScopes.includes(requestedScope)
+    ? requestedScope
+    : "control";
+  const team = scope === "team" ? requestedTeam : "";
+  if (scope !== requestedScope || (scope !== "team" && requestedTeam)) {
+    const query = { ...route.query, scope };
+    delete query.team;
+    router.replace({ name: "TicketsAgent", query });
+    return;
+  }
+  const primaryFilters = getPrimaryWorkbenchFilters(
+    scope,
+    userId,
+    queueTeams.value,
+    team
+  );
+  const currentFilters = listViewRef.value?.list?.params?.filters || {};
+  listViewRef.value?.applyFilters(
+    replacePrimaryWorkbenchFilters(currentFilters, primaryFilters)
+  );
+  selectedTeam.value = team;
+  activeWorkbenchChip.value =
+    scope === "assigned"
+      ? "my_assigned"
+      : scope === "queues"
+      ? "my_queues"
+      : scope === "triage"
+      ? "triage"
+      : scope === "team"
+      ? ""
+      : "control_view";
 }
 
 async function exportRows(
@@ -255,7 +340,6 @@ function reset(reload = false) {
   listSelections.value?.clear();
   if (reload) listViewRef.value.reload();
 }
-
 
 let viewDialog = reactive({
   show: false,
@@ -540,7 +624,14 @@ function resetState() {
   selectedView = null;
 }
 
+watch(
+  [() => route.query.scope, () => route.query.team, queueTeams],
+  () => applyPrimaryScope(),
+  { flush: "post" }
+);
+
 onMounted(() => {
+  applyPrimaryScope();
   if (!route.query.view) {
     currentView.value = {
       label: __("Control View"),

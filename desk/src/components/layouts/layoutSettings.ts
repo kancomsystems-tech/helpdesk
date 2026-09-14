@@ -11,9 +11,9 @@ import { travelosShellLabels } from "@/kancom/shell/navigation";
 
 export const agentPortalSidebarOptions = [
   {
-    label: __("My Queue"),
+    label: __("My Queues"),
     icon: LucideLayoutDashboard,
-    to: "TicketsAgent",
+    to: { name: "TicketsAgent", query: { scope: "queues" } },
   },
   {
     label: __(travelosShellLabels.tickets),
@@ -23,7 +23,7 @@ export const agentPortalSidebarOptions = [
   {
     label: __("Team Queues"),
     icon: LucideUsersRound,
-    to: "TicketsAgent",
+    to: { name: "TicketsAgent", query: { scope: "queues" } },
   },
   {
     label: __("Escalations"),

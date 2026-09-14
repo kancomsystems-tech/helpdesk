@@ -43,18 +43,37 @@
       >
         {{ chip.label }}
       </button>
+      <Dropdown v-if="teamOptions.length" :options="teamOptions">
+        <template #default="{ open }">
+          <Button
+            class="kancom-workbench-chip"
+            :class="{ 'is-active': selectedTeam }"
+            theme="gray"
+          >
+            <span>{{ selectedTeam || "Team" }}</span>
+            <template #suffix>
+              <LucideChevronUp v-if="open" class="h-3.5 w-3.5" />
+              <LucideChevronDown v-else class="h-3.5 w-3.5" />
+            </template>
+          </Button>
+        </template>
+      </Dropdown>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { Dropdown } from "frappe-ui";
+import { computed } from "vue";
+import LucideChevronDown from "~icons/lucide/chevron-down";
+import LucideChevronUp from "~icons/lucide/chevron-up";
 import LucidePlus from "~icons/lucide/plus";
 import VisibilityStrip from "./VisibilityStrip.vue";
 import WorkbenchViews from "./WorkbenchViews.vue";
 import type { WorkbenchVisibilityMetric } from "./visibilityMetrics";
 import type { WorkbenchChip } from "./workbenchFilters";
 
-defineProps<{
+const props = defineProps<{
   createRoute: Record<string, string>;
   chips: WorkbenchChip[];
   activeChip?: string;
@@ -65,9 +84,19 @@ defineProps<{
     label?: string;
     icon?: any;
   };
+  queueTeams: string[];
+  selectedTeam?: string;
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
   chipClick: [chip: WorkbenchChip];
+  teamSelect: [team: string];
 }>();
+
+const teamOptions = computed(() =>
+  props.queueTeams.map((team) => ({
+    label: team,
+    onClick: () => emit("teamSelect", team),
+  }))
+);
 </script>

@@ -1,7 +1,8 @@
 export type WorkbenchChipKey =
   | "control_view"
   | "my_assigned"
-  | "team_open"
+  | "my_queues"
+  | "triage"
   | "client_replied"
   | "sla_risk"
   | "unassigned"
@@ -17,12 +18,8 @@ export interface WorkbenchChip {
 export const workbenchChips: WorkbenchChip[] = [
   { key: "control_view", label: "Control View", enabled: true },
   { key: "my_assigned", label: "My Assigned", enabled: true },
-  {
-    key: "team_open",
-    label: "Team Open",
-    enabled: false,
-    reason: "Parked until Kancom team ownership rules are defined.",
-  },
+  { key: "my_queues", label: "My Queues", enabled: true },
+  { key: "triage", label: "Triage", enabled: true },
   {
     key: "client_replied",
     label: "Follow-up",
@@ -48,6 +45,74 @@ export const workbenchChips: WorkbenchChip[] = [
     reason: "Parked to avoid silently replacing saved-view behavior.",
   },
 ];
+
+export type PrimaryWorkbenchScope =
+  | "control"
+  | "assigned"
+  | "queues"
+  | "triage"
+  | "team";
+
+export interface WorkbenchProductContext {
+  persona?:
+    | "administrator"
+    | "operations_head"
+    | "team_leader"
+    | "agent"
+    | null;
+  managed_teams?: string[];
+  teams?: string[];
+}
+
+const primaryFilterKeys = new Set(["_assign", "agent_group"]);
+
+export function getQueueTeams(context?: WorkbenchProductContext | null) {
+  if (!context) return [];
+  const teams =
+    context.persona === "agent" ? context.teams : context.managed_teams;
+  return Array.from(new Set((teams || []).filter(Boolean))).sort();
+}
+
+export function canUseTriage(context?: WorkbenchProductContext | null) {
+  return ["administrator", "operations_head"].includes(context?.persona || "");
+}
+
+export function getVisibleWorkbenchChips(
+  context?: WorkbenchProductContext | null
+) {
+  return workbenchChips.filter(
+    (chip) => chip.key !== "triage" || canUseTriage(context)
+  );
+}
+
+export function getPrimaryWorkbenchFilters(
+  scope: PrimaryWorkbenchScope,
+  currentUser: string,
+  queueTeams: string[],
+  team?: string
+) {
+  if (scope === "assigned") {
+    return currentUser ? { _assign: ["LIKE", "%" + currentUser + "%"] } : {};
+  }
+  if (scope === "queues") return { agent_group: ["in", queueTeams] };
+  if (scope === "triage") return { agent_group: ["is", "not set"] };
+  if (scope === "team" && team && queueTeams.includes(team)) {
+    return { agent_group: team };
+  }
+  return {};
+}
+
+export function replacePrimaryWorkbenchFilters(
+  currentFilters: Record<string, any> = {},
+  primaryFilters: Record<string, any> = {}
+) {
+  const secondaryFilters = Object.fromEntries(
+    Object.entries(currentFilters).filter(
+      ([key]) => !primaryFilterKeys.has(key)
+    )
+  );
+  return { ...secondaryFilters, ...primaryFilters };
+}
 
 function normalizeUserId(userId?: string | { value?: string }) {
   if (!userId) return "";
