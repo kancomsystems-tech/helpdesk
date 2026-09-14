@@ -50,7 +50,10 @@ const CustomerPortalRoot = defineAsyncComponent(
 
 const PortalRoot = computed(() => {
   const authStore = useAuthStore();
-  if (authStore.hasDeskAccess && authStore.isAgent) {
+  // hasDeskAccess is server-derived. It selects the TravelOS/Helpdesk shell for
+  // approved operational manager/admin personas; router guards and backend
+  // permissions remain the final authorization layer for each route/action.
+  if (authStore.hasDeskAccess) {
     return AgentPortalRoot;
   } else {
     return CustomerPortalRoot;

@@ -6,6 +6,7 @@ import { computed, ComputedRef, Ref, ref } from "vue";
 const URI_LOGIN = "login";
 const URI_LOGOUT = "logout";
 const URI_USER_INFO = "helpdesk.api.auth.get_user";
+const TRAVELOS_LOGIN_DESTINATION = "/helpdesk/dashboard";
 
 /**
  * This is supposed to be the entry point of authentication. This will be
@@ -57,22 +58,66 @@ export const useAuthStore = defineStore("auth", () => {
   }
   const user: Ref<string> = ref(sessionUser());
   const isLoggedIn: ComputedRef<boolean> = computed(() => !!user.value);
+  function getSafeRedirectPath() {
+    const value = router.currentRoute.value.query["redirect-to"];
+    const redirectTo = Array.isArray(value) ? value[0] : value;
+    if (!redirectTo || typeof redirectTo !== "string") return null;
+
+    const trimmed = redirectTo.trim();
+    if (
+      !trimmed ||
+      trimmed.startsWith("//") ||
+      trimmed.startsWith("\\") ||
+      /^[a-z][a-z0-9+.-]*:/i.test(trimmed)
+    ) {
+      return null;
+    }
+
+    try {
+      const url = new URL(trimmed, window.location.origin);
+      if (url.origin !== window.location.origin) return null;
+      if (!url.pathname.startsWith("/helpdesk") && !url.pathname.startsWith("/")) {
+        return null;
+      }
+
+      const path = url.pathname.startsWith("/helpdesk")
+        ? url.pathname.slice("/helpdesk".length) || "/"
+        : url.pathname;
+
+      if (!path.startsWith("/")) return null;
+      return `${path}${url.search}${url.hash}`;
+    } catch {
+      return null;
+    }
+  }
+
   const login = createResource({
     url: URI_LOGIN,
     onError() {
       throw new Error("Invalid email or password");
     },
-    onSuccess() {
+    async onSuccess() {
       user.value = sessionUser();
+      const redirectPath = getSafeRedirectPath();
       login.reset();
-      router.replace({ path: "/" });
+
+      if (redirectPath) {
+        router.replace(redirectPath);
+        return;
+      }
+
+      await init();
+      router.replace(
+        hasDeskAccess.value ? { name: "Dashboard" } : { name: "TicketsCustomer" }
+      );
     },
   });
 
   function logout() {
     user.value = null;
     call(URI_LOGOUT).then(() => {
-      window.location.href = LOGIN_PAGE;
+      window.location.href =
+        LOGIN_PAGE + "?redirect-to=" + encodeURIComponent(TRAVELOS_LOGIN_DESTINATION);
     });
   }
 

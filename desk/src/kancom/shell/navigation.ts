@@ -1,17 +1,64 @@
 import { kancomShellLabels } from "./labels";
+import LucideActivity from "~icons/lucide/activity";
+import LucideBarChart3 from "~icons/lucide/bar-chart-3";
+import LucideLayoutDashboard from "~icons/lucide/layout-dashboard";
+import LucideShieldCheck from "~icons/lucide/shield-check";
+import LucideUsersRound from "~icons/lucide/users-round";
+
+export const travelosShellLabels = {
+  dashboard: "Operations Dashboard",
+  tickets: "Travel Requests",
+  customers: "Clients",
+  knowledgeBase: kancomShellLabels.knowledgeBase,
+  contacts: kancomShellLabels.contacts,
+};
 
 export const kancomSidebarLabels = {
-  dashboard: kancomShellLabels.dashboard,
+  dashboard: travelosShellLabels.dashboard,
 };
+
+export const travelosBrand = {
+  product: "TravelOS",
+  subtitle: "Travel Operations",
+  poweredBy: "Powered by Kancom",
+  icon: LucideActivity,
+};
+
+export const travelosModuleNavigation = [
+  {
+    label: "Operations",
+    icon: LucideLayoutDashboard,
+    to: { name: "Dashboard" },
+    activeRoutes: ["Dashboard", "TicketsAgent", "CustomerList"],
+  },
+  {
+    label: "Analytics",
+    icon: LucideBarChart3,
+    to: { name: "AnalyticsDashboard" },
+    activeRoutes: ["AnalyticsDashboard"],
+  },
+  {
+    label: "Workforce",
+    icon: LucideUsersRound,
+    to: { name: "WorkforceDashboard" },
+    activeRoutes: ["WorkforceDashboard"],
+  },
+  {
+    label: "Quality",
+    icon: LucideShieldCheck,
+    to: { name: "QualityDashboard" },
+    activeRoutes: ["QualityDashboard"],
+  },
+] as const;
 
 export const kancomSecondaryNavigation = {
   knowledgeBase: {
-    label: kancomShellLabels.knowledgeBase,
+    label: travelosShellLabels.knowledgeBase,
     icon: "book-open",
     routeName: "AgentKnowledgeBase",
   },
   contacts: {
-    label: kancomShellLabels.contacts,
+    label: travelosShellLabels.contacts,
     icon: "user",
     routeName: "ContactList",
   },

@@ -8,7 +8,7 @@ const authStore = useAuthStore();
 const configStore = useConfigStore();
 
 function getTarget() {
-  if (authStore.hasDeskAccess) return "TicketsAgent";
+  if (authStore.hasDeskAccess) return "Dashboard";
   else if (configStore.preferKnowledgeBase) return "CustomerKnowledgeBase";
   else return "TicketsCustomer";
 }

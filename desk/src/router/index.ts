@@ -16,6 +16,7 @@ declare module "vue-router" {
     public?: boolean;
     onSuccessRoute?: string;
     parent?: string;
+    manager?: boolean;
   }
 }
 
@@ -24,7 +25,12 @@ const routes = [
   {
     path: "/",
     name: "Home",
-    redirect: "/tickets",
+    redirect: "/dashboard",
+  },
+  {
+    path: "/login",
+    name: "HelpdeskLogin",
+    redirect: { name: "Dashboard" },
   },
 
   {
@@ -105,7 +111,26 @@ const routes = [
   {
     path: "/dashboard",
     name: "Dashboard",
-    component: () => import("@/pages/dashboard/Dashboard.vue"),
+    component: () =>
+      import("@/kancom/operations/pages/OperationsDashboard.vue"),
+  },
+  {
+    path: "/analytics",
+    name: "AnalyticsDashboard",
+    component: () => import("@/kancom/analytics/pages/AnalyticsDashboard.vue"),
+    meta: { manager: true },
+  },
+  {
+    path: "/workforce",
+    name: "WorkforceDashboard",
+    component: () => import("@/kancom/workforce/pages/WorkforceDashboard.vue"),
+    meta: { manager: true },
+  },
+  {
+    path: "/quality",
+    name: "QualityDashboard",
+    component: () => import("@/kancom/quality/pages/QualityDashboard.vue"),
+    meta: { manager: true },
   },
   {
     path: "/call-logs",
@@ -207,6 +232,8 @@ router.beforeEach(async (to, _, next) => {
       (redirectURL ? `?redirect-to=/helpdesk${redirectURL}` : "/helpdesk");
   } else if (!to.meta.public && !authStore.hasDeskAccess) {
     next({ name: "TicketsCustomer" });
+  } else if (to.meta.manager && !(authStore.isManager || authStore.isAdmin)) {
+    next({ name: "Dashboard" });
   } else if (to.name === "TicketAgent" && !authStore.isAgent) {
     const ticketId = to.params.ticketId;
     next({

@@ -1,12 +1,47 @@
 <template>
   <div
-    class="flex select-none flex-col border-r border-gray-200 bg-gray-50 p-2 text-base duration-300 ease-in-out"
+    class="travelos-sidebar flex min-h-0 select-none flex-col border-r border-gray-200 bg-gray-50 p-2 text-base duration-300 ease-in-out"
     :style="{
       'min-width': width,
       'max-width': width,
     }"
   >
-    <UserMenu class="mb-2" :options="profileSettings" />
+    <button
+      type="button"
+      class="travelos-sidebar-brand"
+      :class="{ 'is-collapsed': !isExpanded }"
+      @click="router.push({ name: 'Dashboard' })"
+    >
+      <div class="travelos-brand-mark">
+        <component :is="travelosBrand.icon" class="h-5 w-5" />
+      </div>
+      <div v-if="isExpanded" class="min-w-0">
+        <div class="truncate text-base font-semibold leading-5">
+          {{ travelosBrand.product }}
+        </div>
+        <div class="truncate text-xs leading-4">
+          {{ travelosBrand.subtitle }}
+        </div>
+      </div>
+    </button>
+    <UserMenu
+      class="mb-2"
+      :options="profileSettings"
+      :primary-label="travelosProfileName"
+      :secondary-label="travelosProfileRole"
+    />
+    <div v-if="!isCustomerPortal" class="travelos-module-nav">
+      <SidebarLink
+        v-for="module in travelosModuleNavigation"
+        :key="module.label"
+        :label="module.label"
+        class="my-0.5 travelos-module-link"
+        :icon="module.icon"
+        :to="module.to"
+        :is-active="isTravelosModuleActive(module.activeRoutes)"
+        :is-expanded="isExpanded"
+      />
+    </div>
     <SidebarLink
       v-if="!isCustomerPortal"
       :label="__('Search')"
@@ -22,15 +57,6 @@
         </span>
       </template>
     </SidebarLink>
-    <SidebarLink
-      v-if="!isCustomerPortal"
-      class="relative my-0.5 min-h-7"
-      :label="__(kancomSidebarLabels.dashboard)"
-      :icon="LucideLayoutDashboard"
-      :to="'Dashboard'"
-      :is-active="isActiveTab('Dashboard')"
-      :is-expanded="isExpanded"
-    />
     <div class="mb-4" v-if="!isCustomerPortal">
       <div
         v-if="notificationStore.unread"
@@ -59,7 +85,7 @@
     </div>
     <div
       :class="[
-        'overflow-y-auto overflow-x-hidden',
+        'min-h-0 flex-1 overflow-y-auto overflow-x-hidden',
         !isExpanded && 'hide-scrollbar',
       ]"
     >
@@ -108,19 +134,9 @@
         </Section>
       </div>
     </div>
-    <div class="grow" />
-    <div class="flex flex-col gap-2">
-      <TrialBanner
-        v-if="isFCSite && !isCustomerPortal"
-        :isSidebarCollapsed="!isExpanded"
-      />
-      <GettingStartedBanner
-        v-if="showOnboardingBanner"
-        :isSidebarCollapsed="!isExpanded"
-        appName="helpdesk"
-      />
+    <div class="travelos-sidebar-footer">
       <SidebarLink
-        v-if="isOnboardingStepsCompleted && !isCustomerPortal"
+        v-if="!isCustomerPortal"
         :icon="HelpIcon"
         :label="__('Help')"
         :is-expanded="isExpanded"
@@ -140,10 +156,6 @@
         :on-click="() => (isExpanded = !isExpanded)"
       />
     </div>
-    <TrialBanner
-      v-if="isFCSite && !isCustomerPortal"
-      :isSidebarCollapsed="!isExpanded"
-    />
     <SettingsModal v-model="showSettingsModal" />
     <HelpModal
       v-if="showHelpModal"
@@ -211,7 +223,8 @@ import { __ } from "@/translation";
 import {
   kancomAdminSetupNavigation,
   kancomSecondaryNavigation,
-  kancomSidebarLabels,
+  travelosBrand,
+  travelosModuleNavigation,
 } from "@/kancom/shell/navigation";
 import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
 import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
@@ -379,11 +392,23 @@ const profileSettings = computed(() => {
     : agentPortalDropdown.value;
 });
 
+const travelosProfileName = computed(() => authStore.userName || "Kapil Manager");
+
+const travelosProfileRole = computed(() => {
+  if (authStore.isAdmin) return "Admin";
+  if (authStore.isManager) return "Operations Manager";
+  return "Travel Desk Agent";
+});
+
 function isActiveTab(to: any) {
   if (route.query.view) {
     return route.query.view == to?.query?.view;
   }
   return route.name === to;
+}
+
+function isTravelosModuleActive(activeRoutes: readonly string[]) {
+  return activeRoutes.includes(String(route.name));
 }
 
 function openCommandPalette() {
@@ -398,13 +423,7 @@ const logo = h(
   null
 );
 
-const showOnboardingBanner = computed(() => {
-  return (
-    !isCustomerPortal.value &&
-    !isOnboardingStepsCompleted.value &&
-    authStore.isManager
-  );
-});
+const showOnboardingBanner = computed(() => false);
 
 const steps = [
   {
@@ -650,8 +669,6 @@ async function getGeneralCategory() {
 }
 
 function setUpOnboarding() {
-  if (!authStore.isManager) return;
-  setUp(steps);
   useShortcut({ key: "h", meta: true }, () => {
     showHelpModal.value = !showHelpModal.value;
   });

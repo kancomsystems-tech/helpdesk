@@ -11,83 +11,128 @@
         leave-to="-translate-x-full"
       >
         <div
-          class="relative z-10 flex h-full w-[230px] flex-col border-r bg-gray-50 transition-all duration-300 ease-in-out"
+          class="travelos-sidebar relative z-10 flex h-full min-h-0 w-[230px] flex-col border-r bg-gray-50 transition-all duration-300 ease-in-out"
         >
-          <!-- user dropwdown -->
-          <div class="p-1">
-            <UserMenu :options="profileSettings" />
-          </div>
-          <!-- notifications -->
-          <div class="overflow-y-auto px-2" v-if="!isCustomerPortal">
-            <div class="mb-3 flex flex-col gap-1">
-              <SidebarLink
-                class="relative"
-                label="Notifications"
-                :icon="LucideBell"
-                :on-click="() => (sidebarOpened = false)"
-                :is-expanded="true"
-                to="Notifications"
-              >
-                <template #right>
-                  <Badge
-                    v-if="notificationStore.unread"
-                    :label="notificationStore.unread"
-                    theme="gray"
-                    variant="subtle"
-                  />
-                </template>
-              </SidebarLink>
-              <SidebarLink
-                v-if="!isCustomerPortal"
-                class="relative"
-                :label="kancomSidebarLabels.dashboard"
-                :icon="LucideLayoutDashboard"
-                :to="'Dashboard'"
-                :is-active="isActiveTab('Dashboard')"
-                :is-expanded="true"
-              />
-            </div>
+          <div class="shrink-0">
+            <button
+              type="button"
+              class="travelos-sidebar-brand w-full text-left"
+              @click="goToDashboard"
+            >
+              <div class="travelos-brand-mark">
+                <component :is="travelosBrand.icon" class="h-5 w-5" />
+              </div>
+              <div class="min-w-0">
+                <div class="truncate text-base font-semibold leading-5">
+                  {{ travelosBrand.product }}
+                </div>
+                <div class="truncate text-xs leading-4">
+                  {{ travelosBrand.subtitle }}
+                </div>
+              </div>
+            </button>
           </div>
 
-          <div v-for="view in allViews" :key="view.label">
-            <div
-              v-if="!view.hideLabel && view.views?.length"
-              class="mx-2 my-2 h-1"
-            />
-            <Section
-              :label="view.label"
-              :hideLabel="view.hideLabel"
-              :opened="view.opened"
-            >
-              <template #header="{ opened, hide, toggle }">
-                <div
-                  v-if="!hide"
-                  class="flex cursor-pointer gap-1.5 px-1 text-base font-medium text-ink-gray-5 transition-all duration-300 ease-in-out"
-                  :class="'ml-2 mt-4 h-7 w-auto opacity-100'"
-                  @click="toggle()"
-                >
-                  <FeatherIcon
-                    name="chevron-right"
-                    class="h-4 text-ink-gray-9 transition-all duration-300 ease-in-out"
-                    :class="{ 'rotate-90': opened }"
-                  />
-                  <span>{{ view.label }}</span>
-                </div>
-              </template>
-              <nav class="flex flex-col ml-2 mr-1">
+          <div class="min-h-0 flex-1 overflow-y-auto pb-3">
+            <!-- user dropwdown -->
+            <div class="p-1">
+              <UserMenu
+                :options="profileSettings"
+                :primary-label="travelosProfileName"
+                :secondary-label="travelosProfileRole"
+              />
+            </div>
+            <div v-if="!isCustomerPortal" class="travelos-module-nav px-2">
+              <SidebarLink
+                v-for="module in travelosModuleNavigation"
+                :key="module.label"
+                :label="module.label"
+                class="my-0.5 travelos-module-link"
+                :icon="module.icon"
+                :to="module.to"
+                :is-active="isTravelosModuleActive(module.activeRoutes)"
+                :is-expanded="true"
+                :on-click="() => (sidebarOpened = false)"
+              />
+            </div>
+            <!-- notifications -->
+            <div class="px-2" v-if="!isCustomerPortal">
+              <div class="mb-3 flex flex-col gap-1">
                 <SidebarLink
-                  v-for="link in view.views"
-                  :icon="link.icon"
-                  :label="link.label"
-                  :to="link.to"
-                  :key="link.label"
+                  class="relative"
+                  label="Notifications"
+                  :icon="LucideBell"
+                  :on-click="() => (sidebarOpened = false)"
                   :is-expanded="true"
-                  :is-active="isActiveTab(link.to)"
-                  class="my-0.5"
-                  :onClick="link.onClick"
-                />
-              </nav>
-            </Section>
+                  to="Notifications"
+                >
+                  <template #right>
+                    <Badge
+                      v-if="notificationStore.unread"
+                      :label="notificationStore.unread"
+                      theme="gray"
+                      variant="subtle"
+                    />
+                  </template>
+                </SidebarLink>
+              </div>
+            </div>
+
+            <div v-for="view in allViews" :key="view.label">
+              <div
+                v-if="!view.hideLabel && view.views?.length"
+                class="mx-2 my-2 h-1"
+              />
+              <Section
+                :label="view.label"
+                :hideLabel="view.hideLabel"
+                :opened="view.opened"
+              >
+                <template #header="{ opened, hide, toggle }">
+                  <div
+                    v-if="!hide"
+                    class="flex cursor-pointer gap-1.5 px-1 text-base font-medium text-ink-gray-5 transition-all duration-300 ease-in-out"
+                    :class="'ml-2 mt-4 h-7 w-auto opacity-100'"
+                    @click="toggle()"
+                  >
+                    <FeatherIcon
+                      name="chevron-right"
+                      class="h-4 text-ink-gray-9 transition-all duration-300 ease-in-out"
+                      :class="{ 'rotate-90': opened }"
+                    />
+                    <span>{{ view.label }}</span>
+                  </div>
+                </template>
+                <nav class="flex flex-col ml-2 mr-1">
+                  <SidebarLink
+                    v-for="link in view.views"
+                    :icon="link.icon"
+                    :label="link.label"
+                    :to="link.to"
+                    :key="link.label"
+                    :is-expanded="true"
+                    :is-active="isActiveTab(link.to)"
+                    class="my-0.5"
+                    :onClick="link.onClick"
+                  />
+                </nav>
+              </Section>
+            </div>
+          </div>
+          <div class="travelos-sidebar-footer shrink-0">
+            <SidebarLink
+              v-if="!isCustomerPortal"
+              :icon="HelpIcon"
+              :label="'Help'"
+              :is-expanded="true"
+              @click="
+                () => {
+                  sidebarOpened = false;
+                  showHelpModal = minimize ? true : !showHelpModal;
+                  minimize = !showHelpModal;
+                }
+              "
+            />
           </div>
         </div>
       </TransitionChild>
@@ -105,6 +150,13 @@
     </Dialog>
   </TransitionRoot>
   <SettingsModal v-model="showSettingsModal" />
+  <HelpModal
+    v-if="showHelpModal"
+    v-model="showHelpModal"
+    appName="helpdesk"
+    title="Frappe Helpdesk"
+    docsLink="https://docs.frappe.io/helpdesk"
+  />
 </template>
 
 <script setup lang="ts">
@@ -127,8 +179,8 @@ import { mobileSidebarOpened as sidebarOpened } from "@/composables/mobile";
 import { currentView, useView } from "@/composables/useView";
 
 import LucideBell from "~icons/lucide/bell";
-import LucideLayoutDashboard from "~icons/lucide/layout-dashboard";
-
+import { HelpIcon } from "frappe-ui/icons";
+import { HelpModal, minimize, showHelpModal } from "frappe-ui/frappe";
 import { useAuthStore } from "@/stores/auth";
 import { isCustomerPortal } from "@/utils";
 import {
@@ -140,7 +192,8 @@ import { storeToRefs } from "pinia";
 import {
   kancomAdminSetupNavigation,
   kancomSecondaryNavigation,
-  kancomSidebarLabels,
+  travelosBrand,
+  travelosModuleNavigation,
 } from "@/kancom/shell/navigation";
 import {
   setActiveSettingsTab,
@@ -272,11 +325,28 @@ const profileSettings = computed(() => {
     : agentPortalDropdown.value;
 });
 
-function isActiveTab(to: string) {
+const travelosProfileName = computed(() => authStore.userName || "Kapil Manager");
+
+const travelosProfileRole = computed(() => {
+  if (authStore.isAdmin) return "Admin";
+  if (authStore.isManager) return "Operations Manager";
+  return "Travel Desk Agent";
+});
+
+function isActiveTab(to: any) {
   if (route.query.view) {
     return route.query.view == to?.query?.view;
   }
   return route.name === to;
+}
+
+function isTravelosModuleActive(activeRoutes: readonly string[]) {
+  return activeRoutes.includes(String(route.name));
+}
+
+function goToDashboard() {
+  sidebarOpened.value = false;
+  router.push({ name: "Dashboard" });
 }
 </script>
 

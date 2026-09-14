@@ -483,3 +483,2159 @@
 .kancom-desk-shell .kancom-travel-requests-workbench .kancom-workbench-view-action:focus-visible {
   opacity: 1;
 }
+
+
+/* TravelOS shell and dashboard layer. Workbench-specific rules above remain scoped to .kancom-travel-requests-workbench. */
+.kancom-desk-shell {
+  --travelos-navy: #071827;
+  --travelos-navy-2: #0b2134;
+  --travelos-navy-3: #102b42;
+  --travelos-cyan: #17c6cc;
+  --travelos-blue: #1f6feb;
+  --travelos-content-bg: #f4f7fb;
+  --travelos-card-border: #dfe7ef;
+  --travelos-card-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.kancom-desk-shell .travelos-sidebar,
+.kancom-desk-shell > .travelos-sidebar.select-none.border-r,
+.kancom-desk-shell .travelos-sidebar.w-\[230px\].border-r {
+  background: linear-gradient(180deg, var(--travelos-navy) 0%, var(--travelos-navy-2) 58%, #061320 100%) !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+  box-shadow: 10px 0 30px rgba(2, 8, 23, 0.18);
+  color: #dbeafe;
+}
+
+.kancom-desk-shell .travelos-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 8px 8px 6px;
+  color: #f8fafc;
+}
+
+.kancom-desk-shell button.travelos-sidebar-brand {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.kancom-desk-shell .travelos-sidebar-brand.is-collapsed {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.kancom-desk-shell .travelos-brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(23, 198, 204, 0.95), rgba(31, 111, 235, 0.85));
+  color: #ffffff;
+  box-shadow: 0 10px 20px rgba(23, 198, 204, 0.18);
+}
+
+.kancom-desk-shell .travelos-powered-label {
+  margin: -2px 8px 10px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+  color: rgba(203, 213, 225, 0.72);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.kancom-desk-shell .travelos-sidebar .travelos-module-nav {
+  margin: 2px 0 10px;
+  padding: 8px 0;
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.kancom-desk-shell .travelos-sidebar [class*="text-gray-700"],
+.kancom-desk-shell .travelos-sidebar [class*="text-gray-800"],
+.kancom-desk-shell .travelos-sidebar [class*="text-gray-900"],
+.kancom-desk-shell .travelos-sidebar .text-ink-gray-5,
+.kancom-desk-shell .travelos-sidebar .text-ink-gray-9 {
+  color: rgba(226, 232, 240, 0.86) !important;
+}
+
+.kancom-desk-shell .travelos-sidebar .travelos-module-link,
+.kancom-desk-shell .travelos-sidebar [class*="hover:bg-gray-100"] {
+  border: 1px solid transparent;
+  color: rgba(226, 232, 240, 0.86) !important;
+}
+
+.kancom-desk-shell .travelos-sidebar .travelos-module-link:hover,
+.kancom-desk-shell .travelos-sidebar [class*="hover:bg-gray-100"]:hover {
+  background: rgba(30, 64, 95, 0.72) !important;
+  border-color: rgba(125, 211, 252, 0.12);
+}
+
+.kancom-desk-shell .travelos-sidebar .shadow-sm.bg-white,
+.kancom-desk-shell .travelos-sidebar .bg-white.shadow-sm {
+  background: rgba(23, 198, 204, 0.14) !important;
+  border-color: rgba(23, 198, 204, 0.34) !important;
+  box-shadow: inset 3px 0 0 var(--travelos-cyan), 0 8px 18px rgba(2, 8, 23, 0.14) !important;
+  color: #ffffff !important;
+}
+
+.kancom-desk-shell .travelos-sidebar .shadow-sm.bg-white::before,
+.kancom-desk-shell .travelos-sidebar .bg-white.shadow-sm::before {
+  display: none;
+}
+
+.kancom-desk-shell .travelos-sidebar .bg-surface-white,
+.kancom-desk-shell .travelos-sidebar button.bg-surface-white {
+  background: rgba(15, 40, 61, 0.82) !important;
+  color: #f8fafc !important;
+  box-shadow: none !important;
+}
+
+.kancom-desk-shell .travelos-sidebar button.hover\:bg-surface-gray-3:hover {
+  background: rgba(30, 64, 95, 0.72) !important;
+}
+
+.kancom-desk-shell .travelos-sidebar .bg-blue-400 {
+  background: var(--travelos-cyan) !important;
+}
+
+.kancom-desk-shell .travelos-page {
+  background: radial-gradient(circle at top left, rgba(23, 198, 204, 0.07), transparent 360px), var(--travelos-content-bg);
+  color: #0f172a;
+}
+
+.kancom-desk-shell .travelos-page-header,
+.kancom-desk-shell .travelos-card {
+  border: 1px solid var(--travelos-card-border);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: var(--travelos-card-shadow);
+}
+
+.kancom-desk-shell .travelos-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px;
+}
+
+.kancom-desk-shell .travelos-page-header h1 {
+  margin: 2px 0 0;
+  color: #0f172a;
+  font-size: 22px;
+  font-weight: 720;
+  letter-spacing: 0;
+  line-height: 1.25;
+}
+
+.kancom-desk-shell .travelos-page-header p {
+  margin-top: 6px;
+  max-width: 720px;
+  color: #52657a;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.kancom-desk-shell .travelos-eyebrow {
+  margin: 0 !important;
+  color: var(--travelos-blue) !important;
+  font-size: 11px !important;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.kancom-desk-shell .travelos-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.kancom-desk-shell .travelos-header-actions button,
+.kancom-desk-shell .travelos-primary-action {
+  min-height: 34px;
+  border: 1px solid var(--travelos-card-border);
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 0 12px;
+  color: #1f3652;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.kancom-desk-shell .travelos-primary-action {
+  margin-top: 16px;
+  border-color: #1769e0;
+  background: linear-gradient(180deg, #2580f7, #1769e0);
+  color: #ffffff;
+}
+
+.kancom-desk-shell .travelos-kpi-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+
+.kancom-desk-shell .travelos-card {
+  padding: 16px;
+}
+
+.kancom-desk-shell .travelos-kpi-card p {
+  color: #52657a;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.kancom-desk-shell .travelos-kpi-card strong {
+  display: block;
+  margin-top: 8px;
+  color: #0f172a;
+  font-size: 26px;
+  font-weight: 760;
+  line-height: 1.1;
+}
+
+.kancom-desk-shell .travelos-kpi-card span,
+.kancom-desk-shell .travelos-card-copy {
+  display: block;
+  margin-top: 8px;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.kancom-desk-shell .travelos-card-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.kancom-desk-shell .travelos-card-heading h2 {
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 720;
+}
+
+.kancom-desk-shell .travelos-card-heading span {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.kancom-desk-shell .travelos-line-chart {
+  display: flex;
+  align-items: end;
+  gap: 8px;
+  height: 190px;
+  padding: 12px 8px 0;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #ffffff, #f8fafc);
+  border-bottom: 1px solid #dbe5ef;
+}
+
+.kancom-desk-shell .travelos-line-chart span {
+  flex: 1;
+  min-width: 8px;
+  border-radius: 999px 999px 0 0;
+  background: linear-gradient(180deg, #1f6feb, #17c6cc);
+}
+
+.kancom-desk-shell .travelos-progress-row > div:first-child,
+.kancom-desk-shell .travelos-table-row {
+  display: grid;
+  align-items: center;
+  gap: 10px;
+}
+
+.kancom-desk-shell .travelos-progress-row > div:first-child {
+  grid-template-columns: 1fr auto;
+  color: #334155;
+  font-size: 13px;
+}
+
+.kancom-desk-shell .travelos-progress-row > div:nth-child(2) {
+  height: 7px;
+  margin-top: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e5edf5;
+}
+
+.kancom-desk-shell .travelos-progress-row > div:nth-child(2) span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #17c6cc, #22c55e);
+}
+
+.kancom-desk-shell .travelos-progress-row.is-warning > div:nth-child(2) span {
+  background: linear-gradient(90deg, #f97316, #ef4444);
+}
+
+.kancom-desk-shell .travelos-progress-row small {
+  display: block;
+  margin-top: 4px;
+  color: #64748b;
+  font-size: 11px;
+}
+
+.kancom-desk-shell .travelos-table {
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.kancom-desk-shell .travelos-table-row {
+  grid-template-columns: minmax(0, 1.5fr) repeat(3, minmax(68px, 0.6fr));
+  min-height: 38px;
+  padding: 0 12px;
+  border-bottom: 1px solid #edf2f7;
+  color: #334155;
+  font-size: 13px;
+}
+
+.kancom-desk-shell .travelos-table-row:last-child {
+  border-bottom: 0;
+}
+
+.kancom-desk-shell .travelos-table-row.is-header {
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.kancom-desk-shell .travelos-donut {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 148px;
+  height: 148px;
+  margin: 8px auto 0;
+  border-radius: 999px;
+  color: #0f172a;
+}
+
+.kancom-desk-shell .travelos-donut-blue {
+  background: radial-gradient(circle at center, #ffffff 0 46%, transparent 47%), conic-gradient(#1f6feb 0 62%, #17c6cc 62% 80%, #f59e0b 80% 92%, #ef4444 92% 100%);
+}
+
+.kancom-desk-shell .travelos-donut-green {
+  background: radial-gradient(circle at center, #ffffff 0 46%, transparent 47%), conic-gradient(#22c55e 0 67%, #3b82f6 67% 84%, #f59e0b 84% 96%, #ef4444 96% 100%);
+}
+
+.kancom-desk-shell .travelos-donut strong {
+  font-size: 20px;
+  font-weight: 760;
+}
+
+.kancom-desk-shell .travelos-donut span {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.kancom-desk-shell .travelos-forecast-grid {
+  display: grid;
+  align-items: end;
+  gap: 14px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  min-height: 230px;
+}
+
+.kancom-desk-shell .travelos-forecast-column > div {
+  position: relative;
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  height: 170px;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.kancom-desk-shell .travelos-forecast-column span,
+.kancom-desk-shell .travelos-forecast-column strong {
+  position: absolute;
+  bottom: 0;
+  width: 44%;
+  border-radius: 7px 7px 0 0;
+}
+
+.kancom-desk-shell .travelos-forecast-column span {
+  left: 14%;
+  background: rgba(34, 197, 94, 0.24);
+}
+
+.kancom-desk-shell .travelos-forecast-column strong {
+  right: 14%;
+  background: linear-gradient(180deg, #22c55e, #16a34a);
+}
+
+.kancom-desk-shell .travelos-forecast-column p {
+  margin-top: 8px;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.kancom-desk-shell .travelos-forecast-column small,
+.kancom-desk-shell .travelos-insight-list {
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.kancom-desk-shell .travelos-insight-list {
+  display: grid;
+  gap: 10px;
+  padding-left: 16px;
+}
+
+.kancom-desk-shell .travelos-workforce-demand-chart {
+  display: grid;
+  gap: 10px;
+}
+
+.kancom-desk-shell .travelos-workforce-demand-chart p {
+  max-width: 620px;
+  color: #52657a;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.kancom-desk-shell .travelos-workforce-axis-chart {
+  min-height: 280px;
+  min-width: 0;
+  padding: 4px 0 0;
+}
+
+@media (max-width: 768px) {
+  .kancom-desk-shell .travelos-page-header {
+    flex-direction: column;
+  }
+
+  .kancom-desk-shell .travelos-header-actions {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .kancom-desk-shell .travelos-table-row {
+    grid-template-columns: minmax(0, 1.2fr) repeat(3, minmax(54px, 0.6fr));
+    font-size: 12px;
+  }
+}
+
+
+.kancom-desk-shell .travelos-ops-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  max-width: 760px;
+}
+
+.kancom-desk-shell .travelos-search-affordance,
+.kancom-desk-shell .travelos-date-affordance,
+.kancom-desk-shell .travelos-icon-button,
+.kancom-desk-shell .travelos-quick-create {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  border: 1px solid var(--travelos-card-border);
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 0 12px;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.kancom-desk-shell .travelos-search-affordance {
+  min-width: min(430px, 100%);
+  justify-content: flex-start;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.kancom-desk-shell .travelos-quick-create {
+  border-color: #0f9fa8;
+  background: linear-gradient(180deg, #18c8cc, #0896a7);
+  color: #ffffff;
+}
+
+.kancom-desk-shell .travelos-icon-button {
+  width: 36px;
+  justify-content: center;
+  padding: 0;
+}
+
+@media (max-width: 768px) {
+  .kancom-desk-shell .travelos-ops-actions {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .kancom-desk-shell .travelos-search-affordance {
+    width: 100%;
+  }
+}
+
+.kancom-desk-shell .travelos-page::after {
+  content: "Powered by Kancom";
+  display: block;
+  margin-top: 14px;
+  color: #8a9aab;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: right;
+}
+
+.kancom-desk-shell .travelos-sidebar {
+  min-height: 0;
+}
+
+.kancom-desk-shell .travelos-sidebar-footer {
+  flex: 0 0 auto;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.kancom-desk-shell .travelos-sidebar-footer [class*="hover:bg-gray-100"],
+.kancom-desk-shell .travelos-sidebar-footer .text-ink-gray-5,
+.kancom-desk-shell .travelos-sidebar-footer .text-ink-gray-9 {
+  color: rgba(226, 232, 240, 0.9) !important;
+}
+
+.kancom-desk-shell .travelos-welcome-line {
+  margin: 0 !important;
+  color: #425873 !important;
+  font-size: 13px !important;
+  font-weight: 650;
+}
+
+.kancom-desk-shell .travelos-page-header {
+  padding: 14px 16px;
+}
+
+.kancom-desk-shell .travelos-page-header h1 {
+  margin-top: 2px;
+  font-size: 24px;
+  font-weight: 760;
+}
+
+.kancom-desk-shell .travelos-ops-actions {
+  align-items: center;
+}
+
+.kancom-desk-shell .travelos-search-affordance,
+.kancom-desk-shell .travelos-date-affordance,
+.kancom-desk-shell .travelos-icon-button,
+.kancom-desk-shell .travelos-quick-create {
+  min-height: 34px;
+}
+
+.kancom-desk-shell .travelos-kpi-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.kancom-desk-shell .travelos-kpi-card::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  content: "";
+  background: #1f6feb;
+}
+
+.kancom-desk-shell .travelos-kpi-card.is-warning::before { background: #f59e0b; }
+.kancom-desk-shell .travelos-kpi-card.is-danger::before { background: #ef4444; }
+.kancom-desk-shell .travelos-kpi-card.is-yellow::before { background: #eab308; }
+.kancom-desk-shell .travelos-kpi-card.is-success::before { background: #22c55e; }
+
+.kancom-desk-shell .travelos-kpi-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+}
+
+.kancom-desk-shell .travelos-kpi-icon.is-blue,
+.kancom-desk-shell .travelos-kpi-icon.is-default {
+  background: #eaf4ff;
+  color: #1f6feb;
+}
+
+.kancom-desk-shell .travelos-kpi-icon.is-warning {
+  background: #fff7ed;
+  color: #f97316;
+}
+
+.kancom-desk-shell .travelos-kpi-icon.is-danger {
+  background: #fff1f2;
+  color: #dc2626;
+}
+
+.kancom-desk-shell .travelos-kpi-icon.is-yellow {
+  background: #fefce8;
+  color: #ca8a04;
+}
+
+.kancom-desk-shell .travelos-kpi-icon.is-success {
+  background: #ecfdf5;
+  color: #16a34a;
+}
+
+.kancom-desk-shell .travelos-kpi-card strong {
+  font-size: 30px;
+  font-weight: 780;
+}
+
+.kancom-desk-shell .travelos-kpi-card span {
+  color: #51657d;
+}
+
+.kancom-desk-shell .travelos-attention-panel {
+  border-color: rgba(248, 113, 113, 0.22);
+  background: linear-gradient(180deg, rgba(255, 247, 247, 0.94), #ffffff 72%);
+}
+
+.kancom-desk-shell .travelos-attention-alert,
+.kancom-desk-shell .travelos-attention-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border-radius: 999px;
+}
+
+.kancom-desk-shell .travelos-attention-alert {
+  width: 36px;
+  height: 36px;
+  background: #fff1f2;
+  color: #dc2626;
+}
+
+.kancom-desk-shell .travelos-attention-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 86px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 12px;
+  transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
+}
+
+.kancom-desk-shell .travelos-attention-item:hover {
+  border-color: rgba(239, 68, 68, 0.26);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.07);
+  transform: translateY(-1px);
+}
+
+.kancom-desk-shell .travelos-attention-icon {
+  width: 34px;
+  height: 34px;
+}
+
+.kancom-desk-shell .travelos-attention-icon.is-danger,
+.kancom-desk-shell .travelos-attention-item strong.is-danger {
+  background: #fff1f2;
+  color: #dc2626;
+}
+
+.kancom-desk-shell .travelos-attention-icon.is-warning,
+.kancom-desk-shell .travelos-attention-item strong.is-warning {
+  background: #fff7ed;
+  color: #f97316;
+}
+
+.kancom-desk-shell .travelos-attention-icon.is-default,
+.kancom-desk-shell .travelos-attention-item strong.is-default {
+  background: #eef6ff;
+  color: #1f6feb;
+}
+
+.kancom-desk-shell .travelos-attention-item strong {
+  min-width: 34px;
+  border-radius: 999px;
+  padding: 6px 8px;
+  font-size: 15px;
+  text-align: center;
+}
+
+.kancom-desk-shell .travelos-queue-card {
+  display: block;
+  border: 1px solid #dfe8f2;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #ffffff, #f8fbff);
+  padding: 14px;
+  transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
+}
+
+.kancom-desk-shell .travelos-queue-card:hover {
+  border-color: rgba(31, 111, 235, 0.22);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
+}
+
+.kancom-desk-shell .travelos-queue-marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: #eef6ff;
+  color: #1f6feb;
+}
+
+.kancom-desk-shell .travelos-queue-marker.is-hotel { background: #fff7ed; color: #d97706; }
+.kancom-desk-shell .travelos-queue-marker.is-visa { background: #f5f3ff; color: #7c3aed; }
+.kancom-desk-shell .travelos-queue-marker.is-ets { background: #ecfdf5; color: #16a34a; }
+
+.kancom-desk-shell .travelos-queue-status {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: #edf7ff;
+  padding: 4px 8px;
+  color: #2b5f93;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.kancom-desk-shell .travelos-queue-loadbar,
+.kancom-desk-shell .travelos-sla-mini,
+.kancom-desk-shell .travelos-client-sla-bar {
+  height: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e6eef7;
+}
+
+.kancom-desk-shell .travelos-queue-loadbar {
+  margin-top: 12px;
+}
+
+.kancom-desk-shell .travelos-queue-loadbar span,
+.kancom-desk-shell .travelos-sla-mini span,
+.kancom-desk-shell .travelos-client-sla-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #17c6cc, #22c55e);
+}
+
+.kancom-desk-shell .travelos-sla-mini.is-warning span,
+.kancom-desk-shell .travelos-client-sla-row.is-attention .travelos-client-sla-bar span {
+  background: linear-gradient(90deg, #f59e0b, #ef4444);
+}
+
+.kancom-desk-shell .travelos-client-sla-row.is-watch .travelos-client-sla-bar span {
+  background: linear-gradient(90deg, #f59e0b, #22c55e);
+}
+
+.kancom-desk-shell .travelos-side-card,
+.kancom-desk-shell .travelos-info-panel {
+  background: rgba(255, 255, 255, 0.97);
+}
+
+.kancom-desk-shell .travelos-side-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.kancom-desk-shell .travelos-side-heading h2 {
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 740;
+}
+
+.kancom-desk-shell .travelos-side-heading p {
+  margin-top: 2px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.kancom-desk-shell .travelos-side-heading svg {
+  color: #1f6feb;
+}
+
+.kancom-desk-shell .travelos-rail-row,
+.kancom-desk-shell .travelos-sla-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.kancom-desk-shell .travelos-rail-row {
+  border-radius: 8px;
+  background: #f5f8fc;
+  padding: 8px 10px;
+}
+
+.kancom-desk-shell .travelos-rail-row strong {
+  min-width: 30px;
+  border-radius: 999px;
+  background: #eaf4ff;
+  padding: 3px 7px;
+  color: #1f6feb;
+  text-align: center;
+}
+
+.kancom-desk-shell .travelos-quick-action {
+  display: inline-flex;
+  min-height: 64px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid #dfe8f2;
+  border-radius: 10px;
+  background: #f8fbff;
+  color: #244260;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.kancom-desk-shell .travelos-quick-action:hover {
+  border-color: rgba(31, 111, 235, 0.22);
+  background: #ffffff;
+  color: #1f6feb;
+}
+
+.kancom-desk-shell .travelos-activity-row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 10px;
+  border-bottom: 1px solid #edf2f7;
+  padding-bottom: 12px;
+}
+
+.kancom-desk-shell .travelos-activity-row:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.kancom-desk-shell .travelos-activity-row time {
+  color: #1f6feb;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.kancom-desk-shell .travelos-activity-row p,
+.kancom-desk-shell .travelos-client-sla-row p,
+.kancom-desk-shell .travelos-agent-row p {
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.kancom-desk-shell .travelos-activity-row span,
+.kancom-desk-shell .travelos-client-sla-row span,
+.kancom-desk-shell .travelos-agent-row span {
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.kancom-desk-shell .travelos-client-sla-row,
+.kancom-desk-shell .travelos-agent-row {
+  border-radius: 9px;
+  background: #f8fbff;
+  padding: 10px;
+}
+
+.kancom-desk-shell .travelos-client-sla-row strong,
+.kancom-desk-shell .travelos-agent-row strong {
+  color: #0f172a;
+  font-size: 13px;
+}
+
+.kancom-desk-shell .travelos-client-sla-bar {
+  margin-top: 9px;
+}
+
+.kancom-desk-shell .travelos-agent-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.kancom-desk-shell .travelos-agent-dot {
+  width: 9px;
+  height: 9px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: #22c55e;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12);
+}
+
+.kancom-desk-shell .travelos-agent-row.is-focused .travelos-agent-dot {
+  background: #f59e0b;
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.14);
+}
+
+@media (max-width: 1280px) {
+  .kancom-desk-shell .travelos-attention-panel .xl\:grid-cols-4,
+  .kancom-desk-shell .travelos-attention-panel .xl\:grid-cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.kancom-desk-shell .travelos-operations-dashboard-v2 {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(31, 111, 235, 0.08), transparent 280px),
+    linear-gradient(180deg, #f8fbff 0%, #f3f7fb 100%);
+  color: #0f172a;
+}
+
+.kancom-desk-shell .travelos-command-bar {
+  display: grid;
+  grid-template-columns: 40px minmax(260px, 1fr) auto auto auto auto;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.kancom-desk-shell .travelos-command-menu,
+.kancom-desk-shell .travelos-command-icon,
+.kancom-desk-shell .travelos-command-search,
+.kancom-desk-shell .travelos-command-create,
+.kancom-desk-shell .travelos-command-user,
+.kancom-desk-shell .travelos-date-selector {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #dbe5ef;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.98);
+  color: #1e344f;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.kancom-desk-shell .travelos-command-menu,
+.kancom-desk-shell .travelos-command-icon {
+  position: relative;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+
+.kancom-desk-shell .travelos-command-search {
+  justify-content: flex-start;
+  gap: 10px;
+  height: 42px;
+  padding: 0 14px;
+  color: #66788e;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.kancom-desk-shell .travelos-command-create {
+  gap: 8px;
+  height: 42px;
+  border-color: #0faaa9;
+  background: linear-gradient(180deg, #17c6cc, #0795a6);
+  color: #ffffff;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.kancom-desk-shell .travelos-command-badge {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  min-width: 18px;
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  background: #ef4444;
+  padding: 1px 4px;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.kancom-desk-shell .travelos-command-badge.is-green {
+  background: #22c55e;
+}
+
+.kancom-desk-shell .travelos-command-user {
+  gap: 10px;
+  height: 42px;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 0 2px 0 8px;
+}
+
+.kancom-desk-shell .travelos-command-user > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #dbeafe, #cffafe);
+  color: #1e3a8a;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.kancom-desk-shell .travelos-command-user strong,
+.kancom-desk-shell .travelos-command-user small {
+  display: block;
+  text-align: left;
+}
+
+.kancom-desk-shell .travelos-command-user strong {
+  color: #0f172a;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.kancom-desk-shell .travelos-command-user small {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.kancom-desk-shell .travelos-ops-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 0 14px;
+}
+
+.kancom-desk-shell .travelos-ops-hero h1 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 22px;
+  font-weight: 780;
+  line-height: 1.2;
+}
+
+.kancom-desk-shell .travelos-ops-hero p {
+  margin-top: 5px;
+  color: #425873;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.kancom-desk-shell .travelos-date-selector {
+  gap: 9px;
+  min-height: 40px;
+  padding: 0 14px;
+  color: #1f3652;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.kancom-desk-shell .travelos-v2-kpi-strip {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(5, minmax(150px, 1fr));
+  margin-bottom: 14px;
+}
+
+.kancom-desk-shell .travelos-v2-kpi {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 14px;
+  min-height: 126px;
+  border: 1px solid #dfe7f0;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.98);
+  padding: 18px;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.055);
+}
+
+.kancom-desk-shell .travelos-v2-kpi-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 999px;
+}
+
+.kancom-desk-shell .travelos-v2-kpi-icon.is-blue { background: #eaf4ff; color: #1f6feb; }
+.kancom-desk-shell .travelos-v2-kpi-icon.is-warning { background: #fff7ed; color: #f97316; }
+.kancom-desk-shell .travelos-v2-kpi-icon.is-yellow { background: #fef9c3; color: #ca8a04; }
+.kancom-desk-shell .travelos-v2-kpi-icon.is-danger { background: #fff1f2; color: #dc2626; }
+.kancom-desk-shell .travelos-v2-kpi-icon.is-success { background: #ecfdf5; color: #16a34a; }
+
+.kancom-desk-shell .travelos-v2-kpi p {
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 740;
+}
+
+.kancom-desk-shell .travelos-v2-kpi strong {
+  display: block;
+  margin-top: 7px;
+  color: #0b1220;
+  font-size: 30px;
+  font-weight: 820;
+  line-height: 1;
+}
+
+.kancom-desk-shell .travelos-v2-kpi span {
+  display: inline-block;
+  margin-top: 10px;
+  color: #059669;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.kancom-desk-shell .travelos-v2-kpi span.is-negative {
+  color: #dc2626;
+}
+
+.kancom-desk-shell .travelos-v2-kpi small {
+  margin-left: 4px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.kancom-desk-shell .travelos-v2-main-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(0, 1fr) 292px;
+}
+
+.kancom-desk-shell .travelos-v2-main-column {
+  display: grid;
+  gap: 14px;
+}
+
+.kancom-desk-shell .travelos-v2-section-heading,
+.kancom-desk-shell .travelos-v2-rail-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.kancom-desk-shell .travelos-v2-section-heading h2,
+.kancom-desk-shell .travelos-v2-rail-card h2,
+.kancom-desk-shell .travelos-v2-lower-card h2 {
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 780;
+}
+
+.kancom-desk-shell .travelos-v2-section-heading p {
+  margin-top: 3px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.kancom-desk-shell .travelos-v2-section-heading a,
+.kancom-desk-shell .travelos-v2-rail-heading a {
+  color: #1f6feb;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.kancom-desk-shell .travelos-v2-attention {
+  border: 1px solid rgba(248, 113, 113, 0.2);
+  border-radius: 10px;
+  background: linear-gradient(180deg, #fff7f7, #fffafa);
+  padding: 16px;
+}
+
+.kancom-desk-shell .travelos-v2-attention-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(5, minmax(120px, 1fr));
+  margin-top: 12px;
+}
+
+.kancom-desk-shell .travelos-v2-attention-card {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  min-height: 92px;
+  border: 1px solid rgba(226, 232, 240, 0.88);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.93);
+  padding: 12px;
+}
+
+.kancom-desk-shell .travelos-v2-attention-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+}
+
+.kancom-desk-shell .travelos-v2-attention-icon.is-danger { background: #fff1f2; color: #dc2626; }
+.kancom-desk-shell .travelos-v2-attention-icon.is-yellow { background: #fef9c3; color: #ca8a04; }
+.kancom-desk-shell .travelos-v2-attention-icon.is-warning { background: #fff7ed; color: #f97316; }
+.kancom-desk-shell .travelos-v2-attention-icon.is-blue { background: #eaf4ff; color: #1f6feb; }
+
+.kancom-desk-shell .travelos-v2-attention-card strong {
+  color: #0f172a;
+  font-size: 24px;
+  font-weight: 820;
+  line-height: 1;
+}
+
+.kancom-desk-shell .travelos-v2-attention-card p {
+  margin-top: 3px;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 720;
+}
+
+.kancom-desk-shell .travelos-v2-attention-card span {
+  display: inline-block;
+  margin-top: 5px;
+  color: #1f6feb;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.kancom-desk-shell .travelos-v2-queues,
+.kancom-desk-shell .travelos-v2-rail-card,
+.kancom-desk-shell .travelos-v2-lower-card {
+  border: 1px solid #dfe7f0;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.98);
+  padding: 16px;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.052);
+}
+
+.kancom-desk-shell .travelos-v2-queue-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(5, minmax(142px, 1fr));
+  margin-top: 12px;
+}
+
+.kancom-desk-shell .travelos-v2-queue-card {
+  min-height: 146px;
+  border: 1px solid #dfe7f0;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #ffffff, #f8fbff);
+  padding: 12px;
+  transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+}
+
+.kancom-desk-shell .travelos-v2-queue-card:hover {
+  border-color: rgba(31, 111, 235, 0.24);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
+}
+
+.kancom-desk-shell .travelos-v2-queue-card.is-watch { background: linear-gradient(180deg, #ffffff, #fffaf0); }
+.kancom-desk-shell .travelos-v2-queue-card.is-risk { background: linear-gradient(180deg, #ffffff, #fff5f5); }
+.kancom-desk-shell .travelos-v2-queue-card.is-good { background: linear-gradient(180deg, #ffffff, #f7fdfb); }
+
+.kancom-desk-shell .travelos-v2-queue-top {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.kancom-desk-shell .travelos-v2-queue-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  background: #eaf4ff;
+  color: #1f6feb;
+}
+
+.kancom-desk-shell .travelos-v2-queue-icon.is-hotel { background: #fff7ed; color: #d97706; }
+.kancom-desk-shell .travelos-v2-queue-icon.is-visa { background: #ecfeff; color: #0891b2; }
+.kancom-desk-shell .travelos-v2-queue-icon.is-ets { background: #ecfdf5; color: #16a34a; }
+.kancom-desk-shell .travelos-v2-queue-icon.is-refund { background: #fff1f2; color: #dc2626; }
+.kancom-desk-shell .travelos-v2-queue-icon.is-corporate { background: #f5f3ff; color: #7c3aed; }
+.kancom-desk-shell .travelos-v2-queue-icon.is-finance { background: #eff6ff; color: #2563eb; }
+.kancom-desk-shell .travelos-v2-queue-icon.is-complaints { background: #fff7ed; color: #ea580c; }
+.kancom-desk-shell .travelos-v2-queue-icon.is-mice { background: #f0fdf4; color: #16a34a; }
+
+.kancom-desk-shell .travelos-v2-queue-top h3 {
+  color: #334155;
+  font-size: 12px;
+  font-weight: 740;
+}
+
+.kancom-desk-shell .travelos-v2-queue-top strong {
+  display: block;
+  margin-top: 2px;
+  color: #0f172a;
+  font-size: 22px;
+  font-weight: 820;
+  line-height: 1;
+}
+
+.kancom-desk-shell .travelos-v2-queue-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 14px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.kancom-desk-shell .travelos-v2-queue-meta b {
+  color: #0f172a;
+}
+
+.kancom-desk-shell .travelos-v2-queue-sla {
+  margin-top: 11px;
+}
+
+.kancom-desk-shell .travelos-v2-queue-sla > div:first-child,
+.kancom-desk-shell .travelos-v2-sla-list > div > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: #334155;
+  font-size: 11px;
+  font-weight: 720;
+}
+
+.kancom-desk-shell .travelos-v2-queue-sla small {
+  color: #64748b;
+}
+
+.kancom-desk-shell .travelos-v2-queue-sla > div:nth-child(2),
+.kancom-desk-shell .travelos-v2-sla-list > div > div:nth-child(2) {
+  height: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e6eef7;
+  margin-top: 6px;
+}
+
+.kancom-desk-shell .travelos-v2-queue-sla > div:nth-child(2) span,
+.kancom-desk-shell .travelos-v2-sla-list > div > div:nth-child(2) span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+}
+
+.kancom-desk-shell .travelos-v2-queue-card.is-watch .travelos-v2-queue-sla span,
+.kancom-desk-shell .travelos-v2-sla-list .is-watch span {
+  background: linear-gradient(90deg, #f59e0b, #facc15);
+}
+
+.kancom-desk-shell .travelos-v2-queue-card.is-risk .travelos-v2-queue-sla span,
+.kancom-desk-shell .travelos-v2-sla-list .is-risk span {
+  background: linear-gradient(90deg, #ef4444, #f97316);
+}
+
+.kancom-desk-shell .travelos-v2-side-rail {
+  display: grid;
+  gap: 14px;
+  align-self: start;
+}
+
+.kancom-desk-shell .travelos-v2-queue-states {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.kancom-desk-shell .travelos-v2-queue-states a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.kancom-desk-shell .travelos-v2-queue-states strong {
+  min-width: 28px;
+  border-radius: 999px;
+  background: #eaf4ff;
+  padding: 3px 8px;
+  color: #1f6feb;
+  text-align: center;
+}
+
+.kancom-desk-shell .travelos-v2-queue-states .is-risk strong { background: #fff1f2; color: #dc2626; }
+.kancom-desk-shell .travelos-v2-queue-states .is-watch strong { background: #fff7ed; color: #f97316; }
+.kancom-desk-shell .travelos-v2-queue-states .is-good strong { background: #ecfdf5; color: #16a34a; }
+.kancom-desk-shell .travelos-v2-queue-states .is-neutral strong { background: #eef2f7; color: #475569; }
+
+.kancom-desk-shell .travelos-v2-sla-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.kancom-desk-shell .travelos-v2-action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.kancom-desk-shell .travelos-v2-action-grid a {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 74px;
+  border: 1px solid #dfe7f0;
+  border-radius: 12px;
+  background: #f8fbff;
+  color: #244260;
+  font-size: 11px;
+  font-weight: 750;
+  text-align: center;
+}
+
+.kancom-desk-shell .travelos-v2-action-grid span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  background: #eaf4ff;
+  color: #1f6feb;
+}
+
+.kancom-desk-shell .travelos-v2-lower-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 0.9fr) minmax(0, 1.2fr);
+}
+
+.kancom-desk-shell .travelos-v2-client-list,
+.kancom-desk-shell .travelos-v2-activity-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.kancom-desk-shell .travelos-v2-client-list a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid #edf2f7;
+  padding: 9px 0;
+}
+
+.kancom-desk-shell .travelos-v2-client-list a:last-child {
+  border-bottom: 0;
+}
+
+.kancom-desk-shell .travelos-v2-client-list strong,
+.kancom-desk-shell .travelos-v2-activity-list strong {
+  display: block;
+  color: #0f172a;
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.kancom-desk-shell .travelos-v2-client-list span,
+.kancom-desk-shell .travelos-v2-activity-list span {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.kancom-desk-shell .travelos-v2-client-list p {
+  position: relative;
+  padding-right: 14px;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 740;
+}
+
+.kancom-desk-shell .travelos-v2-client-list p::after {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  content: "";
+  transform: translateY(-50%);
+  background: #22c55e;
+}
+
+.kancom-desk-shell .travelos-v2-client-list .is-watch p::after { background: #f59e0b; }
+.kancom-desk-shell .travelos-v2-client-list .is-risk p::after { background: #ef4444; }
+
+.kancom-desk-shell .travelos-v2-availability {
+  display: grid;
+  grid-template-columns: 128px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.kancom-desk-shell .travelos-v2-donut {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: 126px;
+  height: 126px;
+  border-radius: 999px;
+  background: radial-gradient(circle at center, #ffffff 0 44%, transparent 45%), conic-gradient(#22c55e 0 57%, #f59e0b 57% 82%, #38bdf8 82% 88%, #94a3b8 88% 100%);
+}
+
+.kancom-desk-shell .travelos-v2-donut strong {
+  color: #0f172a;
+  font-size: 24px;
+  font-weight: 820;
+}
+
+.kancom-desk-shell .travelos-v2-donut span {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.kancom-desk-shell .travelos-v2-legend {
+  display: grid;
+  gap: 8px;
+}
+
+.kancom-desk-shell .travelos-v2-legend div {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.kancom-desk-shell .travelos-v2-legend span {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: #94a3b8;
+}
+
+.kancom-desk-shell .travelos-v2-legend .is-good span { background: #22c55e; }
+.kancom-desk-shell .travelos-v2-legend .is-watch span { background: #f59e0b; }
+.kancom-desk-shell .travelos-v2-legend .is-warning span { background: #38bdf8; }
+.kancom-desk-shell .travelos-v2-legend .is-neutral span { background: #94a3b8; }
+
+.kancom-desk-shell .travelos-v2-activity-list a {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 10px;
+  border-bottom: 1px solid #edf2f7;
+  padding: 6px 0 10px;
+}
+
+.kancom-desk-shell .travelos-v2-activity-list a:last-child {
+  border-bottom: 0;
+}
+
+.kancom-desk-shell .travelos-v2-activity-list time {
+  color: #1f6feb;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.kancom-desk-shell .travelos-v2-activity-list .is-risk time { color: #dc2626; }
+.kancom-desk-shell .travelos-v2-activity-list .is-good time { color: #059669; }
+
+@media (max-width: 1280px) {
+  .kancom-desk-shell .travelos-v2-kpi-strip,
+  .kancom-desk-shell .travelos-v2-queue-grid,
+  .kancom-desk-shell .travelos-v2-attention-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .kancom-desk-shell .travelos-v2-main-grid,
+  .kancom-desk-shell .travelos-v2-lower-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .kancom-desk-shell .travelos-command-bar {
+    grid-template-columns: 40px 1fr;
+  }
+
+  .kancom-desk-shell .travelos-command-create,
+  .kancom-desk-shell .travelos-command-icon,
+  .kancom-desk-shell .travelos-command-user {
+    display: none;
+  }
+
+  .kancom-desk-shell .travelos-ops-hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .kancom-desk-shell .travelos-v2-kpi-strip,
+  .kancom-desk-shell .travelos-v2-queue-grid,
+  .kancom-desk-shell .travelos-v2-attention-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* TravelOS Operations V2 micro-polish */
+.kancom-desk-shell .travelos-sidebar [class*="text-base"],
+.kancom-desk-shell .travelos-sidebar nav,
+.kancom-desk-shell .travelos-sidebar .travelos-module-link {
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.kancom-desk-shell .travelos-sidebar .travelos-module-link,
+.kancom-desk-shell .travelos-sidebar [class*="hover:bg-gray-100"] {
+  min-height: 36px;
+}
+
+.kancom-desk-shell .travelos-command-bar {
+  grid-template-columns: 44px minmax(280px, 1fr) auto auto auto auto;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.kancom-desk-shell .travelos-command-menu,
+.kancom-desk-shell .travelos-command-icon {
+  width: 44px;
+  height: 44px;
+}
+
+.kancom-desk-shell .travelos-command-search,
+.kancom-desk-shell .travelos-command-create,
+.kancom-desk-shell .travelos-command-user {
+  height: 46px;
+}
+
+.kancom-desk-shell .travelos-command-search {
+  padding: 0 16px;
+  font-size: 13.5px;
+}
+
+.kancom-desk-shell .travelos-command-create {
+  padding: 0 16px;
+}
+
+.kancom-desk-shell .travelos-v2-kpi-icon {
+  width: 58px;
+  height: 58px;
+}
+
+.kancom-desk-shell .travelos-v2-kpi-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.kancom-desk-shell .travelos-v2-attention-card {
+  min-height: 98px;
+  padding: 14px;
+}
+
+.kancom-desk-shell .travelos-v2-queue-card {
+  min-height: 154px;
+  padding: 14px;
+}
+
+.kancom-desk-shell .travelos-v2-queue-card.is-air {
+  background: linear-gradient(180deg, #ffffff 0%, #eff7ff 100%);
+}
+
+.kancom-desk-shell .travelos-v2-queue-card.is-mice,
+.kancom-desk-shell .travelos-v2-queue-card.is-ets {
+  background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%);
+}
+
+.kancom-desk-shell .travelos-v2-queue-card.is-corporate {
+  background: linear-gradient(180deg, #ffffff 0%, #f6f3ff 100%);
+}
+
+.kancom-desk-shell .travelos-v2-queue-card.is-refund {
+  background: linear-gradient(180deg, #ffffff 0%, #fff1f2 100%);
+}
+
+.kancom-desk-shell .travelos-v2-queue-card.is-hotel {
+  background: linear-gradient(180deg, #ffffff 0%, #fff8ed 100%);
+}
+
+.kancom-desk-shell .travelos-v2-queue-card.is-visa {
+  background: linear-gradient(180deg, #ffffff 0%, #ecfeff 100%);
+}
+
+.kancom-desk-shell .travelos-v2-queue-card.is-finance {
+  background: linear-gradient(180deg, #ffffff 0%, #eff6ff 100%);
+}
+
+.kancom-desk-shell .travelos-v2-queue-card.is-complaints {
+  background: linear-gradient(180deg, #ffffff 0%, #fff7ed 100%);
+}
+
+.kancom-desk-shell .travelos-v2-queue-card.is-neutral {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.kancom-desk-shell .travelos-v2-queue-meta,
+.kancom-desk-shell .travelos-v2-queue-sla > div:first-child,
+.kancom-desk-shell .travelos-v2-sla-list > div > div:first-child,
+.kancom-desk-shell .travelos-v2-queue-states a,
+.kancom-desk-shell .travelos-v2-action-grid a,
+.kancom-desk-shell .travelos-v2-client-list span,
+.kancom-desk-shell .travelos-v2-activity-list span,
+.kancom-desk-shell .travelos-v2-legend div {
+  font-size: 12.5px;
+}
+
+.kancom-desk-shell .travelos-v2-queue-top h3,
+.kancom-desk-shell .travelos-v2-client-list strong,
+.kancom-desk-shell .travelos-v2-activity-list strong {
+  font-size: 13px;
+}
+
+.kancom-desk-shell .travelos-v2-queue-meta b,
+.kancom-desk-shell .travelos-v2-queue-states strong,
+.kancom-desk-shell .travelos-v2-sla-list strong {
+  font-weight: 780;
+}
+
+.kancom-desk-shell .travelos-v2-queue-states,
+.kancom-desk-shell .travelos-v2-sla-list,
+.kancom-desk-shell .travelos-v2-legend {
+  gap: 11px;
+}
+
+.kancom-desk-shell .travelos-v2-action-grid a {
+  gap: 8px;
+  min-height: 78px;
+  line-height: 1.25;
+}
+
+.kancom-desk-shell .travelos-v2-activity-list a {
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 12px;
+  padding: 8px 0 12px;
+}
+
+.kancom-desk-shell .travelos-v2-activity-list time {
+  font-size: 12px;
+}
+
+
+/* TravelOS Quality V2 density band */
+.kancom-desk-shell .travelos-quality-lower-band {
+  align-items: stretch;
+  padding-bottom: 8px;
+}
+
+.kancom-desk-shell .travelos-quality-goal-list,
+.kancom-desk-shell .travelos-quality-alert-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.kancom-desk-shell .travelos-quality-goal-row {
+  display: grid;
+  gap: 8px;
+  border: 1px solid #e2eaf3;
+  border-radius: 10px;
+  background: #f8fbff;
+  padding: 10px 11px;
+}
+
+.kancom-desk-shell .travelos-quality-goal-row > div:first-child,
+.kancom-desk-shell .travelos-quality-goal-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.kancom-desk-shell .travelos-quality-goal-row span,
+.kancom-desk-shell .travelos-quality-alert-row strong,
+.kancom-desk-shell .travelos-quality-summary-card span {
+  color: #0f172a;
+  font-size: 12.5px;
+  font-weight: 740;
+}
+
+.kancom-desk-shell .travelos-quality-goal-row strong {
+  color: #0f172a;
+  font-size: 18px;
+  font-weight: 820;
+}
+
+.kancom-desk-shell .travelos-quality-goal-row small,
+.kancom-desk-shell .travelos-quality-alert-row small,
+.kancom-desk-shell .travelos-quality-summary-card small {
+  color: #64748b;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.kancom-desk-shell .travelos-quality-goal-row em,
+.kancom-desk-shell .travelos-quality-alert-row > span {
+  border-radius: 999px;
+  background: #ecfdf5;
+  padding: 3px 7px;
+  color: #047857;
+  font-size: 10.5px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.kancom-desk-shell .travelos-quality-goal-row.is-watch em,
+.kancom-desk-shell .travelos-quality-alert-row.is-watch > span {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.kancom-desk-shell .travelos-quality-goal-row.is-risk em,
+.kancom-desk-shell .travelos-quality-alert-row.is-risk > span {
+  background: #fff1f2;
+  color: #dc2626;
+}
+
+.kancom-desk-shell .travelos-quality-goal-row.is-neutral em,
+.kancom-desk-shell .travelos-quality-alert-row.is-neutral > span {
+  background: #eef2f7;
+  color: #475569;
+}
+
+.kancom-desk-shell .travelos-quality-bar {
+  height: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e6eef7;
+}
+
+.kancom-desk-shell .travelos-quality-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+}
+
+.kancom-desk-shell .travelos-quality-goal-row.is-watch .travelos-quality-bar span {
+  background: linear-gradient(90deg, #f59e0b, #facc15);
+}
+
+.kancom-desk-shell .travelos-quality-goal-row.is-risk .travelos-quality-bar span {
+  background: linear-gradient(90deg, #ef4444, #f97316);
+}
+
+.kancom-desk-shell .travelos-quality-alert-row {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr) 34px;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #e2eaf3;
+  border-radius: 10px;
+  background: #f8fbff;
+  padding: 10px;
+}
+
+.kancom-desk-shell .travelos-quality-alert-row em {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  background: #eaf4ff;
+  color: #1f6feb;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 820;
+}
+
+.kancom-desk-shell .travelos-quality-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.kancom-desk-shell .travelos-quality-summary-card {
+  min-height: 112px;
+  border: 1px solid #e2eaf3;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #ffffff, #f8fbff);
+  padding: 13px;
+}
+
+.kancom-desk-shell .travelos-quality-summary-card strong {
+  display: block;
+  color: #0f172a;
+  font-size: 26px;
+  font-weight: 820;
+  line-height: 1;
+}
+
+.kancom-desk-shell .travelos-quality-summary-card span {
+  display: block;
+  margin-top: 9px;
+}
+
+.kancom-desk-shell .travelos-quality-summary-card small {
+  display: block;
+  margin-top: 5px;
+}
+
+.kancom-desk-shell .travelos-quality-summary-card.is-risk {
+  background: linear-gradient(180deg, #ffffff, #fff5f5);
+}
+
+.kancom-desk-shell .travelos-quality-summary-card.is-watch {
+  background: linear-gradient(180deg, #ffffff, #fffaf0);
+}
+
+.kancom-desk-shell .travelos-quality-summary-card.is-good {
+  background: linear-gradient(180deg, #ffffff, #f7fdfb);
+}
+
+@media (max-width: 1280px) {
+  .kancom-desk-shell .travelos-quality-lower-band {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .kancom-desk-shell .travelos-quality-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .kancom-desk-shell .travelos-quality-alert-row {
+    grid-template-columns: 50px minmax(0, 1fr) 30px;
+  }
+}
+
+
+/* TravelOS Quality final layout correction */
+.kancom-desk-shell .travelos-quality-alert-summary {
+  margin-top: 8px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.kancom-desk-shell .travelos-quality-goal-list,
+.kancom-desk-shell .travelos-quality-alert-list {
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.kancom-desk-shell .travelos-quality-summary-grid {
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.kancom-desk-shell .travelos-quality-goal-row {
+  gap: 6px;
+  padding: 8px 10px;
+}
+
+.kancom-desk-shell .travelos-quality-alert-row {
+  gap: 9px;
+  padding: 8px 9px;
+}
+
+.kancom-desk-shell .travelos-quality-summary-card {
+  min-height: 96px;
+  padding: 11px;
+}
+
+.kancom-desk-shell .travelos-quality-summary-card strong {
+  font-size: 24px;
+}
+
+.kancom-desk-shell .travelos-quality-summary-card span {
+  margin-top: 7px;
+}
+
+.kancom-desk-shell .travelos-quality-summary-card small {
+  margin-top: 4px;
+}
+
+.kancom-desk-shell .travelos-quality-bar {
+  height: 6px;
+}
+
+
+/* TravelOS responsive dashboard utilities. Apply intentionally per dashboard. */
+.kancom-desk-shell .travelos-responsive-kpis {
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+
+.kancom-desk-shell .travelos-dashboard-grid-3,
+.kancom-desk-shell .travelos-dashboard-grid-2 {
+  display: grid;
+  gap: 16px;
+}
+
+.kancom-desk-shell .travelos-dashboard-grid-3 {
+  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 1fr) minmax(280px, 1fr);
+}
+
+.kancom-desk-shell .travelos-dashboard-grid-2 {
+  grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+}
+
+.kancom-desk-shell .travelos-grid-span-2 {
+  grid-column: span 1;
+}
+
+.kancom-desk-shell .travelos-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.kancom-desk-shell .travelos-table-scroll .travelos-table {
+  min-width: 560px;
+}
+
+.kancom-desk-shell .travelos-chart-frame {
+  min-height: 160px;
+  height: clamp(150px, 18vw, 190px);
+}
+
+.kancom-desk-shell .travelos-responsive-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.kancom-desk-shell .travelos-quality-lower-band.travelos-dashboard-grid-3 {
+  grid-template-columns: repeat(3, minmax(280px, 1fr));
+}
+
+@media (min-width: 1536px) {
+  .kancom-desk-shell .travelos-responsive-kpis {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1200px) and (max-width: 1535px) {
+  .kancom-desk-shell .travelos-responsive-kpis {
+    grid-template-columns: repeat(5, minmax(150px, 1fr));
+  }
+
+  .kancom-desk-shell .travelos-dashboard-grid-3 {
+    grid-template-columns: minmax(0, 1.2fr) minmax(250px, 1fr) minmax(250px, 1fr);
+  }
+}
+
+@media (max-width: 1199px) {
+  .kancom-desk-shell .travelos-responsive-kpis {
+    grid-template-columns: repeat(3, minmax(180px, 1fr));
+  }
+
+  .kancom-desk-shell .travelos-dashboard-grid-3,
+  .kancom-desk-shell .travelos-quality-lower-band.travelos-dashboard-grid-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .kancom-desk-shell .travelos-dashboard-grid-3:not(.travelos-quality-lower-band) > .travelos-card:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .kancom-desk-shell .travelos-dashboard-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  .kancom-desk-shell .travelos-page {
+    padding: 12px;
+  }
+
+  .kancom-desk-shell .travelos-responsive-kpis {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+
+  .kancom-desk-shell .travelos-dashboard-grid-3,
+  .kancom-desk-shell .travelos-dashboard-grid-2,
+  .kancom-desk-shell .travelos-quality-lower-band.travelos-dashboard-grid-3 {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .kancom-desk-shell .travelos-dashboard-grid-3:not(.travelos-quality-lower-band) > .travelos-card:first-child {
+    grid-column: auto;
+  }
+
+  .kancom-desk-shell .travelos-card {
+    padding: 13px;
+  }
+
+  .kancom-desk-shell .travelos-chart-frame {
+    min-height: 130px;
+    height: 34vw;
+    max-height: 170px;
+    gap: 5px;
+    padding-inline: 6px;
+  }
+
+  .kancom-desk-shell .travelos-donut {
+    width: min(132px, 46vw);
+    height: min(132px, 46vw);
+  }
+
+  .kancom-desk-shell .travelos-table-scroll .travelos-table {
+    min-width: 520px;
+  }
+
+  .kancom-desk-shell .travelos-quality-alert-row {
+    grid-template-columns: 48px minmax(0, 1fr) 28px;
+  }
+
+  .kancom-desk-shell .travelos-workforce-axis-chart {
+    min-height: 220px;
+    min-width: 0;
+  }
+}
