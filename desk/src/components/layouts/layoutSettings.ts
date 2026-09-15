@@ -1,6 +1,4 @@
-import LucideAlertTriangle from "~icons/lucide/alert-triangle";
 import LucideBookOpen from "~icons/lucide/book-open";
-import LucideCircleGauge from "~icons/lucide/gauge-circle";
 import LucideLayoutDashboard from "~icons/lucide/layout-dashboard";
 import LucideLineChart from "~icons/lucide/line-chart";
 import LucideTicket from "~icons/lucide/ticket";
@@ -43,16 +41,6 @@ export function getAgentPortalSidebarOptions(
       label: __("Team Queues"),
       icon: LucideUsersRound,
       to: { name: "TicketsAgent", query: { scope: "queues" } },
-    },
-    {
-      label: __("Escalations"),
-      icon: LucideAlertTriangle,
-      to: "TicketsAgent",
-    },
-    {
-      label: __("SLA Monitor"),
-      icon: LucideCircleGauge,
-      to: "TicketsAgent",
     },
     {
       label: __(travelosShellLabels.customers),

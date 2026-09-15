@@ -223,6 +223,7 @@ import { __ } from "@/translation";
 import { useProductContextStore } from "@/kancom/product/store";
 import {
   filterCapabilityNavigation,
+  getKancomPersonaLabel,
   getKancomSetupTabs,
   kancomAdminSetupNavigation,
   kancomSecondaryNavigation,
@@ -409,14 +410,12 @@ const profileSettings = computed(() => {
 });
 
 const travelosProfileName = computed(
-  () => authStore.userName || "Kapil Manager"
+  () => authStore.userName || authStore.userId || ""
 );
 
-const travelosProfileRole = computed(() => {
-  if (authStore.isAdmin) return "Admin";
-  if (authStore.isManager) return "Operations Manager";
-  return "Travel Desk Agent";
-});
+const travelosProfileRole = computed(() =>
+  getKancomPersonaLabel(productContextStore.context?.persona || null)
+);
 
 function isActiveTab(to: any) {
   if (route.query.view) {

@@ -18,6 +18,25 @@ export const kancomSidebarLabels = {
   dashboard: travelosShellLabels.dashboard,
 };
 
+export type KancomPersona =
+  | "administrator"
+  | "operations_head"
+  | "team_leader"
+  | "agent"
+  | null;
+
+export function getKancomPersonaLabel(persona: KancomPersona) {
+  if (!persona) return "";
+
+  const labels: Record<Exclude<KancomPersona, null>, string> = {
+    administrator: "Administrator",
+    operations_head: "Operations Head",
+    team_leader: "Team Leader",
+    agent: "Agent",
+  };
+  return labels[persona];
+}
+
 export const travelosBrand = {
   product: "TravelOS",
   subtitle: "Travel Operations",
