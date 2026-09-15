@@ -5,7 +5,7 @@
         <h2>Department Queues</h2>
         <p>Open requests by current operational team.</p>
       </div>
-      <RouterLink to="/tickets">View All Queues</RouterLink>
+      <RouterLink to="/tickets?scope=queues">View All Queues</RouterLink>
     </div>
     <div class="travelos-v2-queue-grid">
       <RouterLink

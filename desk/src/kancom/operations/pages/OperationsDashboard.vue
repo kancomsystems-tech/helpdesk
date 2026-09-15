@@ -3,7 +3,10 @@
     class="travelos-page travelos-operations-dashboard-v2 min-h-full overflow-y-auto p-4 lg:p-5"
   >
     <OperationsCommandBar />
-    <OperationsTopBar />
+    <OperationsTopBar
+      :period-context="liveSummary"
+      @select-period="selectPeriod"
+    />
 
     <template v-if="liveSummary">
       <div class="travelos-v2-kpi-strip">
@@ -19,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { createResource } from "frappe-ui";
 import AttentionList from "../components/AttentionList.vue";
 import DepartmentQueues from "../components/DepartmentQueues.vue";
@@ -28,10 +31,11 @@ import OperationsCommandBar from "../components/OperationsCommandBar.vue";
 import OperationsTopBar from "../components/OperationsTopBar.vue";
 import {
   attentionDefinitions,
-  kpiDefinitions,
+  type OperationsPeriod,
   type OperationsSummary,
 } from "../data/dashboardData";
 
+const selectedPeriod = ref<OperationsPeriod>("today");
 const operationsSummary = createResource({
   url: "kancom_custom.api.operations_dashboard.get_summary",
   auto: true,
@@ -49,19 +53,48 @@ const kpis = computed(() => {
   const summary = liveSummary.value;
   if (!summary) return [];
 
-  const values = [
-    summary.kpis.total_requests_today,
-    summary.kpis.pending,
-    summary.kpis.sla_overdue,
-    summary.kpis.closed_today,
-    summary.kpis.unassigned,
-  ];
+  const isToday = summary.period === "today";
+  const periodHelper = summary.period_label.toLowerCase();
 
-  return kpiDefinitions.map((definition, index) => ({
-    ...definition,
-    value: formatCount(values[index]),
-  }));
+  return [
+    {
+      label: isToday ? "Total Requests Today" : "Requests Created",
+      value: formatCount(summary.kpis.total_requests_today),
+      helper: isToday ? "Created today" : "Created in " + periodHelper,
+      tone: "blue" as const,
+    },
+    {
+      label: "Pending",
+      value: formatCount(summary.kpis.pending),
+      helper: "Current open inventory",
+      tone: "warning" as const,
+    },
+    {
+      label: "SLA Overdue",
+      value: formatCount(summary.kpis.sla_overdue),
+      helper: "Current open requests with failed SLA",
+      tone: "danger" as const,
+    },
+    {
+      label: isToday ? "Closed Today" : "Requests Resolved",
+      value: formatCount(summary.kpis.closed_today),
+      helper: isToday ? "Resolved today" : "Resolved in " + periodHelper,
+      tone: "success" as const,
+    },
+    {
+      label: "Unassigned",
+      value: formatCount(summary.kpis.unassigned),
+      helper: "Current open requests without an owner",
+      tone: "blue" as const,
+    },
+  ];
 });
+
+async function selectPeriod(period: OperationsPeriod) {
+  if (period === selectedPeriod.value) return;
+  await operationsSummary.submit({ period });
+  selectedPeriod.value = period;
+}
 
 const liveAttentionItems = computed(() => {
   const summary = liveSummary.value;

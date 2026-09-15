@@ -19,7 +19,6 @@ export interface AttentionItem {
   detail: string;
   count: number;
   tone: KpiTone;
-  route: string;
 }
 
 export interface DepartmentQueue {
@@ -29,7 +28,17 @@ export interface DepartmentQueue {
   route: string;
 }
 
+export type OperationsPeriod =
+  | "today"
+  | "yesterday"
+  | "last_7_days"
+  | "last_30_days";
+
 export interface OperationsSummary {
+  period: OperationsPeriod;
+  period_label: string;
+  from_date: string;
+  to_date: string;
   generated_at: string;
   timezone: string;
   scope: {
@@ -49,37 +58,15 @@ export interface OperationsSummary {
   }>;
 }
 
-export const kpiDefinitions: Omit<OperationsKpi, "value">[] = [
-  {
-    label: "Total Requests Today",
-    helper: "Requests created today",
-    tone: "blue",
-  },
-  { label: "Pending", helper: "Open request inventory", tone: "warning" },
-  {
-    label: "SLA Overdue",
-    helper: "Open requests with failed SLA",
-    tone: "danger",
-  },
-  { label: "Closed Today", helper: "Requests resolved today", tone: "success" },
-  {
-    label: "Unassigned",
-    helper: "Open requests without an owner",
-    tone: "blue",
-  },
-];
-
 export const attentionDefinitions: Omit<AttentionItem, "count">[] = [
   {
     label: "SLA Overdue",
     detail: "Failed first response or resolution clocks",
     tone: "danger",
-    route: "/tickets",
   },
   {
     label: "Unassigned",
     detail: "Open requests waiting for ownership",
     tone: "blue",
-    route: "/tickets",
   },
 ];

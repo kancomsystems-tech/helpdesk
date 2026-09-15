@@ -2639,3 +2639,79 @@
     min-width: 0;
   }
 }
+
+/* Operations period controls and compact live-data layout. */
+.kancom-desk-shell .travelos-command-bar {
+  grid-template-columns: 44px minmax(0, 1fr) auto auto auto;
+}
+
+.kancom-desk-shell .travelos-command-create {
+  width: auto;
+  height: 40px;
+  background: #0f8f98;
+  padding: 0 13px;
+}
+
+.kancom-desk-shell .travelos-v2-kpi small {
+  display: block;
+  margin: 4px 0 0;
+}
+
+.kancom-desk-shell .travelos-period-control {
+  display: grid;
+  justify-items: end;
+  gap: 3px;
+}
+
+.kancom-desk-shell .travelos-period-control small {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.kancom-desk-shell .travelos-v2-attention {
+  padding: 14px;
+}
+
+.kancom-desk-shell .travelos-v2-attention-grid {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 240px));
+  justify-content: start;
+}
+
+.kancom-desk-shell .travelos-v2-attention-card {
+  min-height: 76px;
+  padding: 11px;
+}
+
+.kancom-desk-shell .travelos-v2-queue-grid {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 240px));
+  justify-content: start;
+}
+
+.kancom-desk-shell .travelos-v2-queue-card {
+  min-height: 88px;
+  padding: 12px;
+}
+
+@media (max-width: 768px) {
+  .kancom-desk-shell .travelos-command-bar {
+    grid-template-columns: 40px minmax(0, 1fr) auto;
+  }
+
+  .kancom-desk-shell .travelos-command-create {
+    display: inline-flex;
+  }
+
+  .kancom-desk-shell .travelos-command-spacer {
+    display: block;
+  }
+
+  .kancom-desk-shell .travelos-period-control {
+    justify-items: start;
+  }
+
+  .kancom-desk-shell .travelos-v2-attention-grid,
+  .kancom-desk-shell .travelos-v2-queue-grid {
+    grid-template-columns: 1fr;
+  }
+}

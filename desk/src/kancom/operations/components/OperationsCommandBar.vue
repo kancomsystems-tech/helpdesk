@@ -8,6 +8,7 @@
     >
       <LucideMenu class="size-5" />
     </button>
+    <div class="travelos-command-spacer" aria-hidden="true" />
     <RouterLink to="/tickets/new" class="travelos-command-create">
       <LucidePlus class="size-4" />
       New Request
