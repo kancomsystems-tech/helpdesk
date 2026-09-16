@@ -221,6 +221,7 @@ import {
 import { useShortcut } from "@/composables/shortcuts";
 import { __ } from "@/translation";
 import { useProductContextStore } from "@/kancom/product/store";
+import { getHelpdeskModuleNavigation } from "@/extensions/registry";
 import {
   filterCapabilityNavigation,
   getKancomPersonaLabel,
@@ -228,7 +229,6 @@ import {
   kancomAdminSetupNavigation,
   kancomSecondaryNavigation,
   travelosBrand,
-  travelosModuleNavigation,
 } from "@/kancom/shell/navigation";
 import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
 import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
@@ -263,7 +263,7 @@ const { isCallingEnabled } = storeToRefs(telephonyStore);
 const showCommandPalette = ref(false);
 const visibleTravelosModuleNavigation = computed(() =>
   filterCapabilityNavigation(
-    travelosModuleNavigation,
+    getHelpdeskModuleNavigation(),
     productContextStore.hasCapability
   )
 );

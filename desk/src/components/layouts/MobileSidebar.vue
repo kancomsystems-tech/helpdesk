@@ -190,6 +190,7 @@ import {
 import { useTelephonyStore } from "@/stores/telephony";
 import { storeToRefs } from "pinia";
 import { useProductContextStore } from "@/kancom/product/store";
+import { getHelpdeskModuleNavigation } from "@/extensions/registry";
 import {
   filterCapabilityNavigation,
   getKancomPersonaLabel,
@@ -197,7 +198,6 @@ import {
   kancomAdminSetupNavigation,
   kancomSecondaryNavigation,
   travelosBrand,
-  travelosModuleNavigation,
 } from "@/kancom/shell/navigation";
 import {
   setActiveSettingsTab,
@@ -215,7 +215,7 @@ const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
 const visibleTravelosModuleNavigation = computed(() =>
   filterCapabilityNavigation(
-    travelosModuleNavigation,
+    getHelpdeskModuleNavigation(),
     productContextStore.hasCapability
   )
 );

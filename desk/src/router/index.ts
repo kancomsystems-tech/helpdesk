@@ -1,8 +1,7 @@
 import { useScreenSize } from "@/composables/screen";
-import {
-  type KancomCapability,
-  useProductContextStore,
-} from "@/kancom/product/store";
+import "@/kancom/registerExtension";
+import { getHelpdeskExtensionRoutes } from "@/extensions/registry";
+import { useProductContextStore } from "@/kancom/product/store";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { isCustomerPortal } from "@/utils";
@@ -25,7 +24,7 @@ declare module "vue-router" {
     onSuccessRoute?: string;
     parent?: string;
     manager?: boolean;
-    capability?: KancomCapability;
+    capability?: string;
   }
 }
 
@@ -117,31 +116,7 @@ const routes: RouteRecordRaw[] = [
     name: "Team",
     redirect: "/tickets",
   },
-  {
-    path: "/dashboard",
-    name: "Dashboard",
-    component: () =>
-      import("@/kancom/operations/pages/OperationsDashboard.vue"),
-    meta: { capability: "operations" },
-  },
-  {
-    path: "/analytics",
-    name: "AnalyticsDashboard",
-    component: () => import("@/kancom/analytics/pages/AnalyticsDashboard.vue"),
-    meta: { manager: true, capability: "analytics" },
-  },
-  {
-    path: "/workforce",
-    name: "WorkforceDashboard",
-    component: () => import("@/kancom/workforce/pages/WorkforceDashboard.vue"),
-    meta: { manager: true, capability: "workforce" },
-  },
-  {
-    path: "/quality",
-    name: "QualityDashboard",
-    component: () => import("@/kancom/quality/pages/QualityDashboard.vue"),
-    meta: { manager: true, capability: "quality" },
-  },
+  ...getHelpdeskExtensionRoutes(),
   {
     path: "/call-logs",
     name: "CallLogs",

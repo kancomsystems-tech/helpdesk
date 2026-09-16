@@ -1,3 +1,5 @@
+import { getProductContextUrl } from "@/extensions/registry";
+import "@/kancom/registerExtension";
 import { createResource } from "frappe-ui";
 import { defineStore } from "pinia";
 import { computed } from "vue";
@@ -36,7 +38,7 @@ export const useProductContextStore = defineStore(
   "kancomProductContext",
   () => {
     const contextResource = createResource({
-      url: "kancom_custom.api.product_context.get_product_context",
+      url: getProductContextUrl() || "",
     });
 
     const context = computed<ProductContext | null>(
@@ -44,7 +46,7 @@ export const useProductContextStore = defineStore(
     );
     const edition = computed(() => context.value?.edition ?? null);
     const capabilities = computed(
-      () => new Set<KancomCapability>(context.value?.capabilities ?? [])
+      () => new Set<string>(context.value?.capabilities ?? [])
     );
     const actions = computed(
       () => new Set<KancomAction>(context.value?.actions ?? [])
@@ -62,7 +64,7 @@ export const useProductContextStore = defineStore(
       }
     }
 
-    function hasCapability(capability: KancomCapability) {
+    function hasCapability(capability: string) {
       return capabilities.value.has(capability);
     }
 
