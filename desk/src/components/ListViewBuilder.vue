@@ -317,7 +317,7 @@ const pageLengthCount = useStorage(
 
 const defaultParams = reactive({
   doctype: options.value.doctype,
-  filters: {},
+  filters: { ...(options.value.defaultFilters || {}) },
   default_filters: options.value.defaultFilters,
   order_by: options.value.order_by || "modified desc",
   page_length: pageLengthCount.value,

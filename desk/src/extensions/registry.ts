@@ -6,6 +6,7 @@ export interface HelpdeskModuleNavigationItem {
   to: Record<string, unknown>;
   activeRoutes: readonly string[];
   capability?: string;
+  manager?: boolean;
 }
 
 export interface HelpdeskFrontendExtension {

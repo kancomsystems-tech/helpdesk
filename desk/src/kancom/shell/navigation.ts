@@ -58,6 +58,7 @@ export const travelosModuleNavigation = [
     to: { name: "AnalyticsDashboard" },
     activeRoutes: ["AnalyticsDashboard"],
     capability: "analytics",
+    manager: true,
   },
   {
     label: "Workforce",
@@ -65,6 +66,7 @@ export const travelosModuleNavigation = [
     to: { name: "WorkforceDashboard" },
     activeRoutes: ["WorkforceDashboard"],
     capability: "workforce",
+    manager: true,
   },
   {
     label: "Quality",
@@ -72,17 +74,21 @@ export const travelosModuleNavigation = [
     to: { name: "QualityDashboard" },
     activeRoutes: ["QualityDashboard"],
     capability: "quality",
+    manager: true,
   },
 ] as const;
 
 export function filterCapabilityNavigation<
-  T extends { capability?: KancomCapability }
+  T extends { capability?: KancomCapability; manager?: boolean }
 >(
   items: readonly T[],
-  hasCapability: (capability: KancomCapability) => boolean
+  hasCapability: (capability: KancomCapability) => boolean,
+  hasManagerAccess = false
 ): T[] {
   return items.filter(
-    (item) => !item.capability || hasCapability(item.capability)
+    (item) =>
+      (!item.capability || hasCapability(item.capability)) &&
+      (!item.manager || hasManagerAccess)
   );
 }
 

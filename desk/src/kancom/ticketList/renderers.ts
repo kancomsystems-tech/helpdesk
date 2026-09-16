@@ -101,6 +101,18 @@ function normalizeValue(value: unknown) {
   return value;
 }
 
+export function renderOperationalValueCell({ item }: { item: unknown }) {
+  const value = normalizeValue(item);
+  return h(
+    "span",
+    {
+      class: ["truncate flex-1", !value && "text-ink-gray-4"],
+      title: value ? String(value) : undefined,
+    },
+    value ? String(value) : "—"
+  );
+}
+
 export function renderRequestCell({ row, item, userId }) {
   const seenBy = row._seen ? JSON.parse(row._seen) : [];
   const isSeen = seenBy.includes(normalizeValue(userId) || "");
@@ -108,7 +120,10 @@ export function renderRequestCell({ row, item, userId }) {
   return h(
     "span",
     {
-      class: ["kancom-request-cell truncate flex-1", !isSeen && "font-semibold"],
+      class: [
+        "kancom-request-cell truncate flex-1",
+        !isSeen && "font-semibold",
+      ],
     },
     item
   );
@@ -150,7 +165,9 @@ export function renderResponseByCell({ row, item }) {
   if (dayjs(row.first_responded_on).isAfter(item)) {
     return h(Badge, { label: "Failed", theme: "red", variant: "outline" });
   }
-  return h(Tooltip, { text: dayjs(item).long() }, () => dayjs.tz(item).fromNow());
+  return h(Tooltip, { text: dayjs(item).long() }, () =>
+    dayjs.tz(item).fromNow()
+  );
 }
 
 export function renderResolutionByCell({ row, item, getStatus }) {
@@ -164,5 +181,7 @@ export function renderResolutionByCell({ row, item, getStatus }) {
   if (dayjs(row.resolution_date).isAfter(item)) {
     return h(Badge, { label: "Failed", theme: "red", variant: "outline" });
   }
-  return h(Tooltip, { text: dayjs(item).long() }, () => dayjs.tz(item).fromNow());
+  return h(Tooltip, { text: dayjs(item).long() }, () =>
+    dayjs.tz(item).fromNow()
+  );
 }

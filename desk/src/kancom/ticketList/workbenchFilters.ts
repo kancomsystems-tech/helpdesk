@@ -64,6 +64,12 @@ export interface WorkbenchProductContext {
   teams?: string[];
 }
 
+export interface PrimaryWorkbenchState {
+  scope: PrimaryWorkbenchScope;
+  team: string;
+  filters: Record<string, any>;
+}
+
 const primaryFilterKeys = new Set(["_assign", "agent_group"]);
 
 export function getQueueTeams(context?: WorkbenchProductContext | null) {
@@ -100,6 +106,38 @@ export function getPrimaryWorkbenchFilters(
     return { agent_group: team };
   }
   return {};
+}
+
+export function resolvePrimaryWorkbenchState(
+  query: Record<string, any>,
+  currentUser: string,
+  context?: WorkbenchProductContext | null
+): PrimaryWorkbenchState {
+  const queueTeams = getQueueTeams(context);
+  const requestedScope = String(
+    query.scope || "control"
+  ) as PrimaryWorkbenchScope;
+  const requestedTeam = String(query.team || "");
+  const allowedScopes: PrimaryWorkbenchScope[] = [
+    "control",
+    "assigned",
+    "queues",
+  ];
+
+  if (canUseTriage(context)) allowedScopes.push("triage");
+  if (requestedTeam && queueTeams.includes(requestedTeam)) {
+    allowedScopes.push("team");
+  }
+
+  const scope = allowedScopes.includes(requestedScope)
+    ? requestedScope
+    : "control";
+  const team = scope === "team" ? requestedTeam : "";
+  return {
+    scope,
+    team,
+    filters: getPrimaryWorkbenchFilters(scope, currentUser, queueTeams, team),
+  };
 }
 
 export function replacePrimaryWorkbenchFilters(

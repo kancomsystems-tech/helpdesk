@@ -1,6 +1,15 @@
 export const kancomWorkbenchColumns = [
   { label: "ID", type: "Int", key: "name", width: "4.25rem" },
   { label: "Request", type: "Data", key: "subject", width: "14rem" },
+  {
+    label: "Team",
+    type: "Link",
+    key: "agent_group",
+    options: "HD Team",
+    width: "7rem",
+  },
+  { label: "Product", type: "Data", key: "custom_product", width: "6.5rem" },
+  { label: "Category", type: "Data", key: "custom_category", width: "7.5rem" },
   { label: "Raised By", type: "Data", key: "raised_by", width: "12rem" },
   {
     label: "Client",
@@ -26,6 +35,9 @@ export const kancomWorkbenchColumns = [
 export const kancomWorkbenchRows = [
   "name",
   "subject",
+  "agent_group",
+  "custom_product",
+  "custom_category",
   "raised_by",
   "customer",
   "status",

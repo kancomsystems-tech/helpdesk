@@ -66,16 +66,17 @@ import {
   kancomWorkbenchRows,
 } from "@/kancom/ticketList/workbenchColumns";
 import {
-  getPrimaryWorkbenchFilters,
   getQueueTeams,
   getVisibleWorkbenchChips,
   replacePrimaryWorkbenchFilters,
+  resolvePrimaryWorkbenchState,
   type PrimaryWorkbenchScope,
   type WorkbenchChip,
 } from "@/kancom/ticketList/workbenchFilters";
 import { getWorkbenchVisibilityMetrics } from "@/kancom/ticketList/visibilityMetrics";
 import {
   renderDateTimeCell,
+  renderOperationalValueCell,
   renderOwnerCell,
   renderRequestCell,
   renderResponseByCell,
@@ -119,10 +120,17 @@ const showBulkAssignDialog = ref(false);
 
 const { getStatus } = useTicketStatusStore();
 const { getUser } = useUserStore();
-const activeWorkbenchChip = ref("control_view");
-const selectedTeam = ref("");
 const productContext = computed(() => productContextStore.context);
 const queueTeams = computed(() => getQueueTeams(productContext.value));
+const initialPrimaryState = resolvePrimaryWorkbenchState(
+  route.query,
+  userId,
+  productContext.value
+);
+const activeWorkbenchChip = ref(
+  getActiveWorkbenchChip(initialPrimaryState.scope)
+);
+const selectedTeam = ref(initialPrimaryState.team);
 const visibleWorkbenchChips = computed(() =>
   getVisibleWorkbenchChips(productContext.value)
 );
@@ -165,6 +173,8 @@ const options = {
   columns: kancomWorkbenchColumns,
   rows: kancomWorkbenchRows,
   order_by: "modified desc",
+  // URL/product scope is authoritative from the first list request.
+  defaultFilters: initialPrimaryState.filters,
   ignoreDefaultView: true,
   ignoreSavedColumns: true,
   wrapperClass: "kancom-travel-requests-workbench",
@@ -186,6 +196,9 @@ const options = {
           isCustomerPortal: isCustomerPortal.value,
         }),
     },
+    agent_group: { custom: renderOperationalValueCell },
+    custom_product: { custom: renderOperationalValueCell },
+    custom_category: { custom: renderOperationalValueCell },
     _assign: {
       custom: ({ item }) => renderOwnerCell({ item, getUser }),
     },
@@ -257,55 +270,38 @@ function applyPrimaryScope() {
     selectedTeam.value = "";
     return;
   }
-  const requestedScope = String(
-    route.query.scope || "control"
-  ) as PrimaryWorkbenchScope;
+
+  const state = resolvePrimaryWorkbenchState(
+    route.query,
+    userId,
+    productContext.value
+  );
+  const requestedScope = String(route.query.scope || "control");
   const requestedTeam = String(route.query.team || "");
-  const allowedScopes: PrimaryWorkbenchScope[] = [
-    "control",
-    "assigned",
-    "queues",
-  ];
   if (
-    productContext.value?.persona === "operations_head" ||
-    productContext.value?.persona === "administrator"
+    state.scope !== requestedScope ||
+    (state.scope !== "team" && requestedTeam)
   ) {
-    allowedScopes.push("triage");
-  }
-  if (requestedTeam && queueTeams.value.includes(requestedTeam)) {
-    allowedScopes.push("team");
-  }
-  const scope = allowedScopes.includes(requestedScope)
-    ? requestedScope
-    : "control";
-  const team = scope === "team" ? requestedTeam : "";
-  if (scope !== requestedScope || (scope !== "team" && requestedTeam)) {
-    const query = { ...route.query, scope };
+    const query = { ...route.query, scope: state.scope };
     delete query.team;
     router.replace({ name: "TicketsAgent", query });
     return;
   }
-  const primaryFilters = getPrimaryWorkbenchFilters(
-    scope,
-    userId,
-    queueTeams.value,
-    team
-  );
+
   const currentFilters = listViewRef.value?.list?.params?.filters || {};
   listViewRef.value?.applyFilters(
-    replacePrimaryWorkbenchFilters(currentFilters, primaryFilters)
+    replacePrimaryWorkbenchFilters(currentFilters, state.filters)
   );
-  selectedTeam.value = team;
-  activeWorkbenchChip.value =
-    scope === "assigned"
-      ? "my_assigned"
-      : scope === "queues"
-      ? "my_queues"
-      : scope === "triage"
-      ? "triage"
-      : scope === "team"
-      ? ""
-      : "control_view";
+  selectedTeam.value = state.team;
+  activeWorkbenchChip.value = getActiveWorkbenchChip(state.scope);
+}
+
+function getActiveWorkbenchChip(scope: PrimaryWorkbenchScope) {
+  if (scope === "assigned") return "my_assigned";
+  if (scope === "queues") return "my_queues";
+  if (scope === "triage") return "triage";
+  if (scope === "team") return "";
+  return "control_view";
 }
 
 async function exportRows(

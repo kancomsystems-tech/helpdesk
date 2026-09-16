@@ -31,11 +31,11 @@ function parseAssignments(value: unknown): string[] {
 }
 
 function isOpen(row: TicketRow, getStatus: GetStatus) {
-  return getStatus(row.status)?.category === "Open" || row.status === "Open";
+  return ["Open", "Paused"].includes(getStatus(row.status)?.category || "");
 }
 
 function isClosed(row: TicketRow, getStatus: GetStatus) {
-  return getStatus(row.status)?.category === "Resolved" || row.status === "Closed";
+  return getStatus(row.status)?.category === "Resolved";
 }
 
 function isSlaBreached(row: TicketRow) {

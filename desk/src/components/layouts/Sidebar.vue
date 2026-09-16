@@ -264,7 +264,8 @@ const showCommandPalette = ref(false);
 const visibleTravelosModuleNavigation = computed(() =>
   filterCapabilityNavigation(
     getHelpdeskModuleNavigation(),
-    productContextStore.hasCapability
+    productContextStore.hasCapability,
+    authStore.isAdmin || authStore.isManager
   )
 );
 
