@@ -7,15 +7,19 @@
     <OperationsTopBar
       :period-context="liveSummary"
       @select-period="selectPeriod"
+      @customize="showLayoutDialog = true"
     />
 
     <p v-if="refreshError" class="mb-3 text-sm text-red-600" role="status">
       {{ refreshError }}
     </p>
+    <p v-if="layoutError" class="mb-3 text-sm text-red-600" role="status">
+      {{ layoutError }}
+    </p>
 
     <template v-if="liveSummary">
       <div class="travelos-v2-kpi-strip">
-        <KpiCard v-for="item in kpis" :key="item.label" v-bind="item" />
+        <KpiCard v-for="item in visibleKpis" :key="item.id" v-bind="item" />
       </div>
 
       <main class="travelos-v2-main-column">
@@ -23,15 +27,25 @@
         <DepartmentQueues :queues="liveDepartmentQueues" />
       </main>
     </template>
+    <KpiLayoutDialog
+      v-model="showLayoutDialog"
+      :cards="availableKpiCards"
+      :preference="effectiveKpiLayout"
+      :saving="isSavingLayout"
+      @save="saveKpiLayout"
+      @reset="resetKpiLayout"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { call, createResource } from "frappe-ui";
+import { computed, onMounted, ref } from "vue";
+import { call, createResource, toast } from "frappe-ui";
+import { useProductContextStore } from "@/kancom/product/store";
 import AttentionList from "../components/AttentionList.vue";
 import DepartmentQueues from "../components/DepartmentQueues.vue";
 import KpiCard from "../components/KpiCard.vue";
+import KpiLayoutDialog from "../components/KpiLayoutDialog.vue";
 import OperationsCommandBar from "../components/OperationsCommandBar.vue";
 import OperationsTopBar from "../components/OperationsTopBar.vue";
 import {
@@ -39,11 +53,29 @@ import {
   type OperationsPeriod,
   type OperationsSummary,
 } from "../data/dashboardData";
+import {
+  getAvailableOperationsKpiIds,
+  getVisibleOperationsKpiIds,
+  operationsKpiCardLibrary,
+  parseOperationsKpiPreference,
+  resolveOperationsKpiLayout,
+  type OperationsKpiCardId,
+  type OperationsKpiLayoutPreference,
+} from "../data/dashboardLayout";
+
+const userSettingsKey = "Kancom Operations Dashboard";
+const productContextStore = useProductContextStore();
 
 const selectedPeriod = ref<OperationsPeriod>("today");
 const displayedSummary = ref<OperationsSummary | null>(null);
 const isRefreshing = ref(false);
 const refreshError = ref("");
+const layoutError = ref("");
+const showLayoutDialog = ref(false);
+const isSavingLayout = ref(false);
+const kpiLayout = ref<OperationsKpiLayoutPreference>(
+  resolveOperationsKpiLayout(null)
+);
 let requestSequence = 0;
 
 createResource({
@@ -84,46 +116,131 @@ function formatCount(value: number) {
   return value.toLocaleString();
 }
 
-const kpis = computed(() => {
+const availableKpiIds = computed<OperationsKpiCardId[]>(() =>
+  getAvailableOperationsKpiIds(
+    productContextStore.context?.persona,
+    productContextStore.hasCapability("operations")
+  )
+);
+const availableKpiCards = computed(() =>
+  operationsKpiCardLibrary.filter((card) =>
+    availableKpiIds.value.includes(card.id)
+  )
+);
+
+const kpis = computed<Record<OperationsKpiCardId, any>>(() => {
   const summary = liveSummary.value;
-  if (!summary) return [];
+  if (!summary) return {} as Record<OperationsKpiCardId, any>;
 
   const isToday = summary.period === "today";
   const periodHelper = summary.period_label.toLowerCase();
 
-  return [
-    {
+  return {
+    created_today: {
+      id: "created_today",
       label: isToday ? "Total Requests Today" : "Requests Created",
       value: formatCount(summary.kpis.total_requests_today),
       helper: isToday ? "Created today" : "Created in " + periodHelper,
       tone: "blue" as const,
     },
-    {
-      label: "Pending",
+    open_inventory: {
+      id: "open_inventory",
+      label: "Open Inventory",
       value: formatCount(summary.kpis.pending),
       helper: "Current open inventory",
       tone: "warning" as const,
     },
-    {
-      label: "SLA Overdue",
+    sla_breached: {
+      id: "sla_breached",
+      label: "SLA Breached",
       value: formatCount(summary.kpis.sla_overdue),
       helper: "Current open requests with failed SLA",
       tone: "danger" as const,
     },
-    {
+    closed_today: {
+      id: "closed_today",
       label: isToday ? "Closed Today" : "Requests Resolved",
       value: formatCount(summary.kpis.closed_today),
       helper: isToday ? "Resolved today" : "Resolved in " + periodHelper,
       tone: "success" as const,
     },
-    {
+    unassigned: {
+      id: "unassigned",
       label: "Unassigned",
       value: formatCount(summary.kpis.unassigned),
       helper: "Current open requests without an owner",
       tone: "blue" as const,
     },
-  ];
+  };
 });
+
+const visibleKpis = computed(() =>
+  getVisibleOperationsKpiIds(effectiveKpiLayout.value, availableKpiIds.value)
+    .map((id) => kpis.value[id])
+    .filter(Boolean)
+);
+const effectiveKpiLayout = computed(() =>
+  resolveOperationsKpiLayout(kpiLayout.value, availableKpiIds.value)
+);
+
+onMounted(loadKpiLayout);
+
+async function loadKpiLayout() {
+  layoutError.value = "";
+  try {
+    const settings = await call("frappe.model.utils.user_settings.get", {
+      doctype: userSettingsKey,
+    });
+    kpiLayout.value = resolveOperationsKpiLayout(
+      parseOperationsKpiPreference(settings),
+      availableKpiIds.value
+    );
+  } catch {
+    kpiLayout.value = resolveOperationsKpiLayout(null, availableKpiIds.value);
+    layoutError.value =
+      "Dashboard preferences could not be loaded. Showing the default layout.";
+  }
+}
+
+async function saveKpiLayout(preference: OperationsKpiLayoutPreference) {
+  const next = resolveOperationsKpiLayout(preference, availableKpiIds.value);
+  kpiLayout.value = next;
+  isSavingLayout.value = true;
+  layoutError.value = "";
+  try {
+    await call("frappe.model.utils.user_settings.save", {
+      doctype: userSettingsKey,
+      user_settings: JSON.stringify({ kpi_layout: next }),
+    });
+    showLayoutDialog.value = false;
+    toast.success("Dashboard layout saved");
+  } catch {
+    layoutError.value =
+      "Dashboard preferences could not be saved. Your current layout is still shown.";
+  } finally {
+    isSavingLayout.value = false;
+  }
+}
+
+async function resetKpiLayout() {
+  const defaults = resolveOperationsKpiLayout(null, availableKpiIds.value);
+  kpiLayout.value = defaults;
+  isSavingLayout.value = true;
+  layoutError.value = "";
+  try {
+    await call("frappe.model.utils.user_settings.save", {
+      doctype: userSettingsKey,
+      user_settings: JSON.stringify({ kpi_layout: null }),
+    });
+    showLayoutDialog.value = false;
+    toast.success("Dashboard layout reset");
+  } catch {
+    layoutError.value =
+      "The default layout is shown, but the reset could not be saved.";
+  } finally {
+    isSavingLayout.value = false;
+  }
+}
 
 async function selectPeriod(period: OperationsPeriod) {
   if (period === selectedPeriod.value) return;

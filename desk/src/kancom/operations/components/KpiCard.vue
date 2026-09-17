@@ -18,9 +18,11 @@ import LucideAlertTriangle from "~icons/lucide/alert-triangle";
 import LucideCheckCircle2 from "~icons/lucide/check-circle-2";
 import LucideClock3 from "~icons/lucide/clock-3";
 import LucideInbox from "~icons/lucide/inbox";
+import type { OperationsKpiCardId } from "../data/dashboardLayout";
 
 const props = withDefaults(
   defineProps<{
+    id: OperationsKpiCardId;
     label: string;
     value: string;
     helper: string;
@@ -33,9 +35,9 @@ const visualTone = computed(() => props.tone || "blue");
 const cardClass = computed(() => `is-${visualTone.value}`);
 const iconClass = computed(() => `is-${visualTone.value}`);
 const icon = computed(() => {
-  if (props.label === "Pending") return LucideClock3;
-  if (props.label === "SLA Overdue") return LucideAlertTriangle;
-  if (props.label === "Closed Today") return LucideCheckCircle2;
+  if (props.id === "open_inventory") return LucideClock3;
+  if (props.id === "sla_breached") return LucideAlertTriangle;
+  if (props.id === "closed_today") return LucideCheckCircle2;
   return LucideInbox;
 });
 </script>

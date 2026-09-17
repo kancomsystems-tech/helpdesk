@@ -5,6 +5,11 @@
       <p>Here is the live operational picture for your current scope.</p>
     </div>
     <div class="travelos-period-control">
+      <Button label="Customize" variant="subtle" @click="$emit('customize')">
+        <template #prefix>
+          <LucideSlidersHorizontal class="size-4" />
+        </template>
+      </Button>
       <Dropdown :options="periodOptions">
         <template #default="{ open }">
           <button type="button" class="travelos-date-selector">
@@ -21,7 +26,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { Dropdown } from "frappe-ui";
+import { Button, Dropdown } from "frappe-ui";
 import { useAuthStore } from "@/stores/auth";
 import type {
   OperationsPeriod,
@@ -29,12 +34,14 @@ import type {
 } from "../data/dashboardData";
 import LucideCalendarDays from "~icons/lucide/calendar-days";
 import LucideChevronDown from "~icons/lucide/chevron-down";
+import LucideSlidersHorizontal from "~icons/lucide/sliders-horizontal";
 
 const props = defineProps<{
   periodContext: OperationsSummary | null;
 }>();
 const emit = defineEmits<{
   (event: "select-period", period: OperationsPeriod): void;
+  (event: "customize"): void;
 }>();
 
 const authStore = useAuthStore();

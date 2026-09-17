@@ -1,0 +1,113 @@
+<template>
+  <Dialog
+    v-model="show"
+    :options="{ title: 'Customize Dashboard', size: 'md' }"
+  >
+    <template #body-content>
+      <div class="flex flex-col gap-2">
+        <div
+          v-for="(card, index) in orderedCards"
+          :key="card.id"
+          class="flex min-h-10 items-center gap-3 border-b border-outline-gray-1 py-2 last:border-0"
+        >
+          <Checkbox
+            :model-value="!draftHidden.has(card.id)"
+            @update:model-value="toggle(card.id)"
+          />
+          <span class="min-w-0 flex-1 truncate text-sm text-ink-gray-8">
+            {{ card.label }}
+          </span>
+          <Button
+            icon="arrow-up"
+            variant="ghost"
+            :disabled="index === 0"
+            title="Move up"
+            @click="move(index, -1)"
+          />
+          <Button
+            icon="arrow-down"
+            variant="ghost"
+            :disabled="index === orderedCards.length - 1"
+            title="Move down"
+            @click="move(index, 1)"
+          />
+        </div>
+      </div>
+    </template>
+    <template #actions>
+      <div class="flex w-full justify-between gap-2">
+        <Button label="Reset to Default" @click="$emit('reset')" />
+        <div class="flex gap-2">
+          <Button label="Cancel" @click="show = false" />
+          <Button
+            label="Save"
+            variant="solid"
+            :loading="saving"
+            @click="save"
+          />
+        </div>
+      </div>
+    </template>
+  </Dialog>
+</template>
+
+<script setup lang="ts">
+import { Button, Checkbox, Dialog } from "frappe-ui";
+import { computed, ref, watch } from "vue";
+import type {
+  OperationsKpiCardId,
+  OperationsKpiLayoutPreference,
+} from "../data/dashboardLayout";
+
+const show = defineModel<boolean>();
+const props = defineProps<{
+  cards: Array<{ id: OperationsKpiCardId; label: string }>;
+  preference: OperationsKpiLayoutPreference;
+  saving?: boolean;
+}>();
+const emit = defineEmits<{
+  save: [preference: OperationsKpiLayoutPreference];
+  reset: [];
+}>();
+
+const draftOrder = ref<OperationsKpiCardId[]>([]);
+const draftHidden = ref(new Set<OperationsKpiCardId>());
+const orderedCards = computed(() =>
+  draftOrder.value
+    .map((id) => props.cards.find((card) => card.id === id))
+    .filter((card): card is { id: OperationsKpiCardId; label: string } =>
+      Boolean(card)
+    )
+);
+
+watch(
+  () => show.value,
+  (open) => {
+    if (!open) return;
+    draftOrder.value = [...props.preference.order];
+    draftHidden.value = new Set(props.preference.hidden);
+  },
+  { immediate: true }
+);
+
+function toggle(id: OperationsKpiCardId) {
+  const next = new Set(draftHidden.value);
+  next.has(id) ? next.delete(id) : next.add(id);
+  draftHidden.value = next;
+}
+
+function move(index: number, offset: number) {
+  const target = index + offset;
+  if (target < 0 || target >= draftOrder.value.length) return;
+  const next = [...draftOrder.value];
+  [next[index], next[target]] = [next[target], next[index]];
+  draftOrder.value = next;
+}
+
+function save() {
+  emit("save", {
+    order: [...draftOrder.value],
+    hidden: Array.from(draftHidden.value),
+  });
+}
+</script>
