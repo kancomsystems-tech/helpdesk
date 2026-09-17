@@ -23,12 +23,12 @@
               <span
                 class="rounded border border-outline-gray-2 px-1.5 py-0.5 text-xs font-medium"
                 :class="
-                  card.state === 'preview'
+                  card.type === 'preview'
                     ? 'bg-surface-gray-1 text-ink-gray-6'
                     : 'text-ink-gray-7'
                 "
               >
-                {{ card.state === "live" ? "Live" : "Preview" }}
+                {{ card.type === "preview" ? "Preview" : "Live" }}
               </span>
             </div>
             <p class="mt-0.5 truncate text-xs text-ink-gray-5">

@@ -60,7 +60,7 @@ import {
   parseOperationsKpiPreference,
   resolveOperationsKpiLayout,
   type OperationsKpiCardId,
-  type OperationsKpiCardState,
+  type OperationsKpiCardType,
   type OperationsKpiLayoutPreference,
 } from "../data/dashboardLayout";
 
@@ -109,6 +109,12 @@ function isOperationsSummary(value: unknown): value is OperationsSummary {
       summary.from_date &&
       summary.to_date &&
       summary.kpis &&
+      summary.breakdowns &&
+      Array.isArray(summary.breakdowns.clients) &&
+      Array.isArray(summary.breakdowns.teams) &&
+      Array.isArray(summary.breakdowns.products) &&
+      Array.isArray(summary.breakdowns.categories) &&
+      Array.isArray(summary.breakdowns.client_sla_breaches) &&
       Array.isArray(summary.department_load)
   );
 }
@@ -134,7 +140,8 @@ interface DisplayKpiCard {
   label: string;
   value: string;
   helper: string;
-  state: OperationsKpiCardState;
+  type: OperationsKpiCardType;
+  items?: OperationsSummary["breakdowns"]["clients"];
   tone: "blue" | "warning" | "danger" | "success" | "default";
 }
 
@@ -152,15 +159,15 @@ const kpis = computed<Partial<Record<OperationsKpiCardId, DisplayKpiCard>>>(
         label: isToday ? "Total Requests Today" : "Requests Created",
         value: formatCount(summary.kpis.total_requests_today),
         helper: isToday ? "Created today" : "Created in " + periodHelper,
-        state: "live",
+        type: "live_scalar",
         tone: "blue" as const,
       },
       open_inventory: {
         id: "open_inventory",
         label: "Open Inventory",
         value: formatCount(summary.kpis.pending),
-        helper: "Current open inventory",
-        state: "live",
+        helper: "Current open and paused request inventory",
+        type: "live_scalar",
         tone: "warning" as const,
       },
       sla_breached: {
@@ -168,7 +175,7 @@ const kpis = computed<Partial<Record<OperationsKpiCardId, DisplayKpiCard>>>(
         label: "SLA Breached",
         value: formatCount(summary.kpis.sla_overdue),
         helper: "Current open requests with failed SLA",
-        state: "live",
+        type: "live_scalar",
         tone: "danger" as const,
       },
       closed_today: {
@@ -176,7 +183,7 @@ const kpis = computed<Partial<Record<OperationsKpiCardId, DisplayKpiCard>>>(
         label: isToday ? "Closed Today" : "Requests Resolved",
         value: formatCount(summary.kpis.closed_today),
         helper: isToday ? "Resolved today" : "Resolved in " + periodHelper,
-        state: "live",
+        type: "live_scalar",
         tone: "success" as const,
       },
       unassigned: {
@@ -184,12 +191,67 @@ const kpis = computed<Partial<Record<OperationsKpiCardId, DisplayKpiCard>>>(
         label: "Unassigned",
         value: formatCount(summary.kpis.unassigned),
         helper: "Current open requests without an owner",
-        state: "live",
+        type: "live_scalar",
         tone: "blue" as const,
       },
+      due_soon: {
+        id: "due_soon",
+        label: "Due Soon",
+        value: formatCount(summary.kpis.due_soon),
+        helper: "Active SLA deadline due within 60 minutes",
+        type: "live_scalar",
+        tone: "warning" as const,
+      },
+      vip_priority: {
+        id: "vip_priority",
+        label: "High Priority Requests",
+        value: formatCount(summary.kpis.high_priority),
+        helper: "Open or paused requests with High or Urgent priority",
+        type: "live_scalar",
+        tone: "warning" as const,
+      },
+      my_queue: {
+        id: "my_queue",
+        label: "My Assigned",
+        value: formatCount(summary.kpis.my_assigned),
+        helper: "Open or paused requests assigned directly to you",
+        type: "live_scalar",
+        tone: "blue" as const,
+      },
+      client_sla_monitor: breakdownCard(
+        "client_sla_monitor",
+        "Client SLA Breaches",
+        "Top clients by current open SLA breaches",
+        summary.breakdowns.client_sla_breaches,
+        "danger"
+      ),
+      client_wise_open: breakdownCard(
+        "client_wise_open",
+        "Client-wise Open",
+        "Top clients by open and paused requests",
+        summary.breakdowns.clients
+      ),
+      team_wise_open: breakdownCard(
+        "team_wise_open",
+        "Team-wise Open",
+        "Top teams by open and paused requests",
+        summary.breakdowns.teams
+      ),
+      product_wise_open: breakdownCard(
+        "product_wise_open",
+        "Product-wise Open",
+        "Top products by open and paused requests",
+        summary.breakdowns.products
+      ),
+      category_wise_open: breakdownCard(
+        "category_wise_open",
+        "Category-wise Open",
+        "Top categories by open and paused requests",
+        summary.breakdowns.categories
+      ),
       ...Object.fromEntries(
         operationsKpiCardLibrary
-          .filter((card) => card.state === "preview")
+          .filter((card) => card.type === "preview")
           .map((card) => [
             card.id,
             {
@@ -197,7 +259,7 @@ const kpis = computed<Partial<Record<OperationsKpiCardId, DisplayKpiCard>>>(
               label: card.label,
               value: "—",
               helper: card.helper,
-              state: card.state,
+              type: card.type,
               tone: "default" as const,
             },
           ])
@@ -205,6 +267,24 @@ const kpis = computed<Partial<Record<OperationsKpiCardId, DisplayKpiCard>>>(
     };
   }
 );
+
+function breakdownCard(
+  id: OperationsKpiCardId,
+  label: string,
+  helper: string,
+  items: OperationsSummary["breakdowns"]["clients"],
+  tone: DisplayKpiCard["tone"] = "default"
+): DisplayKpiCard {
+  return {
+    id,
+    label,
+    value: formatCount(items.reduce((sum, item) => sum + item.count, 0)),
+    helper,
+    type: "live_breakdown",
+    items,
+    tone,
+  };
+}
 
 const visibleKpis = computed(() =>
   getVisibleOperationsKpiIds(effectiveKpiLayout.value, availableKpiIds.value)

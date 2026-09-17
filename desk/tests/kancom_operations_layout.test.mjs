@@ -21,9 +21,12 @@ try {
   const library = layout.operationsKpiCardLibrary;
   const allIds = library.map((card) => card.id);
   const liveIds = library
-    .filter((card) => card.state === "live")
+    .filter((card) => card.type !== "preview")
     .map((card) => card.id);
-  const previewCards = library.filter((card) => card.state === "preview");
+  const breakdownIds = library
+    .filter((card) => card.type === "live_breakdown")
+    .map((card) => card.id);
+  const previewCards = library.filter((card) => card.type === "preview");
   const historicalPreviewIds = [
     "due_soon",
     "vip_priority",
@@ -41,6 +44,21 @@ try {
     "sla_breached",
     "closed_today",
     "unassigned",
+    "due_soon",
+    "vip_priority",
+    "my_queue",
+    "client_sla_monitor",
+    "client_wise_open",
+    "team_wise_open",
+    "product_wise_open",
+    "category_wise_open",
+  ]);
+  assert.deepEqual(breakdownIds, [
+    "client_sla_monitor",
+    "client_wise_open",
+    "team_wise_open",
+    "product_wise_open",
+    "category_wise_open",
   ]);
   assert.deepEqual(
     historicalPreviewIds.filter((id) => !allIds.includes(id)),
@@ -49,7 +67,7 @@ try {
   assert.equal(new Set(allIds).size, allIds.length);
   assert.ok(
     library
-      .filter((card) => card.state === "live")
+      .filter((card) => card.type !== "preview")
       .every((card) => card.sourceField)
   );
   assert.ok(
@@ -64,7 +82,13 @@ try {
   );
   assert.ok(previewCards.every((card) => defaults.hidden.includes(card.id)));
 
-  const legacyIds = [...liveIds];
+  const legacyIds = [
+    "created_today",
+    "open_inventory",
+    "sla_breached",
+    "closed_today",
+    "unassigned",
+  ];
   const legacyPreference = {
     order: ["closed_today", ...legacyIds.filter((id) => id !== "closed_today")],
     hidden: ["unassigned"],
@@ -124,7 +148,8 @@ try {
     "utf8"
   );
   assert.match(dashboard, /value: "—"/);
-  assert.match(kpiCard, /state === 'preview'/);
+  assert.match(kpiCard, /type === 'preview'/);
+  assert.match(kpiCard, /type !== 'live_breakdown'/);
   assert.match(kpiCard, />\s*Preview\s*</);
   assert.match(
     topBar,

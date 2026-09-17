@@ -28,6 +28,12 @@ export interface DepartmentQueue {
   route: string;
 }
 
+export interface OperationsBreakdownItem {
+  key: string;
+  label: string;
+  count: number;
+}
+
 export type OperationsPeriod =
   | "today"
   | "yesterday"
@@ -51,6 +57,16 @@ export interface OperationsSummary {
     sla_overdue: number;
     closed_today: number;
     unassigned: number;
+    due_soon: number;
+    high_priority: number;
+    my_assigned: number;
+  };
+  breakdowns: {
+    clients: OperationsBreakdownItem[];
+    teams: OperationsBreakdownItem[];
+    products: OperationsBreakdownItem[];
+    categories: OperationsBreakdownItem[];
+    client_sla_breaches: OperationsBreakdownItem[];
   };
   department_load: Array<{
     team: string;
