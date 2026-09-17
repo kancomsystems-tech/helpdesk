@@ -29,20 +29,17 @@ export const workbenchChips: WorkbenchChip[] = [
   {
     key: "sla_risk",
     label: "SLA Breached",
-    enabled: false,
-    reason: "Parked until SLA-breached query semantics are verified.",
+    enabled: true,
   },
   {
     key: "unassigned",
     label: "Unassigned",
-    enabled: false,
-    reason: "Parked until empty-assignment filter semantics are verified.",
+    enabled: true,
   },
   {
     key: "closed",
     label: "Closed",
-    enabled: false,
-    reason: "Parked to avoid silently replacing saved-view behavior.",
+    enabled: true,
   },
 ];
 
@@ -51,7 +48,10 @@ export type PrimaryWorkbenchScope =
   | "assigned"
   | "queues"
   | "triage"
-  | "team";
+  | "team"
+  | "sla_breached"
+  | "unassigned"
+  | "closed";
 
 export interface WorkbenchProductContext {
   persona?:
@@ -70,7 +70,21 @@ export interface PrimaryWorkbenchState {
   filters: Record<string, any>;
 }
 
-const primaryFilterKeys = new Set(["_assign", "agent_group"]);
+const primaryFilterKeys = new Set([
+  "_assign",
+  "agent_group",
+  "agreement_status",
+  "status_category",
+]);
+
+export const SLA_BREACHED_AGREEMENT_STATUS = "Failed";
+export const RESOLVED_STATUS_CATEGORY = "Resolved";
+
+export const exceptionScopeFilters = {
+  sla_breached: { agreement_status: SLA_BREACHED_AGREEMENT_STATUS },
+  unassigned: { _assign: ["is", "not set"] },
+  closed: { status_category: RESOLVED_STATUS_CATEGORY },
+} as const;
 
 export function getQueueTeams(context?: WorkbenchProductContext | null) {
   if (!context) return [];
@@ -105,6 +119,9 @@ export function getPrimaryWorkbenchFilters(
   if (scope === "team" && team && queueTeams.includes(team)) {
     return { agent_group: team };
   }
+  const exceptionFilters =
+    exceptionScopeFilters[scope as keyof typeof exceptionScopeFilters];
+  if (exceptionFilters) return { ...exceptionFilters };
   return {};
 }
 
@@ -122,6 +139,9 @@ export function resolvePrimaryWorkbenchState(
     "control",
     "assigned",
     "queues",
+    "sla_breached",
+    "unassigned",
+    "closed",
   ];
 
   if (canUseTriage(context)) allowedScopes.push("triage");

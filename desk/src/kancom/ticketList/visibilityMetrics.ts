@@ -1,3 +1,8 @@
+import {
+  RESOLVED_STATUS_CATEGORY,
+  SLA_BREACHED_AGREEMENT_STATUS,
+} from "./workbenchFilters";
+
 export type WorkbenchVisibilityMetricTone = "default" | "risk";
 
 export interface WorkbenchVisibilityMetric {
@@ -12,7 +17,7 @@ type TicketStatus = { category?: string } | undefined;
 type GetStatus = (status?: string) => TicketStatus;
 
 // Failed represents a breached first-response or final-resolution SLA in the compact strip.
-const slaBreachedStatuses = new Set(["Failed"]);
+const slaBreachedStatuses = new Set([SLA_BREACHED_AGREEMENT_STATUS]);
 
 function parseAssignments(value: unknown): string[] {
   if (!value) return [];
@@ -35,7 +40,7 @@ function isOpen(row: TicketRow, getStatus: GetStatus) {
 }
 
 function isClosed(row: TicketRow, getStatus: GetStatus) {
-  return getStatus(row.status)?.category === "Resolved";
+  return getStatus(row.status)?.category === RESOLVED_STATUS_CATEGORY;
 }
 
 function isSlaBreached(row: TicketRow) {

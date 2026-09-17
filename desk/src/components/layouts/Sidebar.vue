@@ -289,7 +289,10 @@ function toggleSection(label: string, defaultOpen: boolean) {
 const allViews = computed(() => {
   let items = isCustomerPortal.value
     ? customerPortalSidebarOptions
-    : getAgentPortalSidebarOptions(productContextStore.hasCapability);
+    : getAgentPortalSidebarOptions(
+        productContextStore.hasCapability,
+        productContextStore.context?.persona
+      );
 
   if (!isCallingEnabled.value) {
     items = items.filter((item) => item.label !== __("Call Logs"));
@@ -422,6 +425,16 @@ function isActiveTab(to: any) {
   if (route.query.view) {
     return route.query.view == to?.query?.view;
   }
+  if (typeof to === "object") {
+    if (route.query.entry && !to.query?.entry) return false;
+    return (
+      route.name === to.name &&
+      Object.entries(to.query || {}).every(
+        ([key, value]) => route.query[key] === value
+      )
+    );
+  }
+  if (to === "TicketsAgent" && route.query.scope) return false;
   return route.name === to;
 }
 

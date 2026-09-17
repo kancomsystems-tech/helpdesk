@@ -10,7 +10,10 @@ import { travelosShellLabels } from "@/kancom/shell/navigation";
 const basicReportsPath = "/app/hd-ticket/view/report";
 
 export function getAgentPortalSidebarOptions(
-  hasCapability: (capability: "analytics" | "basic_reports") => boolean
+  hasCapability: (
+    capability: "analytics" | "basic_reports" | "team_queues"
+  ) => boolean,
+  persona?: string | null
 ) {
   const reports = hasCapability("analytics")
     ? {
@@ -26,6 +29,10 @@ export function getAgentPortalSidebarOptions(
       }
     : null;
 
+  const canManageTeamQueues =
+    hasCapability("team_queues") &&
+    ["team_leader", "operations_head", "administrator"].includes(persona || "");
+
   return [
     {
       label: __("My Queues"),
@@ -37,11 +44,18 @@ export function getAgentPortalSidebarOptions(
       icon: LucideTicket,
       to: "TicketsAgent",
     },
-    {
-      label: __("Team Queues"),
-      icon: LucideUsersRound,
-      to: { name: "TicketsAgent", query: { scope: "queues" } },
-    },
+    ...(canManageTeamQueues
+      ? [
+          {
+            label: __("Team Queues"),
+            icon: LucideUsersRound,
+            to: {
+              name: "TicketsAgent",
+              query: { scope: "queues", entry: "team_queues" },
+            },
+          },
+        ]
+      : []),
     {
       label: __(travelosShellLabels.customers),
       icon: OrganizationsIcon,

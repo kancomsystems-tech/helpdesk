@@ -246,6 +246,9 @@ function handleWorkbenchChip(chip: WorkbenchChip) {
     my_assigned: "assigned",
     my_queues: "queues",
     triage: "triage",
+    sla_risk: "sla_breached",
+    unassigned: "unassigned",
+    closed: "closed",
   };
   const scope = scopeByChip[chip.key];
   if (scope) setPrimaryScope(scope);
@@ -259,6 +262,7 @@ function setPrimaryScope(scope: PrimaryWorkbenchScope, team = "") {
   const query = { ...route.query };
   delete query.team;
   delete query.view;
+  if (scope !== "queues") delete query.entry;
   query.scope = scope;
   if (scope === "team") query.team = team;
   router.replace({ name: "TicketsAgent", query });
@@ -300,6 +304,9 @@ function getActiveWorkbenchChip(scope: PrimaryWorkbenchScope) {
   if (scope === "assigned") return "my_assigned";
   if (scope === "queues") return "my_queues";
   if (scope === "triage") return "triage";
+  if (scope === "sla_breached") return "sla_risk";
+  if (scope === "unassigned") return "unassigned";
+  if (scope === "closed") return "closed";
   if (scope === "team") return "";
   return "control_view";
 }
