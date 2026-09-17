@@ -80,7 +80,11 @@ try {
     layout.getVisibleOperationsKpiIds(defaults),
     layout.defaultVisibleOperationsKpiIds
   );
-  assert.ok(previewCards.every((card) => defaults.hidden.includes(card.id)));
+  assert.ok(
+    library
+      .filter((card) => !card.defaultVisible)
+      .every((card) => defaults.hidden.includes(card.id))
+  );
 
   const legacyIds = [
     "created_today",
@@ -97,7 +101,9 @@ try {
   assert.equal(resolvedLegacy.order[0], "closed_today");
   assert.ok(resolvedLegacy.hidden.includes("unassigned"));
   assert.ok(
-    previewCards.every((card) => resolvedLegacy.hidden.includes(card.id))
+    library
+      .filter((card) => !card.defaultVisible)
+      .every((card) => resolvedLegacy.hidden.includes(card.id))
   );
   assert.equal(
     layout.getVisibleOperationsKpiIds(resolvedLegacy).includes("due_soon"),
@@ -150,6 +156,7 @@ try {
   assert.match(dashboard, /value: "—"/);
   assert.match(kpiCard, /type === 'preview'/);
   assert.match(kpiCard, /type !== 'live_breakdown'/);
+  assert.doesNotMatch(kpiCard, /<span/);
   assert.match(kpiCard, />\s*Preview\s*</);
   assert.match(
     topBar,

@@ -6,12 +6,12 @@
     <div>
       <div class="flex items-center gap-2">
         <p>{{ label }}</p>
-        <span
+        <div
           v-if="type === 'preview'"
           class="rounded border border-outline-gray-2 bg-surface-gray-1 px-1.5 py-0.5 text-xs font-medium text-ink-gray-6"
         >
           Preview
-        </span>
+        </div>
       </div>
       <strong v-if="type !== 'live_breakdown'">{{ value }}</strong>
       <ul v-else class="mt-2 flex flex-col gap-1" :aria-label="label">
@@ -20,10 +20,10 @@
           :key="item.key"
           class="flex items-center justify-between gap-3 text-sm text-ink-gray-7"
         >
-          <span class="min-w-0 truncate">{{ item.label }}</span>
-          <span class="shrink-0 font-medium text-ink-gray-9">{{
-            item.count
-          }}</span>
+          <div class="min-w-0 truncate">{{ item.label }}</div>
+          <div class="shrink-0 font-medium text-ink-gray-9">
+            {{ item.count }}
+          </div>
         </li>
         <li v-if="!items.length" class="text-sm text-ink-gray-5">
           No requests
