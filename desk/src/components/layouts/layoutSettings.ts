@@ -37,7 +37,10 @@ export function getAgentPortalSidebarOptions(
     {
       label: __("My Queues"),
       icon: LucideLayoutDashboard,
-      to: { name: "TicketsAgent", query: { scope: "queues" } },
+      to: {
+        name: "TicketsAgent",
+        query: { scope: "queues", entry: "my_queues" },
+      },
     },
     {
       label: __(travelosShellLabels.tickets),

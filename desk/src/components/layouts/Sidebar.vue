@@ -426,6 +426,12 @@ function isActiveTab(to: any) {
     return route.query.view == to?.query?.view;
   }
   if (typeof to === "object") {
+    if (
+      to.query?.entry === "team_queues" &&
+      route.query.entry === "team_queues"
+    ) {
+      return route.name === to.name;
+    }
     if (route.query.entry && !to.query?.entry) return false;
     return (
       route.name === to.name &&

@@ -2,6 +2,8 @@
   <div class="kancom-travel-requests-workbench">
     <LayoutHeader>
       <WorkbenchHeader
+        :title="workbenchHeading.title"
+        :subtitle="workbenchHeading.subtitle"
         :create-route="{
           name: isCustomerPortal ? 'TicketNew' : 'TicketAgentNew',
         }"
@@ -134,6 +136,24 @@ const selectedTeam = ref(initialPrimaryState.team);
 const visibleWorkbenchChips = computed(() =>
   getVisibleWorkbenchChips(productContext.value)
 );
+const workbenchHeading = computed(() => {
+  if (route.query.entry === "team_queues") {
+    return {
+      title: "Team Queues",
+      subtitle: "Manage workload across your assigned teams",
+    };
+  }
+  if (route.query.entry === "my_queues") {
+    return {
+      title: "My Queues",
+      subtitle: "Requests relevant to your working queues",
+    };
+  }
+  return {
+    title: "Travel Requests Workbench",
+    subtitle: "Control ownership, SLA risk and closure across client requests",
+  };
+});
 
 const loadedWorkbenchRows = computed(
   () => listViewRef.value?.list?.data?.data ?? []
@@ -251,20 +271,26 @@ function handleWorkbenchChip(chip: WorkbenchChip) {
     closed: "closed",
   };
   const scope = scopeByChip[chip.key];
-  if (scope) setPrimaryScope(scope);
+  if (scope) {
+    setPrimaryScope(scope, "", chip.key === "my_queues" ? "my_queues" : "");
+  }
 }
 
 function handleTeamSelect(team: string) {
-  if (queueTeams.value.includes(team)) setPrimaryScope("team", team);
+  if (queueTeams.value.includes(team)) {
+    const entry = route.query.entry === "team_queues" ? "team_queues" : "";
+    setPrimaryScope("team", team, entry);
+  }
 }
 
-function setPrimaryScope(scope: PrimaryWorkbenchScope, team = "") {
+function setPrimaryScope(scope: PrimaryWorkbenchScope, team = "", entry = "") {
   const query = { ...route.query };
   delete query.team;
   delete query.view;
-  if (scope !== "queues") delete query.entry;
+  delete query.entry;
   query.scope = scope;
   if (scope === "team") query.team = team;
+  if (entry) query.entry = entry;
   router.replace({ name: "TicketsAgent", query });
 }
 

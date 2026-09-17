@@ -3,10 +3,8 @@
     <div class="kancom-workbench-titlebar">
       <div class="min-w-0">
         <p class="kancom-workbench-eyebrow">CONTROL DESK</p>
-        <h1 class="kancom-workbench-title">Travel Requests Workbench</h1>
-        <p class="kancom-workbench-subtitle">
-          Control ownership, SLA risk and closure across client requests
-        </p>
+        <h1 class="kancom-workbench-title">{{ title }}</h1>
+        <p class="kancom-workbench-subtitle">{{ subtitle }}</p>
       </div>
       <div class="kancom-workbench-actions">
         <WorkbenchViews
@@ -74,6 +72,8 @@ import type { WorkbenchVisibilityMetric } from "./visibilityMetrics";
 import type { WorkbenchChip } from "./workbenchFilters";
 
 const props = defineProps<{
+  title: string;
+  subtitle: string;
   createRoute: Record<string, string>;
   chips: WorkbenchChip[];
   activeChip?: string;
