@@ -31,7 +31,18 @@ export interface DepartmentQueue {
 export interface OperationsBreakdownItem {
   key: string;
   label: string;
-  count: number;
+  count?: number;
+  evaluated?: number;
+  met?: number;
+  breached?: number;
+  percentage?: number | null;
+}
+
+export interface SlaPerformance {
+  evaluated: number;
+  met: number;
+  breached: number;
+  percentage: number | null;
 }
 
 export type OperationsPeriod =
@@ -51,6 +62,7 @@ export interface OperationsSummary {
     type: "personal" | "managed_teams" | "global";
     teams: string[];
   };
+  sla_performance: SlaPerformance;
   kpis: {
     total_requests_today: number;
     pending: number;
@@ -67,6 +79,7 @@ export interface OperationsSummary {
     products: OperationsBreakdownItem[];
     categories: OperationsBreakdownItem[];
     client_sla_breaches: OperationsBreakdownItem[];
+    team_sla_performance: OperationsBreakdownItem[];
   };
   department_load: Array<{
     team: string;

@@ -109,12 +109,14 @@ function isOperationsSummary(value: unknown): value is OperationsSummary {
       summary.from_date &&
       summary.to_date &&
       summary.kpis &&
+      summary.sla_performance &&
       summary.breakdowns &&
       Array.isArray(summary.breakdowns.clients) &&
       Array.isArray(summary.breakdowns.teams) &&
       Array.isArray(summary.breakdowns.products) &&
       Array.isArray(summary.breakdowns.categories) &&
       Array.isArray(summary.breakdowns.client_sla_breaches) &&
+      Array.isArray(summary.breakdowns.team_sla_performance) &&
       Array.isArray(summary.department_load)
   );
 }
@@ -210,6 +212,19 @@ const kpis = computed<Partial<Record<OperationsKpiCardId, DisplayKpiCard>>>(
         type: "live_scalar",
         tone: "warning" as const,
       },
+      sla_performance: {
+        id: "sla_performance",
+        label: "SLA Performance",
+        value:
+          summary.sla_performance.percentage === null
+            ? "—"
+            : `${summary.sla_performance.percentage}%`,
+        helper: `SLA met across ${formatCount(
+          summary.sla_performance.evaluated
+        )} evaluated requests`,
+        type: "live_scalar",
+        tone: "success" as const,
+      },
       my_queue: {
         id: "my_queue",
         label: "My Assigned",
@@ -218,6 +233,12 @@ const kpis = computed<Partial<Record<OperationsKpiCardId, DisplayKpiCard>>>(
         type: "live_scalar",
         tone: "blue" as const,
       },
+      team_sla_performance: breakdownCard(
+        "team_sla_performance",
+        "Team SLA Performance",
+        "SLA met by team across evaluated requests",
+        summary.breakdowns.team_sla_performance
+      ),
       client_sla_monitor: breakdownCard(
         "client_sla_monitor",
         "Client SLA Breaches",
@@ -272,13 +293,15 @@ function breakdownCard(
   id: OperationsKpiCardId,
   label: string,
   helper: string,
-  items: OperationsSummary["breakdowns"]["clients"],
+  items: OperationsSummary["breakdowns"][keyof OperationsSummary["breakdowns"]],
   tone: DisplayKpiCard["tone"] = "default"
 ): DisplayKpiCard {
   return {
     id,
     label,
-    value: formatCount(items.reduce((sum, item) => sum + item.count, 0)),
+    value: formatCount(
+      items.reduce((sum, item) => sum + (item.count || item.evaluated || 0), 0)
+    ),
     helper,
     type: "live_breakdown",
     items,

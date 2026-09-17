@@ -9,6 +9,7 @@ export type OperationsKpiCardId =
   | "escalations"
   | "my_queue"
   | "sla_performance"
+  | "team_sla_performance"
   | "client_sla_monitor"
   | "agent_availability"
   | "today_activity"
@@ -138,10 +139,20 @@ export const operationsKpiCardLibrary: OperationsKpiCardDefinition[] = [
   {
     id: "sla_performance",
     label: "SLA Performance",
-    helper: "SLA health across operational teams",
-    type: "preview",
+    helper: "SLA met across evaluated requests",
+    type: "live_scalar",
+    sourceField: "sla_performance.percentage",
     defaultVisible: false,
     allowedPersonas: managementPersonas,
+  },
+  {
+    id: "team_sla_performance",
+    label: "Team SLA Performance",
+    helper: "SLA met by team across evaluated requests",
+    type: "live_breakdown",
+    defaultVisible: false,
+    allowedPersonas: managementPersonas,
+    sourceField: "breakdowns.team_sla_performance",
   },
   {
     id: "client_sla_monitor",

@@ -22,7 +22,7 @@
         >
           <div class="min-w-0 truncate">{{ item.label }}</div>
           <div class="shrink-0 font-medium text-ink-gray-9">
-            {{ item.count }}
+            {{ formatBreakdownValue(item) }}
           </div>
         </li>
         <li v-if="!items.length" class="text-sm text-ink-gray-5">
@@ -58,6 +58,12 @@ const props = withDefaults(
   }>(),
   { items: () => [], tone: "blue" }
 );
+
+function formatBreakdownValue(item: OperationsBreakdownItem) {
+  if (item.percentage !== undefined)
+    return item.percentage === null ? "—" : `${item.percentage}%`;
+  return (item.count || 0).toLocaleString();
+}
 
 const visualTone = computed(() => props.tone || "blue");
 const cardClass = computed(() => `is-${visualTone.value}`);
