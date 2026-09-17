@@ -8,29 +8,51 @@
         <div
           v-for="(card, index) in orderedCards"
           :key="card.id"
-          class="flex min-h-10 items-center gap-3 border-b border-outline-gray-1 py-2 last:border-0"
+          class="flex min-h-12 items-center gap-3 border-b border-outline-gray-1 py-2 last:border-0"
         >
           <Checkbox
             :model-value="!draftHidden.has(card.id)"
+            :aria-label="`Show ${card.label}`"
             @update:model-value="toggle(card.id)"
           />
-          <span class="min-w-0 flex-1 truncate text-sm text-ink-gray-8">
-            {{ card.label }}
-          </span>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2">
+              <span class="truncate text-sm text-ink-gray-8">
+                {{ card.label }}
+              </span>
+              <span
+                class="rounded border border-outline-gray-2 px-1.5 py-0.5 text-xs font-medium"
+                :class="
+                  card.state === 'preview'
+                    ? 'bg-surface-gray-1 text-ink-gray-6'
+                    : 'text-ink-gray-7'
+                "
+              >
+                {{ card.state === "live" ? "Live" : "Preview" }}
+              </span>
+            </div>
+            <p class="mt-0.5 truncate text-xs text-ink-gray-5">
+              {{ card.helper }}
+            </p>
+          </div>
           <Button
-            icon="arrow-up"
             variant="ghost"
             :disabled="index === 0"
             title="Move up"
+            :aria-label="`Move ${card.label} up`"
             @click="move(index, -1)"
-          />
+          >
+            <LucideChevronUp class="size-4" />
+          </Button>
           <Button
-            icon="arrow-down"
             variant="ghost"
             :disabled="index === orderedCards.length - 1"
             title="Move down"
+            :aria-label="`Move ${card.label} down`"
             @click="move(index, 1)"
-          />
+          >
+            <LucideChevronDown class="size-4" />
+          </Button>
         </div>
       </div>
     </template>
@@ -55,13 +77,16 @@
 import { Button, Checkbox, Dialog } from "frappe-ui";
 import { computed, ref, watch } from "vue";
 import type {
+  OperationsKpiCardDefinition,
   OperationsKpiCardId,
   OperationsKpiLayoutPreference,
 } from "../data/dashboardLayout";
+import LucideChevronDown from "~icons/lucide/chevron-down";
+import LucideChevronUp from "~icons/lucide/chevron-up";
 
 const show = defineModel<boolean>();
 const props = defineProps<{
-  cards: Array<{ id: OperationsKpiCardId; label: string }>;
+  cards: OperationsKpiCardDefinition[];
   preference: OperationsKpiLayoutPreference;
   saving?: boolean;
 }>();
@@ -75,9 +100,7 @@ const draftHidden = ref(new Set<OperationsKpiCardId>());
 const orderedCards = computed(() =>
   draftOrder.value
     .map((id) => props.cards.find((card) => card.id === id))
-    .filter((card): card is { id: OperationsKpiCardId; label: string } =>
-      Boolean(card)
-    )
+    .filter((card): card is OperationsKpiCardDefinition => Boolean(card))
 );
 
 watch(

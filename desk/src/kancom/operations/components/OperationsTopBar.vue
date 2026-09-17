@@ -5,20 +5,30 @@
       <p>Here is the live operational picture for your current scope.</p>
     </div>
     <div class="travelos-period-control">
-      <Button label="Customize" variant="subtle" @click="$emit('customize')">
-        <template #prefix>
-          <LucideSlidersHorizontal class="size-4" />
-        </template>
-      </Button>
-      <Dropdown :options="periodOptions">
-        <template #default="{ open }">
-          <button type="button" class="travelos-date-selector">
-            <LucideCalendarDays class="size-4" />
-            <span>{{ periodContext?.period_label || "Today" }}</span>
-            <LucideChevronDown class="size-4" :class="{ 'rotate-180': open }" />
-          </button>
-        </template>
-      </Dropdown>
+      <div class="travelos-dashboard-controls">
+        <Button
+          class="travelos-customize-control"
+          label="Customize"
+          variant="subtle"
+          @click="$emit('customize')"
+        >
+          <template #prefix>
+            <LucideSlidersHorizontal class="size-4" />
+          </template>
+        </Button>
+        <Dropdown :options="periodOptions">
+          <template #default="{ open }">
+            <button type="button" class="travelos-date-selector">
+              <LucideCalendarDays class="size-4" />
+              <span>{{ periodContext?.period_label || "Today" }}</span>
+              <LucideChevronDown
+                class="size-4"
+                :class="{ 'rotate-180': open }"
+              />
+            </button>
+          </template>
+        </Dropdown>
+      </div>
       <small v-if="periodContext">{{ dateRangeLabel }}</small>
     </div>
   </header>

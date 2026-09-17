@@ -2663,6 +2663,16 @@
   gap: 3px;
 }
 
+.kancom-desk-shell .travelos-dashboard-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kancom-desk-shell .travelos-customize-control {
+  min-height: 40px;
+}
+
 .kancom-desk-shell .travelos-period-control small {
   color: #64748b;
   font-size: 11px;

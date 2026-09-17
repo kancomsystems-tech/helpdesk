@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { rm } from "node:fs/promises";
+import { readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createRequire } from "node:module";
@@ -18,30 +18,69 @@ await build({
 
 try {
   const layout = require(output);
-  const defaults = layout.defaultOperationsKpiOrder;
+  const library = layout.operationsKpiCardLibrary;
+  const allIds = library.map((card) => card.id);
+  const liveIds = library
+    .filter((card) => card.state === "live")
+    .map((card) => card.id);
+  const previewCards = library.filter((card) => card.state === "preview");
+  const historicalPreviewIds = [
+    "due_soon",
+    "vip_priority",
+    "escalations",
+    "my_queue",
+    "sla_performance",
+    "client_sla_monitor",
+    "agent_availability",
+    "today_activity",
+  ];
 
-  assert.deepEqual(layout.resolveOperationsKpiLayout(null).order, defaults);
+  assert.deepEqual(liveIds, [
+    "created_today",
+    "open_inventory",
+    "sla_breached",
+    "closed_today",
+    "unassigned",
+  ]);
   assert.deepEqual(
-    layout.getVisibleOperationsKpiIds({
-      order: defaults,
-      hidden: ["unassigned"],
-    }),
-    defaults.filter((id) => id !== "unassigned")
+    historicalPreviewIds.filter((id) => !allIds.includes(id)),
+    []
   );
-  assert.deepEqual(
-    layout
-      .resolveOperationsKpiLayout({
-        order: ["closed_today", "created_today"],
-        hidden: [],
-      })
-      .order.slice(0, 2),
-    ["closed_today", "created_today"]
+  assert.equal(new Set(allIds).size, allIds.length);
+  assert.ok(
+    library
+      .filter((card) => card.state === "live")
+      .every((card) => card.sourceField)
   );
+  assert.ok(
+    previewCards.every((card) => !card.sourceField && !card.defaultVisible)
+  );
+  assert.ok(previewCards.every((card) => !/\d/.test(card.helper)));
+
+  const defaults = layout.resolveOperationsKpiLayout(null);
   assert.deepEqual(
-    layout.resolveOperationsKpiLayout("malformed").order,
-    defaults
+    layout.getVisibleOperationsKpiIds(defaults),
+    layout.defaultVisibleOperationsKpiIds
+  );
+  assert.ok(previewCards.every((card) => defaults.hidden.includes(card.id)));
+
+  const legacyIds = [...liveIds];
+  const legacyPreference = {
+    order: ["closed_today", ...legacyIds.filter((id) => id !== "closed_today")],
+    hidden: ["unassigned"],
+  };
+  const resolvedLegacy = layout.resolveOperationsKpiLayout(legacyPreference);
+  assert.equal(resolvedLegacy.order[0], "closed_today");
+  assert.ok(resolvedLegacy.hidden.includes("unassigned"));
+  assert.ok(
+    previewCards.every((card) => resolvedLegacy.hidden.includes(card.id))
   );
   assert.equal(
+    layout.getVisibleOperationsKpiIds(resolvedLegacy).includes("due_soon"),
+    false
+  );
+
+  assert.deepEqual(
     layout
       .resolveOperationsKpiLayout({
         order: ["unknown", "unassigned"],
@@ -50,34 +89,47 @@ try {
       .order.includes("unknown"),
     false
   );
+  assert.deepEqual(layout.resolveOperationsKpiLayout("malformed"), defaults);
+  assert.deepEqual(layout.resolveOperationsKpiLayout({}), defaults);
 
-  const authorized = ["created_today", "open_inventory"];
-  assert.deepEqual(
-    layout.resolveOperationsKpiLayout(
-      {
-        order: ["sla_breached", "created_today"],
-        hidden: [],
-      },
-      authorized
-    ).order,
-    authorized
-  );
-  assert.equal(
-    layout.parseOperationsKpiPreference(
-      JSON.stringify({ kpi_layout: { order: authorized, hidden: [] } })
-    ).order[0],
-    "created_today"
-  );
-  assert.equal(layout.parseOperationsKpiPreference("{"), null);
-  assert.deepEqual(
-    layout.getAvailableOperationsKpiIds("agent", true),
-    defaults
-  );
+  const agentIds = layout.getAvailableOperationsKpiIds("agent", true);
+  assert.ok(agentIds.includes("due_soon"));
+  assert.ok(agentIds.includes("my_queue"));
+  assert.equal(agentIds.includes("agent_availability"), false);
+  assert.equal(agentIds.includes("client_sla_monitor"), false);
   assert.deepEqual(
     layout.getAvailableOperationsKpiIds("team_leader", false),
     []
   );
   assert.deepEqual(layout.getAvailableOperationsKpiIds(null, true), []);
+
+  assert.equal(
+    layout.parseOperationsKpiPreference(
+      JSON.stringify({ kpi_layout: legacyPreference })
+    ).order[0],
+    "closed_today"
+  );
+  assert.equal(layout.parseOperationsKpiPreference("{"), null);
+
+  const dashboard = await readFile(
+    "src/kancom/operations/pages/OperationsDashboard.vue",
+    "utf8"
+  );
+  const kpiCard = await readFile(
+    "src/kancom/operations/components/KpiCard.vue",
+    "utf8"
+  );
+  const topBar = await readFile(
+    "src/kancom/operations/components/OperationsTopBar.vue",
+    "utf8"
+  );
+  assert.match(dashboard, /value: "—"/);
+  assert.match(kpiCard, /state === 'preview'/);
+  assert.match(kpiCard, />\s*Preview\s*</);
+  assert.match(
+    topBar,
+    /travelos-dashboard-controls[\s\S]*label="Customize"[\s\S]*<Dropdown/
+  );
 } finally {
   await rm(output, { force: true });
 }

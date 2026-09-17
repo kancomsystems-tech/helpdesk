@@ -60,6 +60,7 @@ import {
   parseOperationsKpiPreference,
   resolveOperationsKpiLayout,
   type OperationsKpiCardId,
+  type OperationsKpiCardState,
   type OperationsKpiLayoutPreference,
 } from "../data/dashboardLayout";
 
@@ -128,51 +129,82 @@ const availableKpiCards = computed(() =>
   )
 );
 
-const kpis = computed<Record<OperationsKpiCardId, any>>(() => {
-  const summary = liveSummary.value;
-  if (!summary) return {} as Record<OperationsKpiCardId, any>;
+interface DisplayKpiCard {
+  id: OperationsKpiCardId;
+  label: string;
+  value: string;
+  helper: string;
+  state: OperationsKpiCardState;
+  tone: "blue" | "warning" | "danger" | "success" | "default";
+}
 
-  const isToday = summary.period === "today";
-  const periodHelper = summary.period_label.toLowerCase();
+const kpis = computed<Partial<Record<OperationsKpiCardId, DisplayKpiCard>>>(
+  () => {
+    const summary = liveSummary.value;
+    if (!summary) return {};
 
-  return {
-    created_today: {
-      id: "created_today",
-      label: isToday ? "Total Requests Today" : "Requests Created",
-      value: formatCount(summary.kpis.total_requests_today),
-      helper: isToday ? "Created today" : "Created in " + periodHelper,
-      tone: "blue" as const,
-    },
-    open_inventory: {
-      id: "open_inventory",
-      label: "Open Inventory",
-      value: formatCount(summary.kpis.pending),
-      helper: "Current open inventory",
-      tone: "warning" as const,
-    },
-    sla_breached: {
-      id: "sla_breached",
-      label: "SLA Breached",
-      value: formatCount(summary.kpis.sla_overdue),
-      helper: "Current open requests with failed SLA",
-      tone: "danger" as const,
-    },
-    closed_today: {
-      id: "closed_today",
-      label: isToday ? "Closed Today" : "Requests Resolved",
-      value: formatCount(summary.kpis.closed_today),
-      helper: isToday ? "Resolved today" : "Resolved in " + periodHelper,
-      tone: "success" as const,
-    },
-    unassigned: {
-      id: "unassigned",
-      label: "Unassigned",
-      value: formatCount(summary.kpis.unassigned),
-      helper: "Current open requests without an owner",
-      tone: "blue" as const,
-    },
-  };
-});
+    const isToday = summary.period === "today";
+    const periodHelper = summary.period_label.toLowerCase();
+
+    return {
+      created_today: {
+        id: "created_today",
+        label: isToday ? "Total Requests Today" : "Requests Created",
+        value: formatCount(summary.kpis.total_requests_today),
+        helper: isToday ? "Created today" : "Created in " + periodHelper,
+        state: "live",
+        tone: "blue" as const,
+      },
+      open_inventory: {
+        id: "open_inventory",
+        label: "Open Inventory",
+        value: formatCount(summary.kpis.pending),
+        helper: "Current open inventory",
+        state: "live",
+        tone: "warning" as const,
+      },
+      sla_breached: {
+        id: "sla_breached",
+        label: "SLA Breached",
+        value: formatCount(summary.kpis.sla_overdue),
+        helper: "Current open requests with failed SLA",
+        state: "live",
+        tone: "danger" as const,
+      },
+      closed_today: {
+        id: "closed_today",
+        label: isToday ? "Closed Today" : "Requests Resolved",
+        value: formatCount(summary.kpis.closed_today),
+        helper: isToday ? "Resolved today" : "Resolved in " + periodHelper,
+        state: "live",
+        tone: "success" as const,
+      },
+      unassigned: {
+        id: "unassigned",
+        label: "Unassigned",
+        value: formatCount(summary.kpis.unassigned),
+        helper: "Current open requests without an owner",
+        state: "live",
+        tone: "blue" as const,
+      },
+      ...Object.fromEntries(
+        operationsKpiCardLibrary
+          .filter((card) => card.state === "preview")
+          .map((card) => [
+            card.id,
+            {
+              id: card.id,
+              label: card.label,
+              value: "—",
+              helper: card.helper,
+              state: card.state,
+              tone: "default" as const,
+            },
+          ])
+      ),
+    };
+  }
+);
 
 const visibleKpis = computed(() =>
   getVisibleOperationsKpiIds(effectiveKpiLayout.value, availableKpiIds.value)

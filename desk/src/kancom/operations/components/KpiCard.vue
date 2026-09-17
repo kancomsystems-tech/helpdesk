@@ -4,7 +4,15 @@
       <component :is="icon" class="size-7" />
     </div>
     <div>
-      <p>{{ label }}</p>
+      <div class="flex items-center gap-2">
+        <p>{{ label }}</p>
+        <span
+          v-if="state === 'preview'"
+          class="rounded border border-outline-gray-2 bg-surface-gray-1 px-1.5 py-0.5 text-xs font-medium text-ink-gray-6"
+        >
+          Preview
+        </span>
+      </div>
       <strong>{{ value }}</strong>
       <small>{{ helper }}</small>
     </div>
@@ -14,11 +22,14 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import type { KpiTone } from "../data/dashboardData";
+import type {
+  OperationsKpiCardId,
+  OperationsKpiCardState,
+} from "../data/dashboardLayout";
 import LucideAlertTriangle from "~icons/lucide/alert-triangle";
 import LucideCheckCircle2 from "~icons/lucide/check-circle-2";
 import LucideClock3 from "~icons/lucide/clock-3";
 import LucideInbox from "~icons/lucide/inbox";
-import type { OperationsKpiCardId } from "../data/dashboardLayout";
 
 const props = withDefaults(
   defineProps<{
@@ -26,6 +37,7 @@ const props = withDefaults(
     label: string;
     value: string;
     helper: string;
+    state: OperationsKpiCardState;
     tone?: KpiTone;
   }>(),
   { tone: "blue" }
