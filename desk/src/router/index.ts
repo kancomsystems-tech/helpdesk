@@ -226,6 +226,8 @@ router.beforeEach(async (to, _, next) => {
     !productContextStore.hasCapability(to.meta.capability)
   ) {
     next({ name: "TicketsAgent" });
+  } else if (to.meta.admin && !authStore.isAdmin) {
+    next({ name: "Dashboard" });
   } else if (to.meta.manager && !(authStore.isManager || authStore.isAdmin)) {
     next({ name: "Dashboard" });
   } else if (to.name === "TicketAgent" && !authStore.isAgent) {

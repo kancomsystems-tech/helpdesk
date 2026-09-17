@@ -1,31 +1,62 @@
-export const analyticsKpis = [
-  { label: "Total Requests", value: "1,286", trend: "+12% vs yesterday" },
-  { label: "Resolved", value: "842", trend: "+15% vs yesterday" },
-  { label: "Pending", value: "214", trend: "+8% vs yesterday" },
-  { label: "SLA Breached", value: "7", trend: "Needs action" },
-  { label: "Avg Response", value: "07m 28s", trend: "Inside target" },
-  { label: "Avg Resolution", value: "4h 32m", trend: "Stable" },
-];
+export interface AnalyticsKpis {
+  total_requests: number;
+  resolved: number;
+  open_inventory: number;
+  sla_breached_current: number;
+  avg_response_seconds: number | null;
+  avg_resolution_seconds: number | null;
+}
 
-export const requestTrend = [68, 84, 71, 92, 76, 88, 80, 96, 74, 90, 85, 98];
+export interface AnalyticsTrendPoint {
+  date: string;
+  count: number;
+}
 
-export const clientPerformance = [
-  { name: "Demo Corporate Travel", requests: 286, sla: "91%", trend: "+6%" },
-  { name: "Demo MICE Client", requests: 214, sla: "88%", trend: "+4%" },
-  { name: "Demo Accounts Desk", requests: 172, sla: "82%", trend: "Watch" },
-  { name: "Vendor Desk", requests: 96, sla: "78%", trend: "Review" },
-];
+export interface AnalyticsTeamSla {
+  team: string;
+  evaluated_count: number;
+  fulfilled_count: number;
+  sla_percent: number | null;
+}
 
-export const agentPerformance = [
-  { agent: "Air Agent", resolved: 84, response: "06m", sla: "94%" },
-  { agent: "Hotel Agent", resolved: 61, response: "09m", sla: "91%" },
-  { agent: "Visa Agent", resolved: 38, response: "12m", sla: "86%" },
-  { agent: "ETS Agent", resolved: 47, response: "08m", sla: "92%" },
-];
+export interface AnalyticsResolutionItem {
+  category: string;
+  count: number;
+}
 
-export const slaByTeam = [
-  { team: "AirOps", score: 93 },
-  { team: "HotelOps", score: 90 },
-  { team: "VisaOps", score: 78 },
-  { team: "ETS", score: 88 },
-];
+export interface AnalyticsClientPerformance {
+  client: string;
+  requests: number;
+  evaluated_count: number;
+  fulfilled_count: number;
+  sla_percent: number | null;
+  previous_requests: number;
+  trend_percent: number | null;
+}
+
+export interface AnalyticsSummary {
+  from_date: string;
+  to_date: string;
+  period_label: string;
+  generated_at: string;
+  timezone: string;
+  scope: {
+    type: "global";
+    teams: string[];
+  };
+  kpis: AnalyticsKpis;
+  request_trend: AnalyticsTrendPoint[];
+  sla_by_team: AnalyticsTeamSla[];
+  resolution_mix: AnalyticsResolutionItem[];
+  clients: AnalyticsClientPerformance[];
+  agent_performance: {
+    state: "preview";
+    reason: string;
+  };
+}
+
+export const analyticsPeriodOptions = [
+  { label: "Last 7 days", days: 7 },
+  { label: "Last 30 days", days: 30 },
+  { label: "Last 90 days", days: 90 },
+] as const;

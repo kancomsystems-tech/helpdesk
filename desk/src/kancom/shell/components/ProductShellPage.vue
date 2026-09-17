@@ -7,9 +7,11 @@
         <p>{{ description }}</p>
       </div>
       <div class="travelos-header-actions">
-        <button type="button">{{ period }}</button>
-        <button type="button">Filters</button>
-        <button type="button">Export</button>
+        <slot name="actions">
+          <button type="button">{{ period }}</button>
+          <button type="button">Filters</button>
+          <button type="button">Export</button>
+        </slot>
       </div>
     </header>
     <slot />

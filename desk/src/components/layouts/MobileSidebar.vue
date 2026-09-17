@@ -217,7 +217,8 @@ const visibleTravelosModuleNavigation = computed(() =>
   filterCapabilityNavigation(
     getHelpdeskModuleNavigation(),
     productContextStore.hasCapability,
-    authStore.isAdmin || authStore.isManager
+    authStore.isAdmin || authStore.isManager,
+    authStore.isAdmin
   )
 );
 
