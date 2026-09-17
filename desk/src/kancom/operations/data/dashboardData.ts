@@ -24,6 +24,8 @@ export interface AttentionItem {
 export interface DepartmentQueue {
   team: string;
   load: number;
+  actionable: number;
+  waiting: number;
   tone: HealthTone;
   route: string;
 }
@@ -66,6 +68,8 @@ export interface OperationsSummary {
   kpis: {
     total_requests_today: number;
     pending: number;
+    actionable: number;
+    waiting: number;
     sla_overdue: number;
     closed_today: number;
     unassigned: number;
@@ -81,10 +85,19 @@ export interface OperationsSummary {
     client_sla_breaches: OperationsBreakdownItem[];
     team_sla_performance: OperationsBreakdownItem[];
   };
-  department_load: Array<{
-    team: string;
-    load: number;
-  }>;
+  department_load: DepartmentQueue[];
+  visuals: {
+    workload_by_team: DepartmentQueue[];
+    actionable_waiting: {
+      actionable: number;
+      waiting: number;
+      total: number;
+    };
+    created_resolved: {
+      created: number;
+      resolved: number;
+    };
+  };
 }
 
 export const attentionDefinitions: Omit<AttentionItem, "count">[] = [

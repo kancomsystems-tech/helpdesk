@@ -3,7 +3,7 @@
     <div class="travelos-v2-section-heading">
       <div>
         <h2>Department Queues</h2>
-        <p>Open requests by current operational team.</p>
+        <p>Current unresolved requests by operational team.</p>
       </div>
       <RouterLink to="/tickets?scope=queues">View All Queues</RouterLink>
     </div>
@@ -21,8 +21,16 @@
           <div>
             <h3>{{ queue.team }}</h3>
             <strong>{{ queue.load }}</strong>
-            <span>Open</span>
+            <span>Unresolved</span>
           </div>
+        </div>
+        <div class="travelos-v2-queue-meta">
+          <span
+            ><b>{{ queue.actionable }}</b> Actionable</span
+          >
+          <span
+            ><b>{{ queue.waiting }}</b> Waiting</span
+          >
         </div>
       </RouterLink>
     </div>

@@ -16,12 +16,19 @@ export type OperationsKpiCardId =
   | "client_wise_open"
   | "team_wise_open"
   | "product_wise_open"
-  | "category_wise_open";
+  | "category_wise_open"
+  | "workload_by_team"
+  | "actionable_waiting"
+  | "created_resolved"
+  | "sla_outcome";
 
 export type OperationsKpiCardType =
   | "live_scalar"
   | "live_breakdown"
+  | "live_visual"
   | "preview";
+export type OperationsItemGroup = "kpis" | "breakdowns" | "visuals" | "preview";
+export type OperationsItemState = "live" | "preview";
 export type OperationsPersona =
   | "agent"
   | "team_leader"
@@ -33,6 +40,8 @@ export interface OperationsKpiCardDefinition {
   label: string;
   helper: string;
   type: OperationsKpiCardType;
+  group: OperationsItemGroup;
+  state: OperationsItemState;
   defaultVisible: boolean;
   allowedPersonas: OperationsPersona[];
   sourceField?: string;
@@ -61,6 +70,8 @@ export const operationsKpiCardLibrary: OperationsKpiCardDefinition[] = [
     label: "Requests Created",
     helper: "Requests created in the selected period",
     type: "live_scalar",
+    group: "kpis",
+    state: "live",
     defaultVisible: true,
     allowedPersonas: allOperationsPersonas,
     sourceField: "kpis.total_requests_today",
@@ -70,6 +81,8 @@ export const operationsKpiCardLibrary: OperationsKpiCardDefinition[] = [
     label: "Open Inventory",
     helper: "Current open and paused request inventory",
     type: "live_scalar",
+    group: "kpis",
+    state: "live",
     defaultVisible: true,
     allowedPersonas: allOperationsPersonas,
     sourceField: "kpis.pending",
@@ -79,6 +92,8 @@ export const operationsKpiCardLibrary: OperationsKpiCardDefinition[] = [
     label: "SLA Breached",
     helper: "Current open requests with failed SLA",
     type: "live_scalar",
+    group: "kpis",
+    state: "live",
     defaultVisible: true,
     allowedPersonas: allOperationsPersonas,
     sourceField: "kpis.sla_overdue",
@@ -88,6 +103,8 @@ export const operationsKpiCardLibrary: OperationsKpiCardDefinition[] = [
     label: "Requests Resolved",
     helper: "Requests resolved in the selected period",
     type: "live_scalar",
+    group: "kpis",
+    state: "live",
     defaultVisible: true,
     allowedPersonas: allOperationsPersonas,
     sourceField: "kpis.closed_today",
@@ -97,6 +114,8 @@ export const operationsKpiCardLibrary: OperationsKpiCardDefinition[] = [
     label: "Unassigned",
     helper: "Current open requests without an owner",
     type: "live_scalar",
+    group: "kpis",
+    state: "live",
     defaultVisible: true,
     allowedPersonas: allOperationsPersonas,
     sourceField: "kpis.unassigned",
@@ -106,6 +125,8 @@ export const operationsKpiCardLibrary: OperationsKpiCardDefinition[] = [
     label: "Due Soon",
     helper: "Active SLA deadline due within 60 minutes",
     type: "live_scalar",
+    group: "kpis",
+    state: "live",
     defaultVisible: false,
     allowedPersonas: allOperationsPersonas,
     sourceField: "kpis.due_soon",
@@ -115,6 +136,8 @@ export const operationsKpiCardLibrary: OperationsKpiCardDefinition[] = [
     label: "High Priority Requests",
     helper: "Open or paused requests with High or Urgent priority",
     type: "live_scalar",
+    group: "kpis",
+    state: "live",
     defaultVisible: false,
     allowedPersonas: managementPersonas,
     sourceField: "kpis.high_priority",
@@ -124,6 +147,8 @@ export const operationsKpiCardLibrary: OperationsKpiCardDefinition[] = [
     label: "Escalations",
     helper: "Requests requiring management attention",
     type: "preview",
+    group: "preview",
+    state: "preview",
     defaultVisible: false,
     allowedPersonas: managementPersonas,
   },
@@ -132,6 +157,8 @@ export const operationsKpiCardLibrary: OperationsKpiCardDefinition[] = [
     label: "My Assigned",
     helper: "Open or paused requests assigned directly to you",
     type: "live_scalar",
+    group: "kpis",
+    state: "live",
     defaultVisible: false,
     allowedPersonas: allOperationsPersonas,
     sourceField: "kpis.my_assigned",
@@ -141,6 +168,8 @@ export const operationsKpiCardLibrary: OperationsKpiCardDefinition[] = [
     label: "SLA Performance",
     helper: "SLA met across evaluated requests",
     type: "live_scalar",
+    group: "kpis",
+    state: "live",
     sourceField: "sla_performance.percentage",
     defaultVisible: false,
     allowedPersonas: managementPersonas,
@@ -150,6 +179,8 @@ export const operationsKpiCardLibrary: OperationsKpiCardDefinition[] = [
     label: "Team SLA Performance",
     helper: "SLA met by team across evaluated requests",
     type: "live_breakdown",
+    group: "breakdowns",
+    state: "live",
     defaultVisible: false,
     allowedPersonas: managementPersonas,
     sourceField: "breakdowns.team_sla_performance",
@@ -159,6 +190,8 @@ export const operationsKpiCardLibrary: OperationsKpiCardDefinition[] = [
     label: "Client SLA Breaches",
     helper: "Top clients by current open SLA breaches",
     type: "live_breakdown",
+    group: "breakdowns",
+    state: "live",
     defaultVisible: false,
     allowedPersonas: managementPersonas,
     sourceField: "breakdowns.client_sla_breaches",
@@ -168,6 +201,8 @@ export const operationsKpiCardLibrary: OperationsKpiCardDefinition[] = [
     label: "Agent Availability",
     helper: "Current agent availability by status",
     type: "preview",
+    group: "preview",
+    state: "preview",
     defaultVisible: false,
     allowedPersonas: managementPersonas,
   },
@@ -176,6 +211,8 @@ export const operationsKpiCardLibrary: OperationsKpiCardDefinition[] = [
     label: "Today's Activity",
     helper: "Recent operational events and changes",
     type: "preview",
+    group: "preview",
+    state: "preview",
     defaultVisible: false,
     allowedPersonas: managementPersonas,
   },
@@ -184,6 +221,8 @@ export const operationsKpiCardLibrary: OperationsKpiCardDefinition[] = [
     label: "Client-wise Open",
     helper: "Top clients by open and paused requests",
     type: "live_breakdown",
+    group: "breakdowns",
+    state: "live",
     defaultVisible: false,
     allowedPersonas: allOperationsPersonas,
     sourceField: "breakdowns.clients",
@@ -193,6 +232,8 @@ export const operationsKpiCardLibrary: OperationsKpiCardDefinition[] = [
     label: "Team-wise Open",
     helper: "Top teams by open and paused requests",
     type: "live_breakdown",
+    group: "breakdowns",
+    state: "live",
     defaultVisible: false,
     allowedPersonas: allOperationsPersonas,
     sourceField: "breakdowns.teams",
@@ -202,6 +243,8 @@ export const operationsKpiCardLibrary: OperationsKpiCardDefinition[] = [
     label: "Product-wise Open",
     helper: "Top products by open and paused requests",
     type: "live_breakdown",
+    group: "breakdowns",
+    state: "live",
     defaultVisible: false,
     allowedPersonas: allOperationsPersonas,
     sourceField: "breakdowns.products",
@@ -211,9 +254,55 @@ export const operationsKpiCardLibrary: OperationsKpiCardDefinition[] = [
     label: "Category-wise Open",
     helper: "Top categories by open and paused requests",
     type: "live_breakdown",
+    group: "breakdowns",
+    state: "live",
     defaultVisible: false,
     allowedPersonas: allOperationsPersonas,
     sourceField: "breakdowns.categories",
+  },
+  {
+    id: "workload_by_team",
+    label: "Workload by Team",
+    helper: "Current unresolved workload by operational team",
+    type: "live_visual",
+    group: "visuals",
+    state: "live",
+    defaultVisible: false,
+    allowedPersonas: allOperationsPersonas,
+    sourceField: "visuals.workload_by_team",
+  },
+  {
+    id: "actionable_waiting",
+    label: "Actionable vs Waiting",
+    helper: "Current open and paused workload composition",
+    type: "live_visual",
+    group: "visuals",
+    state: "live",
+    defaultVisible: false,
+    allowedPersonas: allOperationsPersonas,
+    sourceField: "visuals.actionable_waiting",
+  },
+  {
+    id: "created_resolved",
+    label: "Created vs Resolved",
+    helper: "Requests created and resolved in the selected period",
+    type: "live_visual",
+    group: "visuals",
+    state: "live",
+    defaultVisible: false,
+    allowedPersonas: allOperationsPersonas,
+    sourceField: "visuals.created_resolved",
+  },
+  {
+    id: "sla_outcome",
+    label: "SLA Outcome",
+    helper: "Met and breached outcomes across evaluated requests",
+    type: "live_visual",
+    group: "visuals",
+    state: "live",
+    defaultVisible: false,
+    allowedPersonas: managementPersonas,
+    sourceField: "sla_performance",
   },
 ];
 

@@ -19,7 +19,16 @@
 
     <template v-if="liveSummary">
       <div class="travelos-v2-kpi-strip">
-        <KpiCard v-for="item in visibleKpis" :key="item.id" v-bind="item" />
+        <template v-for="item in visibleKpis" :key="item.id">
+          <OperationsVisualCard
+            v-if="item.type === 'live_visual'"
+            :id="item.id"
+            :label="item.label"
+            :helper="item.helper"
+            :summary="liveSummary"
+          />
+          <KpiCard v-else v-bind="item" />
+        </template>
       </div>
 
       <main class="travelos-v2-main-column">
@@ -48,6 +57,7 @@ import KpiCard from "../components/KpiCard.vue";
 import KpiLayoutDialog from "../components/KpiLayoutDialog.vue";
 import OperationsCommandBar from "../components/OperationsCommandBar.vue";
 import OperationsTopBar from "../components/OperationsTopBar.vue";
+import OperationsVisualCard from "../components/OperationsVisualCard.vue";
 import {
   attentionDefinitions,
   type OperationsPeriod,
@@ -111,6 +121,7 @@ function isOperationsSummary(value: unknown): value is OperationsSummary {
       summary.kpis &&
       summary.sla_performance &&
       summary.breakdowns &&
+      summary.visuals &&
       Array.isArray(summary.breakdowns.clients) &&
       Array.isArray(summary.breakdowns.teams) &&
       Array.isArray(summary.breakdowns.products) &&
@@ -270,6 +281,26 @@ const kpis = computed<Partial<Record<OperationsKpiCardId, DisplayKpiCard>>>(
         "Top categories by open and paused requests",
         summary.breakdowns.categories
       ),
+      workload_by_team: visualCard(
+        "workload_by_team",
+        "Workload by Team",
+        "Current unresolved workload by operational team"
+      ),
+      actionable_waiting: visualCard(
+        "actionable_waiting",
+        "Actionable vs Waiting",
+        "Current open and paused workload composition"
+      ),
+      created_resolved: visualCard(
+        "created_resolved",
+        "Created vs Resolved",
+        `Requests created and resolved in ${periodHelper}`
+      ),
+      sla_outcome: visualCard(
+        "sla_outcome",
+        "SLA Outcome",
+        "Met and breached outcomes across evaluated requests"
+      ),
       ...Object.fromEntries(
         operationsKpiCardLibrary
           .filter((card) => card.type === "preview")
@@ -288,6 +319,14 @@ const kpis = computed<Partial<Record<OperationsKpiCardId, DisplayKpiCard>>>(
     };
   }
 );
+
+function visualCard(
+  id: OperationsKpiCardId,
+  label: string,
+  helper: string
+): DisplayKpiCard {
+  return { id, label, helper, value: "", type: "live_visual", tone: "default" };
+}
 
 function breakdownCard(
   id: OperationsKpiCardId,

@@ -1625,6 +1625,49 @@
   font-weight: 600;
 }
 
+.kancom-desk-shell .travelos-v2-visual-card {
+  grid-column: span 2;
+  min-height: 190px;
+  border: 1px solid #dfe7f0;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.98);
+  padding: 18px;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.055);
+}
+
+.kancom-desk-shell .travelos-v2-visual-card header,
+.kancom-desk-shell .travelos-v2-visual-list > div > div:first-child,
+.kancom-desk-shell .travelos-v2-visual-values {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.kancom-desk-shell .travelos-v2-visual-card h3 { color: #0f172a; font-size: 14px; font-weight: 760; }
+.kancom-desk-shell .travelos-v2-visual-card header p,
+.kancom-desk-shell .travelos-v2-visual-card header > span,
+.kancom-desk-shell .travelos-v2-sample,
+.kancom-desk-shell .travelos-v2-empty { color: #64748b; font-size: 11px; font-weight: 600; }
+.kancom-desk-shell .travelos-v2-visual-card header > span { white-space: nowrap; }
+.kancom-desk-shell .travelos-v2-visual-list,
+.kancom-desk-shell .travelos-v2-composition { display: grid; gap: 11px; margin-top: 18px; }
+.kancom-desk-shell .travelos-v2-visual-list span,
+.kancom-desk-shell .travelos-v2-visual-values span { color: #475569; font-size: 12px; }
+.kancom-desk-shell .travelos-v2-visual-list b,
+.kancom-desk-shell .travelos-v2-visual-values b { color: #0f172a; font-size: 14px; }
+.kancom-desk-shell .travelos-v2-visual-track,
+.kancom-desk-shell .travelos-v2-stacked-bar { height: 9px; overflow: hidden; border-radius: 999px; background: #e6eef7; }
+.kancom-desk-shell .travelos-v2-visual-track { margin-top: 5px; }
+.kancom-desk-shell .travelos-v2-visual-track span,
+.kancom-desk-shell .travelos-v2-stacked-bar span { display: block; height: 100%; background: #64748b; }
+.kancom-desk-shell .travelos-v2-stacked-bar { display: flex; }
+.kancom-desk-shell .travelos-v2-stacked-bar span:first-child { background: #475569; }
+.kancom-desk-shell .travelos-v2-stacked-bar span:nth-child(2) { background: #cbd5e1; }
+.kancom-desk-shell .travelos-v2-stacked-bar span.is-breached { background: #94a3b8; }
+.kancom-desk-shell .travelos-v2-visual-values > div { display: grid; gap: 3px; }
+.kancom-desk-shell .travelos-v2-visual-values > div:last-child { text-align: right; }
+
 .kancom-desk-shell .travelos-v2-main-grid {
   display: grid;
   gap: 14px;
@@ -2118,6 +2161,8 @@
   .kancom-desk-shell .travelos-v2-attention-grid {
     grid-template-columns: 1fr;
   }
+
+  .kancom-desk-shell .travelos-v2-visual-card { grid-column: span 1; }
 }
 
 /* TravelOS Operations V2 micro-polish */
