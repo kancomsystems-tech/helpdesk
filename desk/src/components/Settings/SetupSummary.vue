@@ -20,7 +20,11 @@
           <SummaryRow :label="__('Product')" :value="data.product.name" />
           <SummaryRow :label="__('Edition')" :value="data.product.edition" />
           <SummaryRow
-            :label="__('Capabilities')"
+            :label="__('Operating scope')"
+            :value="data.product.operating_scope"
+          />
+          <SummaryRow
+            :label="__('Enabled capabilities')"
             :value="list(data.product.capabilities.map(getCapabilityLabel))"
           />
         </SummaryCard>
