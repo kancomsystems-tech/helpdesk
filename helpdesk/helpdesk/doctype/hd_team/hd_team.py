@@ -145,7 +145,9 @@ class HDTeam(Document):
             assignment_rule_doc.append("users", {"user": _user})
             if assignment_rule_doc.disabled:
                 assignment_rule_doc.disabled = False
-            assignment_rule_doc.save()
+            assignment_rule_doc.save(
+                ignore_permissions=bool(self.flags.ignore_permissions)
+            )
 
             # remove the user from the base assignment rule
             base_assignment_rule = frappe.get_value(
@@ -159,7 +161,11 @@ class HDTeam(Document):
                 {"user": _user, "parent": base_assignment_rule.name},
             )
             if user_id:
-                frappe.delete_doc("Assignment Rule User", user_id)
+                frappe.delete_doc(
+                    "Assignment Rule User",
+                    user_id,
+                    ignore_permissions=bool(self.flags.ignore_permissions),
+                )
         else:
             user_id = frappe.get_value(
                 "Assignment Rule User",
@@ -167,7 +173,11 @@ class HDTeam(Document):
             )
             if not user_id:
                 return
-            frappe.delete_doc("Assignment Rule User", user_id)
+            frappe.delete_doc(
+                "Assignment Rule User",
+                user_id,
+                ignore_permissions=bool(self.flags.ignore_permissions),
+            )
 
             # disable the assignment rule if there are no users
             total_users_in_assignment_rule = frappe.db.count(
@@ -175,7 +185,9 @@ class HDTeam(Document):
             )
             if total_users_in_assignment_rule == 0:
                 assignment_rule_doc.disabled = True
-                assignment_rule_doc.save()
+                assignment_rule_doc.save(
+                    ignore_permissions=bool(self.flags.ignore_permissions)
+                )
 
 
 @frappe.whitelist()
