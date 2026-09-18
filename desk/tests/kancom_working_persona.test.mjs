@@ -65,11 +65,26 @@ try {
     "src/components/layouts/MobileSidebar.vue",
     "utf8"
   );
+  assert.match(switcher, /Operating as:/);
+  assert.doesNotMatch(switcher, /Working as:/);
+  assert.match(switcher, /focus-visible:outline/);
   assert.match(switcher, /setWorkingPersona\(persona\)/);
   assert.match(switcher, /route\.name !== "Dashboard"/);
   assert.doesNotMatch(switcher, /logout/);
   assert.match(desktop, /is_platform_administrator[\s\S]*System Admin/);
   assert.match(mobile, /is_platform_administrator[\s\S]*System Admin/);
+  const commandBar = await readFile(
+    "src/kancom/operations/components/OperationsCommandBar.vue",
+    "utf8"
+  );
+  assert.match(commandBar, /New Request/);
+  assert.match(commandBar, /aria-label="Notifications"/);
+  assert.match(commandBar, /aria-label="Open account menu"/);
+  assert.match(commandBar, /<Dropdown :options="accountOptions"/);
+  assert.doesNotMatch(commandBar, /<strong>{{ userName }}<\/strong>/);
+  assert.doesNotMatch(commandBar, /<small>{{ profileLabel }}<\/small>/);
+  assert.match(commandBar, /setActiveSettingsTab\("Profile"\)/);
+  assert.match(commandBar, /is_platform_administrator[\s\S]*System Admin/);
 } finally {
   await rm(output, { force: true });
 }

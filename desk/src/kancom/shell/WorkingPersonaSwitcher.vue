@@ -2,10 +2,12 @@
   <Dropdown v-if="showSwitcher" :options="options" placement="right">
     <button
       type="button"
-      class="flex w-full items-center justify-between gap-2 rounded px-2 py-1.5 text-left text-xs text-ink-gray-7 hover:bg-surface-gray-2"
+      class="travelos-persona-control flex w-full items-center justify-between gap-2 rounded-md border border-outline-gray-2 bg-surface-white px-2.5 py-2 text-left text-xs text-ink-gray-8 shadow-sm transition hover:border-outline-gray-3 hover:bg-surface-gray-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-5"
       :disabled="switching"
     >
-      <span class="truncate">{{ __("Working as: {0}", [selectedLabel]) }}</span>
+      <span class="truncate"
+        >{{ __("Operating as:") }} <strong>{{ selectedLabel }}</strong></span
+      >
       <LucideChevronDown class="size-3.5 shrink-0" />
     </button>
   </Dropdown>
