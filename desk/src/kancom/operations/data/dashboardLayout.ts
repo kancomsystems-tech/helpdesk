@@ -263,7 +263,7 @@ export const operationsKpiCardLibrary: OperationsKpiCardDefinition[] = [
   {
     id: "workload_by_team",
     label: "Workload by Team",
-    helper: "Current unresolved workload by operational team",
+    helper: "Relative unresolved workload by team; counts show actual workload",
     type: "live_visual",
     group: "visuals",
     state: "live",

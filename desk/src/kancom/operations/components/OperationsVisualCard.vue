@@ -14,7 +14,11 @@
           <span>{{ team.team }}</span
           ><b>{{ team.load }}</b>
         </div>
-        <div class="travelos-v2-visual-track">
+        <div
+          class="travelos-v2-visual-track"
+          role="img"
+          :aria-label="`${team.team}: ${team.load} unresolved; bar is relative to the largest team`"
+        >
           <span :style="{ width: percent(team.load, maxTeamLoad) }" />
         </div>
       </div>
@@ -33,8 +37,11 @@
       <div
         v-if="summary.visuals.actionable_waiting.total"
         class="travelos-v2-stacked-bar"
+        role="img"
+        :aria-label="`${summary.visuals.actionable_waiting.actionable} actionable and ${summary.visuals.actionable_waiting.waiting} waiting`"
       >
         <span
+          class="is-actionable"
           :style="{
             width: percent(
               summary.visuals.actionable_waiting.actionable,
@@ -43,6 +50,7 @@
           }"
         />
         <span
+          class="is-waiting"
           :style="{
             width: percent(
               summary.visuals.actionable_waiting.waiting,
@@ -52,11 +60,11 @@
         />
       </div>
       <div class="travelos-v2-visual-values">
-        <div>
+        <div class="is-actionable">
           <span>Actionable</span
           ><b>{{ summary.visuals.actionable_waiting.actionable }}</b>
         </div>
-        <div>
+        <div class="is-waiting">
           <span>Waiting</span
           ><b>{{ summary.visuals.actionable_waiting.waiting }}</b>
         </div>
@@ -75,7 +83,11 @@
           <span>{{ item.label }}</span
           ><b>{{ item.value }}</b>
         </div>
-        <div class="travelos-v2-visual-track">
+        <div
+          class="travelos-v2-visual-track"
+          role="img"
+          :aria-label="`${item.label}: ${item.value} in ${summary.period_label}`"
+        >
           <span :style="{ width: percent(item.value, maxCreatedResolved) }" />
         </div>
       </div>
@@ -85,8 +97,11 @@
       <div
         v-if="summary.sla_performance.evaluated"
         class="travelos-v2-stacked-bar"
+        role="img"
+        :aria-label="`${summary.sla_performance.met} met and ${summary.sla_performance.breached} breached out of ${summary.sla_performance.evaluated} evaluated`"
       >
         <span
+          class="is-met"
           :style="{
             width: percent(
               summary.sla_performance.met,
@@ -105,10 +120,10 @@
         />
       </div>
       <div class="travelos-v2-visual-values">
-        <div>
+        <div class="is-met">
           <span>Met</span><b>{{ summary.sla_performance.met }}</b>
         </div>
-        <div>
+        <div class="is-breached">
           <span>Breached</span><b>{{ summary.sla_performance.breached }}</b>
         </div>
       </div>

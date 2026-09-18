@@ -284,7 +284,7 @@ const kpis = computed<Partial<Record<OperationsKpiCardId, DisplayKpiCard>>>(
       workload_by_team: visualCard(
         "workload_by_team",
         "Workload by Team",
-        "Current unresolved workload by operational team"
+        "Relative unresolved workload by team; counts show actual workload"
       ),
       actionable_waiting: visualCard(
         "actionable_waiting",
