@@ -42,12 +42,14 @@ try {
     "Setup Summary",
     "Team Members",
     "Saved Replies",
+    "Add User",
     "Agents",
     "Teams",
   ]);
   const administrator = getKancomSetupTabs("administrator", true, true);
   for (const label of [
     "Invite Agents",
+    "Add User",
     "SLA Policies",
     "Business Holidays",
     "Assignment Rules",

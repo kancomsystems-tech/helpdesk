@@ -14,8 +14,9 @@ export const productAdministrationTabs = {
     "Team Members",
     "Saved Replies",
   ],
-  operations_head_managed: ["Agents", "Teams"],
+  operations_head_managed: ["Add User", "Agents", "Teams"],
   administrator: [
+    "Add User",
     "Profile",
     "Saved Replies",
     "Team Members",

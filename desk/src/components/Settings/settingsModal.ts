@@ -30,6 +30,7 @@ import SettingsGear from "~icons/lucide/settings";
 import SavedReplyIcon from "../icons/SavedReplyIcon.vue";
 import SetupSummary from "./SetupSummary.vue";
 import TeamMembers from "./TeamMembers.vue";
+import AddOperationalUser from "@/kancom/product/AddOperationalUser.vue";
 import LucideClipboardCheck from "~icons/lucide/clipboard-check";
 import LucideContactRound from "~icons/lucide/contact-round";
 
@@ -70,6 +71,11 @@ export const tabs = computed(() => {
     {
       label: __("People & Teams"),
       items: [
+        {
+          label: __("Add User"),
+          icon: markRaw(LucideUserPlus),
+          component: markRaw(AddOperationalUser),
+        },
         {
           label: __("Team Members"),
           icon: markRaw(LucideContactRound),
@@ -170,6 +176,7 @@ export const disableSettingModalOutsideClick = ref(false);
 
 type TabName =
   | "Profile"
+  | "Add User"
   | "Setup Summary"
   | "Team Members"
   | "Email Accounts"

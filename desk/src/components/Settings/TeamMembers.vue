@@ -71,6 +71,7 @@
 
 <script setup lang="ts">
 import { createResource, LoadingIndicator } from "frappe-ui";
+import { onMounted, onUnmounted } from "vue";
 import { __ } from "@/translation";
 import SettingsLayoutBase from "../layouts/SettingsLayoutBase.vue";
 
@@ -78,6 +79,14 @@ const members = createResource({
   url: "kancom_custom.api.setup_summary.get_team_members",
   auto: true,
 });
+
+const refresh = () => members.reload();
+onMounted(() =>
+  window.addEventListener("kancom:operational-user-added", refresh)
+);
+onUnmounted(() =>
+  window.removeEventListener("kancom:operational-user-added", refresh)
+);
 
 const list = (values: string[] = []) =>
   values.length ? values.join(", ") : __("No team assigned");

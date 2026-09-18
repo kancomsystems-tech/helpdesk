@@ -5,7 +5,7 @@
   >
     <template #header-actions>
       <Button
-        @click="() => setActiveSettingsTab('Invite Agents')"
+        @click="() => setActiveSettingsTab('Add User')"
         label="New"
         variant="solid"
       >
@@ -109,7 +109,7 @@
             :label="__('New')"
             variant="outline"
             icon-left="plus"
-            @click="setActiveSettingsTab('Invite Agents')"
+            @click="setActiveSettingsTab('Add User')"
           />
         </div>
         <!-- Agent List -->
@@ -199,7 +199,7 @@
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { Avatar, Button, call, Dropdown, FeatherIcon, toast } from "frappe-ui";
-import { h, onUnmounted } from "vue";
+import { h, onMounted, onUnmounted } from "vue";
 import LucideCheck from "~icons/lucide/check";
 import { activeFilter, useAgents } from "./agents";
 import AgentIcon from "../icons/AgentIcon.vue";
@@ -212,6 +212,14 @@ const { isManager } = useAuthStore();
 const agentStore = useAgents();
 const search = agentStore.search;
 const agents = agentStore.agents;
+
+const refreshAgents = () => agents.reload();
+onMounted(() =>
+  window.addEventListener("kancom:operational-user-added", refreshAgents)
+);
+onUnmounted(() =>
+  window.removeEventListener("kancom:operational-user-added", refreshAgents)
+);
 
 function getRoles(agent: string) {
   const agentRole = getUserRole(agent);
