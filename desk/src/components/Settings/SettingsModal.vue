@@ -12,11 +12,11 @@
           <h1
             class="h-7.5 px-2 py-[7px] my-[3px] flex cursor-pointer gap-1.5 text-base text-ink-gray-5 transition-all duration-300 ease-in-out truncate"
           >
-            {{ settingsModalMode === "setup" ? __("Setup") : __("My Settings") }}
+            {{ __("Product Administration") }}
           </h1>
           <div v-for="tab in tabs">
             <div
-              v-if="!tab.hideLabel && settingsModalMode !== 'setup'"
+              v-if="!tab.hideLabel"
               class="mb-2 mt-3 flex gap-1.5 px-1 text-base font-medium text-ink-gray-5"
             >
               <Tooltip :text="__(tab.label)" placement="right">
@@ -89,7 +89,6 @@ import {
   activeTab,
   disableSettingModalOutsideClick,
   nextActiveTab,
-  settingsModalMode,
   tabs,
 } from "./settingsModal";
 

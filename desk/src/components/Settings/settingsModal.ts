@@ -39,23 +39,17 @@ export const settingsModalMode = ref<"full" | "setup">("full");
 const auth = useAuthStore();
 const productContextStore = useProductContextStore();
 
-const canShowTeams = () =>
-  auth.isAdmin ||
-  (productContextStore.workingPersona === "operations_head" &&
-    productContextStore.hasCapability("managed_configuration"));
-
 const isKancomSetupTab = (label: string) =>
   getKancomSetupTabs(
-    productContextStore.workingPersona,
+    productContextStore.context?.authoritative_persona || null,
     productContextStore.hasCapability("managed_configuration"),
-    auth.isAdmin
+    Boolean(productContextStore.context?.is_platform_administrator)
   ).some((tabName) => label === __(tabName));
 
 export const tabs = computed(() => {
   const _tabs = [
     {
-      label: __("User Settings"),
-      hideLabel: true,
+      label: __("My Settings"),
       items: [
         {
           label: __("Profile"),
@@ -66,11 +60,70 @@ export const tabs = computed(() => {
           }),
           component: markRaw(Profile),
         },
+        {
+          label: __("Saved Replies"),
+          icon: markRaw(SavedReplyIcon),
+          component: markRaw(SavedReplies),
+        },
       ],
     },
     {
-      label: __("Email Settings"),
-      condition: () => auth.isAdmin || auth.isManager,
+      label: __("People & Teams"),
+      items: [
+        {
+          label: __("Team Members"),
+          icon: markRaw(LucideContactRound),
+          component: markRaw(TeamMembers),
+        },
+        {
+          label: __("Agents"),
+          icon: markRaw(LucideUser),
+          component: markRaw(Agents),
+        },
+        {
+          label: __("Invite Agents"),
+          icon: markRaw(LucideUserPlus),
+          component: markRaw(InviteAgents),
+        },
+        {
+          label: __("Teams"),
+          icon: markRaw(LucideUsers),
+          component: markRaw(TeamsConfig),
+        },
+      ],
+    },
+    {
+      label: __("Operations Configuration"),
+      items: [
+        {
+          label: __("SLA Policies"),
+          icon: markRaw(ShieldCheck),
+          component: markRaw(Sla),
+        },
+        {
+          label: __("Business Holidays"),
+          icon: markRaw(Briefcase),
+          component: markRaw(HolidayList),
+        },
+        {
+          label: __("Assignment Rules"),
+          icon: markRaw(h(Settings, { class: "rotate-90" })),
+          component: markRaw(AssignmentRules),
+        },
+      ],
+    },
+    {
+      label: __("System"),
+      items: [
+        {
+          label: __("Setup Summary"),
+          icon: markRaw(LucideClipboardCheck),
+          component: markRaw(SetupSummary),
+        },
+      ],
+    },
+    {
+      label: __("Technical Administration"),
       items: [
         {
           label: __("Email Accounts"),
@@ -82,89 +135,16 @@ export const tabs = computed(() => {
           icon: markRaw(LucideMailOpen),
           component: markRaw(EmailNotifications),
         },
-      ],
-    },
-    {
-      label: __("App Settings"),
-      items: [
-        {
-          label: __("Setup Summary"),
-          icon: markRaw(LucideClipboardCheck),
-          component: markRaw(SetupSummary),
-          condition: () =>
-            productContextStore.context?.is_platform_administrator ||
-            ["operations_head", "team_leader"].includes(
-              productContextStore.workingPersona || ""
-            ),
-        },
-        {
-          label: __("Team Members"),
-          icon: markRaw(LucideContactRound),
-          component: markRaw(TeamMembers),
-          condition: () =>
-            productContextStore.context?.is_platform_administrator ||
-            ["operations_head", "team_leader"].includes(
-              productContextStore.workingPersona || ""
-            ),
-        },
         {
           label: __("General"),
           icon: markRaw(SettingsGear),
           component: markRaw(General),
-          condition: () => auth.isAdmin,
-        },
-        {
-          label: __("Agents"),
-          icon: markRaw(LucideUser),
-          component: markRaw(Agents),
-          condition: () => auth.isAdmin || auth.isManager,
-        },
-        {
-          label: __("Invite Agents"),
-          icon: markRaw(LucideUserPlus),
-          component: markRaw(InviteAgents),
-          condition: () => auth.isAdmin || auth.isManager,
-        },
-        {
-          label: __("Teams"),
-          icon: markRaw(LucideUsers),
-          component: markRaw(TeamsConfig),
-          condition: canShowTeams,
-        },
-        {
-          label: __("SLA Policies"),
-          icon: markRaw(ShieldCheck),
-          component: markRaw(Sla),
-          condition: () => auth.isAdmin || auth.isManager,
-        },
-        {
-          label: __("Business Holidays"),
-          icon: markRaw(Briefcase),
-          component: markRaw(HolidayList),
-          condition: () => auth.isAdmin || auth.isManager,
-        },
-        {
-          label: __("Assignment Rules"),
-          icon: markRaw(h(Settings, { class: "rotate-90" })),
-          component: markRaw(AssignmentRules),
-          condition: () => auth.isAdmin || auth.isManager,
         },
         {
           label: __("Field Dependencies"),
           icon: markRaw(FieldDependencyIcon),
           component: markRaw(FieldDependencyConfig),
-          condition: () => auth.isAdmin || auth.isManager,
         },
-        {
-          label: __("Saved Replies"),
-          icon: markRaw(SavedReplyIcon),
-          component: markRaw(SavedReplies),
-        },
-      ],
-    },
-    {
-      label: __("Integrations"),
-      items: [
         {
           label: __("Telephony"),
           icon: markRaw(PhoneIcon),
@@ -174,22 +154,12 @@ export const tabs = computed(() => {
     },
   ];
 
-  return _tabs.filter((tab) => {
-    if (tab.condition && !tab.condition()) return false;
-    if (tab.items) {
-      tab.items = tab.items.filter((item) => {
-        if (item.condition && !item.condition()) return false;
-        if (
-          settingsModalMode.value === "setup" &&
-          !isKancomSetupTab(item.label)
-        ) {
-          return false;
-        }
-        return true;
-      });
-    }
-    return Boolean(tab.items?.length);
-  });
+  return _tabs
+    .map((tab) => ({
+      ...tab,
+      items: tab.items.filter((item) => isKancomSetupTab(item.label)),
+    }))
+    .filter((tab) => tab.items.length);
 });
 
 export const activeTab = ref(tabs.value[0].items[0]);

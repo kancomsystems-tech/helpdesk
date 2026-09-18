@@ -40,6 +40,7 @@
                 :options="profileSettings"
                 :primary-label="travelosProfileName"
                 :secondary-label="travelosProfileRole"
+                :platform-label="travelosPlatformAuthorityLabel"
               />
               <WorkingPersonaSwitcher v-if="!isCustomerPortal" class="mt-1" />
             </div>
@@ -302,9 +303,9 @@ function openSetupModal() {
 
 const visibleSetupTabs = computed(() =>
   getKancomSetupTabs(
-    productContextStore.workingPersona,
+    productContextStore.context?.authoritative_persona || null,
     productContextStore.hasCapability("managed_configuration"),
-    authStore.isAdmin
+    Boolean(productContextStore.context?.is_platform_administrator)
   )
 );
 
@@ -372,6 +373,10 @@ const travelosProfileRole = computed(() =>
       productContextStore.context?.authoritative_persona ||
       null
   )
+);
+
+const travelosPlatformAuthorityLabel = computed(() =>
+  authStore.isAdmin ? "System Admin" : ""
 );
 
 function isActiveTab(to: any) {

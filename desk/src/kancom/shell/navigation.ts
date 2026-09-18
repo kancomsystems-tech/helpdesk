@@ -130,45 +130,7 @@ export const kancomSecondaryNavigation = {
   },
 };
 
-export type KancomSetupPersona =
-  | "administrator"
-  | "operations_head"
-  | "team_leader"
-  | "agent"
-  | null;
-
-const operationalSetupTabs: Partial<
-  Record<KancomSetupPersona & string, string[]>
-> = {
-  team_leader: ["Profile", "Setup Summary", "Team Members", "Saved Replies"],
-  operations_head: [
-    "Profile",
-    "Setup Summary",
-    "Team Members",
-    "Teams",
-    "Saved Replies",
-  ],
-};
-
-export function getKancomSetupTabs(
-  persona: KancomSetupPersona,
-  hasManagedConfiguration: boolean,
-  hasNativeManagement: boolean
-) {
-  if (hasNativeManagement) {
-    return kancomAdminSetupNavigation.items
-      .filter(
-        (item) =>
-          !["Setup Summary", "Team Members"].includes(item.label) ||
-          ["administrator", "operations_head", "team_leader"].includes(
-            persona || ""
-          )
-      )
-      .map((item) => item.label);
-  }
-  if (!hasManagedConfiguration || !persona) return [];
-  return operationalSetupTabs[persona] || [];
-}
+export { getKancomSetupTabs } from "@/kancom/product/productAdministration";
 
 export const kancomAdminSetupNavigation = {
   group: "Setup",

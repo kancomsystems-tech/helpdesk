@@ -20,11 +20,19 @@
               : 'ml-2 w-auto opacity-100'
           "
         >
-          <div class="text-base font-medium leading-none text-gray-900 truncate">
+          <div
+            class="text-base font-medium leading-none text-gray-900 truncate"
+          >
             {{ primaryLabel || config.brandName || "Helpdesk" }}
           </div>
           <div class="mt-1 text-sm leading-none text-gray-700">
             {{ secondaryLabel || authStore.userName }}
+          </div>
+          <div
+            v-if="platformLabel"
+            class="mt-1 w-fit rounded border border-outline-gray-2 bg-surface-gray-1 px-1.5 py-0.5 text-xs font-medium leading-none text-ink-gray-7"
+          >
+            {{ platformLabel }}
           </div>
         </div>
         <div
@@ -65,6 +73,10 @@ defineProps({
     default: "",
   },
   secondaryLabel: {
+    type: String,
+    default: "",
+  },
+  platformLabel: {
     type: String,
     default: "",
   },
