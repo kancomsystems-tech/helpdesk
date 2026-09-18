@@ -140,8 +140,8 @@ export type KancomSetupPersona =
 const operationalSetupTabs: Partial<
   Record<KancomSetupPersona & string, string[]>
 > = {
-  team_leader: ["Profile", "Saved Replies"],
-  operations_head: ["Profile", "Teams", "Saved Replies"],
+  team_leader: ["Profile", "Setup Summary", "Saved Replies"],
+  operations_head: ["Profile", "Setup Summary", "Teams", "Saved Replies"],
 };
 
 export function getKancomSetupTabs(
@@ -150,7 +150,15 @@ export function getKancomSetupTabs(
   hasNativeManagement: boolean
 ) {
   if (hasNativeManagement) {
-    return kancomAdminSetupNavigation.items.map((item) => item.label);
+    return kancomAdminSetupNavigation.items
+      .filter(
+        (item) =>
+          item.label !== "Setup Summary" ||
+          ["administrator", "operations_head", "team_leader"].includes(
+            persona || ""
+          )
+      )
+      .map((item) => item.label);
   }
   if (!hasManagedConfiguration || !persona) return [];
   return operationalSetupTabs[persona] || [];
@@ -160,6 +168,11 @@ export const kancomAdminSetupNavigation = {
   group: "Setup",
   items: [
     { label: "Profile", icon: "user", settingsTab: "Profile" },
+    {
+      label: "Setup Summary",
+      icon: "clipboard",
+      settingsTab: "Setup Summary",
+    },
     { label: "Agents", icon: "user", settingsTab: "Agents" },
     { label: "Teams", icon: "users", settingsTab: "Teams" },
     {

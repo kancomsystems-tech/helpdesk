@@ -28,6 +28,8 @@ import { getKancomSetupTabs } from "@/kancom/shell/navigation";
 import General from "./General/General.vue";
 import SettingsGear from "~icons/lucide/settings";
 import SavedReplyIcon from "../icons/SavedReplyIcon.vue";
+import SetupSummary from "./SetupSummary.vue";
+import LucideClipboardCheck from "~icons/lucide/clipboard-check";
 
 export const showSettingsModal = ref(false);
 export const settingsModalMode = ref<"full" | "setup">("full");
@@ -84,6 +86,16 @@ export const tabs = computed(() => {
     {
       label: __("App Settings"),
       items: [
+        {
+          label: __("Setup Summary"),
+          icon: markRaw(LucideClipboardCheck),
+          component: markRaw(SetupSummary),
+          condition: () =>
+            auth.isAdmin ||
+            ["operations_head", "team_leader"].includes(
+              productContextStore.context?.persona || ""
+            ),
+        },
         {
           label: __("General"),
           icon: markRaw(SettingsGear),
@@ -177,6 +189,7 @@ export const disableSettingModalOutsideClick = ref(false);
 
 type TabName =
   | "Profile"
+  | "Setup Summary"
   | "Email Accounts"
   | "Email Notifications"
   | "General"
