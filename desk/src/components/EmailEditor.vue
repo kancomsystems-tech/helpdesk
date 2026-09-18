@@ -68,7 +68,6 @@
     <template #editor>
       <div class="overflow-y-auto min-h-[12rem] max-h-[50vh]">
         <EditorContent :editor="editor" />
-
       </div>
     </template>
     <template #bottom>
@@ -174,6 +173,10 @@ import { useTyping } from "@/composables/realtime";
 import { useAuthStore } from "@/stores/auth";
 import { ComponentUtils, HandleExcelPaste } from "@/tiptap-extensions";
 import {
+  EMAIL_QUOTE_BOUNDARY_CLASS,
+  insertSavedReply,
+} from "@/kancom/email/savedReplyInsertion";
+import {
   getFontFamily,
   isContentEmpty,
   removeAttachmentFromServer,
@@ -249,7 +252,6 @@ const newEmail = useStorage<null | string>(
   null
 );
 
-
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { isManager } = useAuthStore();
 
@@ -259,7 +261,9 @@ const { onUserType, cleanup } = useTyping(props.ticketId);
 const attachments = ref([]);
 const isUploading = ref(false);
 const isDisabled = computed(() => {
-  return isContentEmpty(newEmail.value) || sendMail.loading || isUploading.value;
+  return (
+    isContentEmpty(newEmail.value) || sendMail.loading || isUploading.value
+  );
 });
 
 // Watch for changes in email content to trigger typing events
@@ -284,9 +288,11 @@ const ccInput = ref(null);
 const bccInput = ref(null);
 
 function applySavedReplies(template: string) {
-  isContentEmpty(newEmail.value)
-    ? (newEmail.value = template)
-    : (newEmail.value = newEmail.value + "\n" + template);
+  const editor = editorRef.value?.editor;
+  if (editor) {
+    insertSavedReply(editor, template);
+    newEmail.value = editor.getHTML();
+  }
   showSavedRepliesSelectorModal.value = false;
 }
 
@@ -390,8 +396,11 @@ function addToReply(
 
   const quoteHeader = [
     "<p><br></p>",
+    `<p class="${EMAIL_QUOTE_BOUNDARY_CLASS}"><br></p>`,
     "<hr>",
-    `<p style="color:#555;font-size:13px;line-height:1.35;">On ${formattedDate}, ${originalEmail.from || "sender"}${quoteRecipients ? ` (${quoteRecipients})` : ""} wrote:</p>`,
+    `<p style="color:#555;font-size:13px;line-height:1.35;">On ${formattedDate}, ${
+      originalEmail.from || "sender"
+    }${quoteRecipients ? ` (${quoteRecipients})` : ""} wrote:</p>`,
   ].join("");
 
   const replyContent = `
