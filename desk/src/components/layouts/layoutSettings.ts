@@ -13,13 +13,7 @@ export function getAgentPortalSidebarOptions(
   ) => boolean,
   persona?: string | null
 ) {
-  const reports = hasCapability("analytics")
-    ? {
-        label: __("Reports"),
-        icon: LucideLineChart,
-        to: "AnalyticsDashboard",
-      }
-    : hasCapability("basic_reports")
+  const reports = hasCapability("basic_reports")
     ? {
         label: __("Reports"),
         icon: LucideLineChart,

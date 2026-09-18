@@ -2,6 +2,7 @@ import { useScreenSize } from "@/composables/screen";
 import "@/kancom/registerExtension";
 import { getHelpdeskExtensionRoutes } from "@/extensions/registry";
 import { useProductContextStore } from "@/kancom/product/store";
+import { canAccessAnalytics } from "@/kancom/product/accessPolicy";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
 import { isCustomerPortal } from "@/utils";
@@ -24,6 +25,7 @@ declare module "vue-router" {
     onSuccessRoute?: string;
     parent?: string;
     manager?: boolean;
+    analytics?: boolean;
     capability?: string;
   }
 }
@@ -226,6 +228,14 @@ router.beforeEach(async (to, _, next) => {
     !productContextStore.hasCapability(to.meta.capability)
   ) {
     next({ name: "TicketsAgent" });
+  } else if (
+    to.meta.analytics &&
+    !canAccessAnalytics(
+      productContextStore.context?.authoritative_persona || null,
+      Boolean(productContextStore.context?.is_platform_administrator)
+    )
+  ) {
+    next({ name: "Dashboard" });
   } else if (to.meta.admin && !authStore.isAdmin) {
     next({ name: "Dashboard" });
   } else if (to.meta.manager && !(authStore.isManager || authStore.isAdmin)) {

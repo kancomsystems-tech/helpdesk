@@ -21,6 +21,7 @@ const setup = readFileSync(
 
 assert.doesNotMatch(layout, /\/app\/hd-ticket\/view\/report/);
 assert.match(layout, /to: "OperationalReports"/);
+assert.doesNotMatch(layout, /to: "AnalyticsDashboard"/);
 assert.match(routes, /path: "\/reports"[\s\S]*capability: "basic_reports"/);
 assert.match(page, /kancom_custom\.api\.operational_reports\.get_report/);
 for (const label of [

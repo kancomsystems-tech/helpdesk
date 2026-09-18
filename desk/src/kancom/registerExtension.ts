@@ -18,7 +18,7 @@ registerHelpdeskExtension({
       name: "AnalyticsDashboard",
       component: () =>
         import("@/kancom/analytics/pages/AnalyticsDashboard.vue"),
-      meta: { admin: true, capability: "analytics" },
+      meta: { analytics: true, capability: "analytics" },
     },
     {
       path: "/reports",

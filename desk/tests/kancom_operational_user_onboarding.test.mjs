@@ -28,6 +28,7 @@ assert.match(
 assert.doesNotMatch(policy, /team_leader: \[[^\]]*"Add User"/s);
 assert.doesNotMatch(policy, /agent: \[[^\]]*"Add User"/s);
 assert.match(form, /Operational Role/);
+assert.match(form, /get_add_user_options[\s\S]*method: "GET"/);
 assert.match(form, /v-if="form\.worksTickets"[\s\S]*Worker Teams/);
 assert.match(form, /v-if="isTeamLeader"[\s\S]*Managed Teams/);
 assert.match(form, /:disabled="isAgent"/);

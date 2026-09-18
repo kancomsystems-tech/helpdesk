@@ -154,6 +154,7 @@ const errorMessage = ref("");
 
 const options = createResource({
   url: "kancom_custom.api.operational_user_onboarding.get_add_user_options",
+  method: "GET",
   auto: true,
 });
 

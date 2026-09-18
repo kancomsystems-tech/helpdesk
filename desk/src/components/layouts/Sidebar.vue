@@ -223,6 +223,7 @@ import {
 import { useShortcut } from "@/composables/shortcuts";
 import { __ } from "@/translation";
 import { useProductContextStore } from "@/kancom/product/store";
+import { canAccessAnalytics } from "@/kancom/product/accessPolicy";
 import WorkingPersonaSwitcher from "@/kancom/shell/WorkingPersonaSwitcher.vue";
 import { getHelpdeskModuleNavigation } from "@/extensions/registry";
 import {
@@ -273,7 +274,11 @@ const visibleTravelosModuleNavigation = computed(() =>
         ["team_leader", "operations_head"].includes(
           productContextStore.workingPersona || ""
         )),
-    authStore.isAdmin
+    authStore.isAdmin,
+    canAccessAnalytics(
+      productContextStore.context?.authoritative_persona || null,
+      Boolean(productContextStore.context?.is_platform_administrator)
+    )
   )
 );
 
