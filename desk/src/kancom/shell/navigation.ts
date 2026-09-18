@@ -140,8 +140,14 @@ export type KancomSetupPersona =
 const operationalSetupTabs: Partial<
   Record<KancomSetupPersona & string, string[]>
 > = {
-  team_leader: ["Profile", "Setup Summary", "Saved Replies"],
-  operations_head: ["Profile", "Setup Summary", "Teams", "Saved Replies"],
+  team_leader: ["Profile", "Setup Summary", "Team Members", "Saved Replies"],
+  operations_head: [
+    "Profile",
+    "Setup Summary",
+    "Team Members",
+    "Teams",
+    "Saved Replies",
+  ],
 };
 
 export function getKancomSetupTabs(
@@ -153,7 +159,7 @@ export function getKancomSetupTabs(
     return kancomAdminSetupNavigation.items
       .filter(
         (item) =>
-          item.label !== "Setup Summary" ||
+          !["Setup Summary", "Team Members"].includes(item.label) ||
           ["administrator", "operations_head", "team_leader"].includes(
             persona || ""
           )
@@ -172,6 +178,11 @@ export const kancomAdminSetupNavigation = {
       label: "Setup Summary",
       icon: "clipboard",
       settingsTab: "Setup Summary",
+    },
+    {
+      label: "Team Members",
+      icon: "users",
+      settingsTab: "Team Members",
     },
     { label: "Agents", icon: "user", settingsTab: "Agents" },
     { label: "Teams", icon: "users", settingsTab: "Teams" },

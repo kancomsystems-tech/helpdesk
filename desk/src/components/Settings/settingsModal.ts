@@ -29,7 +29,9 @@ import General from "./General/General.vue";
 import SettingsGear from "~icons/lucide/settings";
 import SavedReplyIcon from "../icons/SavedReplyIcon.vue";
 import SetupSummary from "./SetupSummary.vue";
+import TeamMembers from "./TeamMembers.vue";
 import LucideClipboardCheck from "~icons/lucide/clipboard-check";
+import LucideContactRound from "~icons/lucide/contact-round";
 
 export const showSettingsModal = ref(false);
 export const settingsModalMode = ref<"full" | "setup">("full");
@@ -91,8 +93,16 @@ export const tabs = computed(() => {
           icon: markRaw(LucideClipboardCheck),
           component: markRaw(SetupSummary),
           condition: () =>
-            auth.isAdmin ||
-            ["operations_head", "team_leader"].includes(
+            ["administrator", "operations_head", "team_leader"].includes(
+              productContextStore.context?.persona || ""
+            ),
+        },
+        {
+          label: __("Team Members"),
+          icon: markRaw(LucideContactRound),
+          component: markRaw(TeamMembers),
+          condition: () =>
+            ["administrator", "operations_head", "team_leader"].includes(
               productContextStore.context?.persona || ""
             ),
         },
@@ -190,6 +200,7 @@ export const disableSettingModalOutsideClick = ref(false);
 type TabName =
   | "Profile"
   | "Setup Summary"
+  | "Team Members"
   | "Email Accounts"
   | "Email Notifications"
   | "General"

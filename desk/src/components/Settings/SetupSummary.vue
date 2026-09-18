@@ -21,7 +21,7 @@
           <SummaryRow :label="__('Edition')" :value="data.product.edition" />
           <SummaryRow
             :label="__('Capabilities')"
-            :value="list(data.product.capabilities)"
+            :value="list(data.product.capabilities.map(getCapabilityLabel))"
           />
         </SummaryCard>
 
@@ -31,12 +31,18 @@
             :value="list(data.teams.configured.map((team) => team.name))"
           />
           <SummaryRow
-            :label="__('Managed by you')"
+            :label="__('Teams you manage')"
             :value="list(data.teams.managed_teams)"
           />
           <SummaryRow
-            :label="__('Active agents')"
-            :value="data.teams.active_agents"
+            :label="__('Active coverage')"
+            :value="
+              __(
+                '{0} active agents across {1} teams',
+                String(data.teams.active_agents),
+                String(data.teams.configured.length)
+              )
+            "
           />
           <SummaryRow
             :label="__('Team leaders')"
@@ -60,8 +66,14 @@
             <div class="text-sm font-medium text-ink-gray-8">
               {{ account.email_account_name || account.name }}
             </div>
+            <div
+              v-if="account.state.account_type"
+              class="mt-1 text-xs font-medium text-ink-gray-5"
+            >
+              {{ account.state.account_type }}
+            </div>
             <div class="mt-1 text-p-sm text-ink-gray-6">
-              {{ mailboxModes(account) }} · {{ mailboxState(account) }}
+              {{ mailboxModes(account) }} · {{ account.state.reason }}
             </div>
             <div
               v-if="account.last_received_at"
@@ -72,27 +84,50 @@
           </div>
         </SummaryCard>
 
-        <SummaryCard :title="__('Workflow')">
-          <SummaryRow
-            :label="__('Statuses')"
-            :value="list(data.workflow.statuses.map((status) => status.name))"
-          />
-          <SummaryRow
-            :label="__('New ticket status')"
-            :value="data.workflow.default_ticket_status"
-          />
-          <SummaryRow
-            :label="__('After agent reply')"
-            :value="data.workflow.update_status_to"
-          />
-          <SummaryRow
-            :label="__('After customer reply')"
-            :value="data.workflow.ticket_reopen_status"
-          />
-          <SummaryRow
-            :label="__('Automatic reply transitions')"
-            :value="yesNo(data.workflow.auto_update_status)"
-          />
+        <SummaryCard :title="__('Workflow')" class="lg:col-span-2">
+          <div class="workflow-flow">
+            <template
+              v-for="(status, index) in workflowStates"
+              :key="status.name"
+            >
+              <div class="workflow-state">
+                <div class="text-sm font-medium text-ink-gray-8">
+                  {{ status.name }}
+                </div>
+                <div class="mt-1 text-xs text-ink-gray-5">
+                  {{ statusMeaning(status) }}
+                </div>
+              </div>
+              <div
+                v-if="index < workflowStates.length - 1"
+                class="workflow-arrow"
+              >
+                <span>{{ transitionLabel(status.name) }}</span>
+                <LucideArrowRight
+                  class="size-4 shrink-0 rotate-90 md:rotate-0"
+                />
+              </div>
+            </template>
+          </div>
+          <div
+            v-if="data.workflow.ticket_reopen_status"
+            class="mt-3 rounded bg-surface-gray-1 px-3 py-2 text-p-sm text-ink-gray-7"
+          >
+            {{
+              __(
+                'Customer reply after resolution reopens the request as "{0}".',
+                data.workflow.ticket_reopen_status
+              )
+            }}
+          </div>
+          <div v-if="pausedStatus" class="mt-2 text-xs text-ink-gray-5">
+            {{
+              __(
+                'SLA timing pauses while the request is in "{0}".',
+                pausedStatus.name
+              )
+            }}
+          </div>
         </SummaryCard>
 
         <SummaryCard :title="__('SLA policies')" class="lg:col-span-2">
@@ -109,8 +144,11 @@
                 policy.service_level
               }}</span>
               <span class="text-xs text-ink-gray-5">{{
-                policy.condition || __("Default policy")
+                policy.applicability.label
               }}</span>
+            </div>
+            <div class="mt-1 text-p-sm text-ink-gray-6">
+              {{ policy.applicability.detail }}
             </div>
             <div class="mt-2 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
               <div
@@ -131,7 +169,12 @@
               </div>
             </div>
             <div class="mt-2 text-xs text-ink-gray-5">
-              {{ workingHours(policy.working_hours) }}
+              <div v-for="hours in policy.working_hours_summary" :key="hours">
+                {{ hours }}
+              </div>
+              <div>
+                {{ __("Holiday list: {0}", policy.holiday_list || __("None")) }}
+              </div>
             </div>
           </div>
         </SummaryCard>
@@ -152,8 +195,13 @@
           </div>
           <SummaryRow
             v-else
-            :label="__('Enabled rules')"
-            :value="list(data.assignment.enabled_rules)"
+            :label="__('Active rules')"
+            :value="
+              __(
+                '{0} active assignment rules',
+                String(data.assignment.enabled_rules.length)
+              )
+            "
           />
           <SummaryRow
             v-for="route in data.assignment.team_routes"
@@ -181,11 +229,11 @@
         <SummaryCard :title="__('Automation and health')">
           <SummaryRow
             :label="__('Overall')"
-            :value="statusLabel(data.health.status)"
+            :value="overallStatusLabel(data.health.status)"
           />
           <SummaryRow
             :label="__('Scheduler')"
-            :value="data.automation.scheduler.label"
+            :value="automationStatus(data.automation.scheduler)"
           />
           <SummaryRow
             :label="__('Mailbox')"
@@ -215,6 +263,8 @@ import { computed, defineComponent, h } from "vue";
 import { createResource, LoadingIndicator } from "frappe-ui";
 import { __ } from "@/translation";
 import SettingsLayoutBase from "../layouts/SettingsLayoutBase.vue";
+import { getCapabilityLabel } from "@/kancom/product/labels";
+import LucideArrowRight from "~icons/lucide/arrow-right";
 
 const summary = createResource({
   url: "kancom_custom.api.setup_summary.get_setup_summary",
@@ -225,13 +275,18 @@ const data = computed(() => summary.data as any);
 const emptyValue = () => __("Not configured");
 const list = (values: unknown[] = []) =>
   values.filter(Boolean).join(", ") || emptyValue();
-const yesNo = (value: unknown) => (value ? __("Enabled") : __("Disabled"));
-const statusLabel = (value: string) =>
+const overallStatusLabel = (value: string) =>
   ({
     healthy: __("Healthy"),
-    attention: __("Needs attention"),
+    attention: __("Attention required"),
     unknown: __("Unknown"),
   }[value] || __("Unknown"));
+const automationStatus = (signal: any) =>
+  signal.status === "healthy"
+    ? __("Active")
+    : signal.status === "attention"
+    ? __("Attention required")
+    : __("Unknown");
 const duration = (seconds: number) => {
   if (!seconds) return __("Not configured");
   const hours = seconds / 3600;
@@ -239,22 +294,50 @@ const duration = (seconds: number) => {
     ? __("{0} h", String(Number(hours.toFixed(1))))
     : __("{0} min", String(Math.round(seconds / 60)));
 };
-const workingHours = (rows: any[]) =>
-  rows?.length
-    ? rows
-        .map((row) => `${row.workday} ${row.start_time}–${row.end_time}`)
-        .join(" · ")
-    : __("Working hours not configured");
 const mailboxModes = (account: any) => {
   const modes = [];
   if (account.enable_incoming) modes.push(__("Incoming"));
   if (account.enable_outgoing) modes.push(__("Outgoing"));
   return modes.join(" + ") || __("Disabled");
 };
-const mailboxState = (account: any) =>
-  account.awaiting_password || account.no_failed
-    ? __("Needs attention")
-    : __("Configured");
+const workflowStates = computed(() => {
+  const statuses = data.value?.workflow?.statuses || [];
+  const preferred = [
+    data.value?.workflow?.default_ticket_status,
+    data.value?.workflow?.update_status_to,
+    data.value?.workflow?.ticket_reopen_status,
+    ...statuses
+      .filter((status: any) => status.category === "Resolved")
+      .map((status: any) => status.name),
+  ].filter(Boolean);
+  const names = [...new Set(preferred)];
+  return names
+    .map((name) => statuses.find((status: any) => status.name === name))
+    .filter(Boolean);
+});
+const pausedStatus = computed(() =>
+  data.value?.workflow?.statuses?.find(
+    (status: any) => status.category === "Paused"
+  )
+);
+const statusMeaning = (status: any) => {
+  if (status.category === "Paused") return __("Waiting for customer");
+  if (status.category === "Resolved")
+    return status.name === "Closed"
+      ? __("Completed / closed")
+      : __("Completed");
+  return __("Team action required");
+};
+const transitionLabel = (statusName: string) => {
+  if (
+    data.value?.workflow?.auto_update_status &&
+    statusName === data.value?.workflow?.default_ticket_status
+  )
+    return __("Agent replies");
+  if (statusName === data.value?.workflow?.update_status_to)
+    return __("Customer replies");
+  return "";
+};
 
 const SummaryCard = defineComponent({
   props: { title: String },
@@ -304,5 +387,17 @@ const SummaryRow = defineComponent({
 <style scoped>
 .empty-copy {
   @apply rounded bg-surface-gray-1 px-3 py-4 text-p-sm text-ink-gray-6;
+}
+
+.workflow-flow {
+  @apply flex flex-col items-stretch gap-2 md:flex-row md:items-center;
+}
+
+.workflow-state {
+  @apply min-w-0 flex-1 rounded border border-outline-gray-2 bg-surface-gray-1 px-3 py-2;
+}
+
+.workflow-arrow {
+  @apply flex shrink-0 flex-col items-center justify-center gap-1 text-center text-xs text-ink-gray-5 md:flex-row;
 }
 </style>
