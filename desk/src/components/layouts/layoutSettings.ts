@@ -7,8 +7,6 @@ import { OrganizationsIcon } from "../icons";
 import { __ } from "@/translation";
 import { travelosShellLabels } from "@/kancom/shell/navigation";
 
-const basicReportsPath = "/app/hd-ticket/view/report";
-
 export function getAgentPortalSidebarOptions(
   hasCapability: (
     capability: "analytics" | "basic_reports" | "team_queues"
@@ -25,7 +23,7 @@ export function getAgentPortalSidebarOptions(
     ? {
         label: __("Reports"),
         icon: LucideLineChart,
-        onClick: () => window.location.assign(basicReportsPath),
+        to: "OperationalReports",
       }
     : null;
 

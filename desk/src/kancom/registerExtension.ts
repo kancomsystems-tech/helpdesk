@@ -21,6 +21,12 @@ registerHelpdeskExtension({
       meta: { admin: true, capability: "analytics" },
     },
     {
+      path: "/reports",
+      name: "OperationalReports",
+      component: () => import("@/kancom/reports/pages/OperationalReports.vue"),
+      meta: { capability: "basic_reports" },
+    },
+    {
       path: "/workforce",
       name: "WorkforceDashboard",
       component: () =>
