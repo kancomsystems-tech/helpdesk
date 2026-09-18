@@ -250,9 +250,14 @@ function reset() {
 }
 
 function safeError(error: any) {
-  return (
-    error?.messages?.[0] ||
-    __("The user could not be added. Review the details and try again.")
+  const fallback = __(
+    "The user could not be added. Review the details and try again."
   );
+  const message = error?.messages?.[0];
+  if (typeof message !== "string") return fallback;
+
+  const text = new DOMParser().parseFromString(message, "text/html").body
+    .textContent;
+  return text?.trim() || fallback;
 }
 </script>
