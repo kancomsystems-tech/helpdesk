@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { call, createResource, toast } from "frappe-ui";
 import { useProductContextStore } from "@/kancom/product/store";
 import AttentionList from "../components/AttentionList.vue";
@@ -138,7 +138,7 @@ function formatCount(value: number) {
 
 const availableKpiIds = computed<OperationsKpiCardId[]>(() =>
   getAvailableOperationsKpiIds(
-    productContextStore.context?.persona,
+    productContextStore.workingPersona,
     productContextStore.hasCapability("operations")
   )
 );
@@ -416,8 +416,8 @@ async function resetKpiLayout() {
   }
 }
 
-async function selectPeriod(period: OperationsPeriod) {
-  if (period === selectedPeriod.value) return;
+async function selectPeriod(period: OperationsPeriod, force = false) {
+  if (!force && period === selectedPeriod.value) return;
   selectedPeriod.value = period;
   const sequence = ++requestSequence;
   isRefreshing.value = true;
@@ -441,6 +441,11 @@ async function selectPeriod(period: OperationsPeriod) {
     if (sequence === requestSequence) isRefreshing.value = false;
   }
 }
+
+watch(
+  () => productContextStore.workingPersona,
+  () => selectPeriod(selectedPeriod.value, true)
+);
 
 const liveAttentionItems = computed(() => {
   const summary = liveSummary.value;

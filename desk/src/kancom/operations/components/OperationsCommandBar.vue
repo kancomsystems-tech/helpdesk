@@ -63,7 +63,11 @@ const initials = computed(() =>
     .toUpperCase()
 );
 const profileLabel = computed(() =>
-  getKancomPersonaLabel(productContextStore.context?.persona || null)
+  getKancomPersonaLabel(
+    productContextStore.workingPersona ||
+      productContextStore.context?.authoritative_persona ||
+      null
+  )
 );
 
 function toggleSidebar() {

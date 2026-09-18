@@ -122,7 +122,7 @@ const showBulkAssignDialog = ref(false);
 
 const { getStatus } = useTicketStatusStore();
 const { getUser } = useUserStore();
-const productContext = computed(() => productContextStore.context);
+const productContext = computed(() => productContextStore.workingContext);
 const queueTeams = computed(() => getQueueTeams(productContext.value));
 const initialPrimaryState = resolvePrimaryWorkbenchState(
   route.query,

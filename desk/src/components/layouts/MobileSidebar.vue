@@ -41,6 +41,7 @@
                 :primary-label="travelosProfileName"
                 :secondary-label="travelosProfileRole"
               />
+              <WorkingPersonaSwitcher v-if="!isCustomerPortal" class="mt-1" />
             </div>
             <div v-if="!isCustomerPortal" class="travelos-module-nav px-2">
               <SidebarLink
@@ -190,6 +191,7 @@ import {
 import { useTelephonyStore } from "@/stores/telephony";
 import { storeToRefs } from "pinia";
 import { useProductContextStore } from "@/kancom/product/store";
+import WorkingPersonaSwitcher from "@/kancom/shell/WorkingPersonaSwitcher.vue";
 import { getHelpdeskModuleNavigation } from "@/extensions/registry";
 import {
   filterCapabilityNavigation,
@@ -217,7 +219,11 @@ const visibleTravelosModuleNavigation = computed(() =>
   filterCapabilityNavigation(
     getHelpdeskModuleNavigation(),
     productContextStore.hasCapability,
-    authStore.isAdmin || authStore.isManager,
+    authStore.isAdmin ||
+      (authStore.isManager &&
+        ["team_leader", "operations_head"].includes(
+          productContextStore.workingPersona || ""
+        )),
     authStore.isAdmin
   )
 );
@@ -227,7 +233,7 @@ const allViews = computed(() => {
     ? customerPortalSidebarOptions
     : getAgentPortalSidebarOptions(
         productContextStore.hasCapability,
-        productContextStore.context?.persona
+        productContextStore.workingPersona
       );
 
   if (!isCallingEnabled.value) {
@@ -296,9 +302,9 @@ function openSetupModal() {
 
 const visibleSetupTabs = computed(() =>
   getKancomSetupTabs(
-    productContextStore.context?.persona || null,
+    productContextStore.workingPersona,
     productContextStore.hasCapability("managed_configuration"),
-    authStore.isAdmin || authStore.isManager
+    authStore.isAdmin
   )
 );
 
@@ -319,6 +325,15 @@ const agentPortalDropdown = computed(() => [
       router.push({ name: kancomSecondaryNavigation.contacts.routeName });
     },
   },
+  ...(productContextStore.context?.is_platform_administrator
+    ? [
+        {
+          label: "System Admin",
+          icon: "tool",
+          onClick: () => window.location.assign("/app"),
+        },
+      ]
+    : []),
   // Kancom Requests stays hidden until its destination is implemented.
   ...(visibleSetupTabs.value.length
     ? [
@@ -352,7 +367,11 @@ const travelosProfileName = computed(
 );
 
 const travelosProfileRole = computed(() =>
-  getKancomPersonaLabel(productContextStore.context?.persona || null)
+  getKancomPersonaLabel(
+    productContextStore.workingPersona ||
+      productContextStore.context?.authoritative_persona ||
+      null
+  )
 );
 
 function isActiveTab(to: any) {

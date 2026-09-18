@@ -41,15 +41,14 @@ const productContextStore = useProductContextStore();
 
 const canShowTeams = () =>
   auth.isAdmin ||
-  auth.isManager ||
-  (productContextStore.context?.persona === "operations_head" &&
+  (productContextStore.workingPersona === "operations_head" &&
     productContextStore.hasCapability("managed_configuration"));
 
 const isKancomSetupTab = (label: string) =>
   getKancomSetupTabs(
-    productContextStore.context?.persona || null,
+    productContextStore.workingPersona,
     productContextStore.hasCapability("managed_configuration"),
-    auth.isAdmin || auth.isManager
+    auth.isAdmin
   ).some((tabName) => label === __(tabName));
 
 export const tabs = computed(() => {
@@ -93,8 +92,9 @@ export const tabs = computed(() => {
           icon: markRaw(LucideClipboardCheck),
           component: markRaw(SetupSummary),
           condition: () =>
-            ["administrator", "operations_head", "team_leader"].includes(
-              productContextStore.context?.persona || ""
+            productContextStore.context?.is_platform_administrator ||
+            ["operations_head", "team_leader"].includes(
+              productContextStore.workingPersona || ""
             ),
         },
         {
@@ -102,8 +102,9 @@ export const tabs = computed(() => {
           icon: markRaw(LucideContactRound),
           component: markRaw(TeamMembers),
           condition: () =>
-            ["administrator", "operations_head", "team_leader"].includes(
-              productContextStore.context?.persona || ""
+            productContextStore.context?.is_platform_administrator ||
+            ["operations_head", "team_leader"].includes(
+              productContextStore.workingPersona || ""
             ),
         },
         {
