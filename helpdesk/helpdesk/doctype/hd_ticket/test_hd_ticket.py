@@ -1,6 +1,7 @@
 # Copyright (c) 2023, Frappe Technologies and Contributors
 # See license.txt
 from datetime import timedelta
+from unittest.mock import patch
 
 import frappe
 from frappe.tests.utils import FrappeTestCase
@@ -65,6 +66,51 @@ class TestHDTicket(FrappeTestCase):
         ticket = frappe.get_doc(get_ticket_obj())
         ticket.insert()
         self.assertTrue(ticket.name)
+
+    def test_non_email_communication_uses_ticket_lifecycle_without_email(self):
+        ticket = make_ticket(description="")
+        ticket.status = "Resolved"
+        ticket.save()
+
+        with patch("frappe.sendmail") as sendmail:
+            communication = frappe.get_doc(
+                {
+                    "doctype": "Communication",
+                    "communication_type": "Communication",
+                    "communication_medium": "Other",
+                    "content": "Generic inbound message",
+                    "reference_doctype": "HD Ticket",
+                    "reference_name": ticket.name,
+                    "sender": non_agent,
+                    "sent_or_received": "Received",
+                }
+            )
+            communication.insert(ignore_permissions=True)
+
+        ticket.reload()
+        self.assertEqual(ticket.status, ticket.default_open_status)
+        self.assertIsNotNone(ticket.last_customer_response)
+        sendmail.assert_not_called()
+
+        with patch("frappe.sendmail") as sendmail:
+            communication = frappe.get_doc(
+                {
+                    "doctype": "Communication",
+                    "communication_type": "Communication",
+                    "communication_medium": "Other",
+                    "content": "Generic outbound message",
+                    "reference_doctype": "HD Ticket",
+                    "reference_name": ticket.name,
+                    "sender": agent,
+                    "sent_or_received": "Sent",
+                }
+            )
+            communication.insert(ignore_permissions=True)
+
+        ticket.reload()
+        self.assertIsNotNone(ticket.first_responded_on)
+        self.assertIsNotNone(ticket.last_agent_response)
+        sendmail.assert_not_called()
 
     def test_agent_flow(self):
         ticket = frappe.get_doc(get_ticket_obj())

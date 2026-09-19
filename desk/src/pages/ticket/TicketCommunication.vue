@@ -14,6 +14,10 @@
       </div>
     </div>
 
+    <div v-if="channel.id !== 'email'" class="mb-2 text-sm text-gray-500">
+      {{ channel.label }}
+    </div>
+
     <EmailContent :content="sanitize(content)" />
     <div class="flex flex-wrap gap-2 mb-2">
       <AttachmentItem
@@ -31,8 +35,10 @@ import { AttachmentItem, UserAvatar } from "@/components";
 import { dayjs } from "@/dayjs";
 import { UserInfo } from "@/types";
 import { dateFormat, dateTooltipFormat, timeAgo } from "@/utils";
+import { getHelpdeskCommunicationChannel } from "@/extensions/registry";
 import { Tooltip } from "frappe-ui";
 import sanitizeHtml from "sanitize-html";
+import { computed } from "vue";
 
 interface Attachment {
   file_name: string;
@@ -42,17 +48,20 @@ interface Attachment {
 interface P {
   content: string;
   date: string;
+  medium?: string | null;
   user: UserInfo;
   cc?: string;
   bcc?: string;
   attachments?: Attachment[];
 }
 
-withDefaults(defineProps<P>(), {
+const props = withDefaults(defineProps<P>(), {
   cc: () => "",
   bcc: () => "",
   attachments: () => [],
 });
+
+const channel = computed(() => getHelpdeskCommunicationChannel(props.medium));
 
 function sanitize(html: string) {
   return sanitizeHtml(html, {

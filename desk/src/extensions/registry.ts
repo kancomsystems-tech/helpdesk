@@ -10,6 +10,17 @@ export interface HelpdeskModuleNavigationItem {
   admin?: boolean;
 }
 
+export interface HelpdeskCommunicationReplyAction {
+  id: string;
+  label: string;
+}
+
+export interface HelpdeskCommunicationChannel {
+  id: string;
+  label: string;
+  replyActions?: readonly HelpdeskCommunicationReplyAction[];
+}
+
 export interface HelpdeskFrontendExtension {
   id: string;
   productContextUrl?: string;
@@ -18,6 +29,46 @@ export interface HelpdeskFrontendExtension {
 }
 
 const extensions = new Map<string, HelpdeskFrontendExtension>();
+const communicationChannels = new Map<string, HelpdeskCommunicationChannel>();
+
+const unknownCommunicationChannel: HelpdeskCommunicationChannel = {
+  id: "unknown",
+  label: "Unknown",
+};
+
+export const emailCommunicationChannel: HelpdeskCommunicationChannel = {
+  id: "email",
+  label: "Email",
+  replyActions: [
+    { id: "reply", label: "Reply" },
+    { id: "reply-all", label: "Reply All" },
+    { id: "forward", label: "Forward" },
+  ],
+};
+
+communicationChannels.set(emailCommunicationChannel.id, emailCommunicationChannel);
+
+export function registerHelpdeskCommunicationChannel(
+  channel: HelpdeskCommunicationChannel
+) {
+  const id = channel.id.toLowerCase();
+  if (!id || communicationChannels.has(id)) return false;
+  communicationChannels.set(id, channel);
+  return true;
+}
+
+export function getHelpdeskCommunicationChannel(
+  medium?: string | null
+): HelpdeskCommunicationChannel {
+  if (!medium) return unknownCommunicationChannel;
+  return communicationChannels.get(medium.toLowerCase()) || unknownCommunicationChannel;
+}
+
+export function getHelpdeskCommunicationReplyActions(
+  medium?: string | null
+): readonly HelpdeskCommunicationReplyAction[] {
+  return getHelpdeskCommunicationChannel(medium).replyActions || [];
+}
 
 export function registerHelpdeskExtension(
   extension: HelpdeskFrontendExtension

@@ -31,6 +31,7 @@
         <TicketCommunication
           :content="c.content"
           :date="c.creation"
+          :medium="c.communication_medium"
           :user="c.user"
           :sender-image="c.sender"
           :cc="c.cc || ''"
