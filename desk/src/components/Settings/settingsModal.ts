@@ -168,7 +168,9 @@ export const tabs = computed(() => {
     .filter((tab) => tab.items.length);
 });
 
-export const activeTab = ref(tabs.value[0].items[0]);
+const getFirstSettingsTab = () => tabs.value[0]?.items[0] || null;
+
+export const activeTab = ref(getFirstSettingsTab());
 
 export const nextActiveTab = ref(null);
 
@@ -193,14 +195,29 @@ type TabName =
   | "Saved Replies";
 
 export const setActiveSettingsTab = (tabName: TabName) => {
+  const availableItems = tabs.value.map((tab) => tab.items).flat();
   activeTab.value =
     (tabName &&
-      tabs.value
-        .map((tab) => tab.items)
-        .flat()
-        .find((tab) => tab.label == __(tabName))) ||
-    tabs.value[0].items[0];
+      availableItems.find((tab) => tab.label == __(tabName))) ||
+    availableItems[0] ||
+    null;
 };
+
+watch(
+  tabs,
+  (availableTabs) => {
+    const availableItems = availableTabs.map((tab) => tab.items).flat();
+    if (!availableItems.length) {
+      activeTab.value = null;
+    } else if (
+      !activeTab.value ||
+      !availableItems.some((tab) => tab.label === activeTab.value?.label)
+    ) {
+      activeTab.value = availableItems[0];
+    }
+  },
+  { immediate: true }
+);
 
 watch(showSettingsModal, (show) => {
   if (!show) {

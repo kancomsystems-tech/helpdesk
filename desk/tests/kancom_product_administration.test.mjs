@@ -70,6 +70,9 @@ try {
   assert.match(settings, /authoritative_persona/);
   assert.match(settings, /is_platform_administrator/);
   assert.doesNotMatch(settings, /auth\.isManager/);
+  assert.match(settings, /tabs\.value\[0\]\?\.items\[0\] \|\| null/);
+  assert.match(settings, /watch\([\s\S]*tabs[\s\S]*\{ immediate: true \}/);
+  assert.doesNotMatch(settings, /tabs\.value\[0\]\.items\[0\]/);
   const modal = await readFile(
     "src/components/Settings/SettingsModal.vue",
     "utf8"
