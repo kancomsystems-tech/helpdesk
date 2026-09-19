@@ -20,6 +20,11 @@ try {
   const registry = require(output);
 
   assert.equal(registry.getHelpdeskCommunicationChannel("Email").id, "email");
+  assert.equal(
+    registry.registerHelpdeskCommunicationChannel({ id: "Chat", label: "Chat" }),
+    true
+  );
+  assert.equal(registry.getHelpdeskCommunicationChannel("Chat").label, "Chat");
   assert.deepEqual(
     registry.getHelpdeskCommunicationReplyActions("Email").map((action) => action.id),
     ["reply", "reply-all", "forward"]
@@ -62,6 +67,10 @@ try {
     "src/pages/ticket/TicketConversation.vue",
     "utf8"
   );
+  const ticketApi = await readFile(
+    "../helpdesk/helpdesk/doctype/hd_ticket/api.py",
+    "utf8"
+  );
   const communication = await readFile(
     "src/pages/ticket/TicketCommunication.vue",
     "utf8"
@@ -71,6 +80,7 @@ try {
     "utf8"
   );
   assert.match(conversation, /:medium="c\.communication_medium"/);
+  assert.match(ticketApi, /QBCommunication\.communication_medium/);
   assert.match(communication, /getHelpdeskCommunicationChannel/);
   assert.match(communication, /channel\.id !== 'email'/);
   assert.match(composer, /ReplyIcon/);
