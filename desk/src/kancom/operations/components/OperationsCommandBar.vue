@@ -92,11 +92,6 @@ const accountOptions = computed(() => [
       ]
     : []),
   {
-    label: kancomSecondaryNavigation.docs.label,
-    icon: kancomSecondaryNavigation.docs.icon,
-    onClick: () => window.open(kancomSecondaryNavigation.docs.url),
-  },
-  {
     label: kancomSecondaryNavigation.logout.label,
     icon: kancomSecondaryNavigation.logout.icon,
     onClick: () => authStore.logout(),

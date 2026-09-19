@@ -121,21 +121,6 @@
               </Section>
             </div>
           </div>
-          <div class="travelos-sidebar-footer shrink-0">
-            <SidebarLink
-              v-if="!isCustomerPortal"
-              :icon="HelpIcon"
-              :label="'Help'"
-              :is-expanded="true"
-              @click="
-                () => {
-                  sidebarOpened = false;
-                  showHelpModal = minimize ? true : !showHelpModal;
-                  minimize = !showHelpModal;
-                }
-              "
-            />
-          </div>
         </div>
       </TransitionChild>
       <TransitionChild
@@ -157,7 +142,6 @@
     v-model="showHelpModal"
     appName="helpdesk"
     title="Frappe Helpdesk"
-    docsLink="https://docs.frappe.io/helpdesk"
   />
 </template>
 
@@ -181,8 +165,7 @@ import { mobileSidebarOpened as sidebarOpened } from "@/composables/mobile";
 import { currentView, useView } from "@/composables/useView";
 
 import LucideBell from "~icons/lucide/bell";
-import { HelpIcon } from "frappe-ui/icons";
-import { HelpModal, minimize, showHelpModal } from "frappe-ui/frappe";
+import { HelpModal, showHelpModal } from "frappe-ui/frappe";
 import { useAuthStore } from "@/stores/auth";
 import { isCustomerPortal } from "@/utils";
 import {
@@ -350,11 +333,6 @@ const agentPortalDropdown = computed(() => [
         },
       ]
     : []),
-  {
-    label: kancomSecondaryNavigation.docs.label,
-    icon: kancomSecondaryNavigation.docs.icon,
-    onClick: () => window.open(kancomSecondaryNavigation.docs.url),
-  },
   {
     label: kancomSecondaryNavigation.logout.label,
     icon: kancomSecondaryNavigation.logout.icon,

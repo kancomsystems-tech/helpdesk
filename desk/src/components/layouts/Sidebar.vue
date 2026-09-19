@@ -138,19 +138,6 @@
     </div>
     <div class="travelos-sidebar-footer">
       <SidebarLink
-        v-if="!isCustomerPortal"
-        :icon="HelpIcon"
-        :label="__('Help')"
-        :is-expanded="isExpanded"
-        @click="
-          () => {
-            showHelpModal = minimize ? true : !showHelpModal;
-            minimize = !showHelpModal;
-          }
-        "
-      />
-
-      <SidebarLink
         :icon="isExpanded ? LucideArrowLeftFromLine : LucideArrowRightFromLine"
         :is-active="false"
         :is-expanded="isExpanded"
@@ -166,7 +153,6 @@
       appName="helpdesk"
       title="Frappe Helpdesk"
       :logo="logo"
-      docsLink="https://docs.frappe.io/helpdesk"
       :afterSkip="(step: string) => capture('onboarding_step_skipped_' + step)"
       :afterSkipAll="() => capture('onboarding_steps_skipped')"
       :afterReset="(step: string) => capture('onboarding_step_reset_' + step)"
@@ -211,7 +197,6 @@ import {
   useOnboarding,
 } from "frappe-ui/frappe";
 
-import { HelpIcon } from "frappe-ui/icons";
 import { storeToRefs } from "pinia";
 import { computed, h, markRaw, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -411,11 +396,6 @@ const agentPortalDropdown = computed(() => [
         },
       ]
     : []),
-  {
-    label: __(kancomSecondaryNavigation.docs.label),
-    icon: kancomSecondaryNavigation.docs.icon,
-    onClick: () => window.open(kancomSecondaryNavigation.docs.url),
-  },
   {
     group: __("Danger"),
     hideLabel: true,

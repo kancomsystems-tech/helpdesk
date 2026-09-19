@@ -116,11 +116,6 @@ export const kancomSecondaryNavigation = {
     label: "Settings",
     icon: "settings",
   },
-  docs: {
-    label: "Help / Docs",
-    icon: "book-open",
-    url: "https://docs.frappe.io/helpdesk",
-  },
   logout: {
     label: "Log out",
     icon: "log-out",
