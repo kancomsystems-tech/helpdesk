@@ -23,6 +23,11 @@ try {
   const context = {
     persona: "team_leader",
     managed_teams: ["AirOps", "VisaOps"],
+    effective_permissions: [
+      "view_unassigned",
+      "view_team_queues",
+      "view_team_workload",
+    ],
   };
   const chips = Object.fromEntries(
     scopes.workbenchChips.map((chip) => [chip.key, chip.enabled])
@@ -47,6 +52,45 @@ try {
   assert.deepEqual(resolve("queues").filters, {
     agent_group: ["in", ["AirOps", "VisaOps"]],
   });
+
+  const agentContext = {
+    persona: "agent",
+    teams: ["AirOps"],
+    effective_permissions: ["view_reports"],
+  };
+  const visibleAgentChips = scopes
+    .getVisibleWorkbenchChips(agentContext)
+    .map((chip) => chip.key);
+  assert.equal(visibleAgentChips.includes("control_view"), false);
+  assert.equal(visibleAgentChips.includes("unassigned"), false);
+  assert.equal(visibleAgentChips.includes("triage"), false);
+  assert.equal(
+    scopes.resolvePrimaryWorkbenchState(
+      { scope: "control" },
+      "agent@example.com",
+      agentContext
+    ).scope,
+    "queues"
+  );
+  assert.equal(
+    scopes.resolvePrimaryWorkbenchState(
+      { scope: "unassigned" },
+      "agent@example.com",
+      agentContext
+    ).scope,
+    "queues"
+  );
+
+  const headContext = {
+    persona: "operations_head",
+    managed_teams: ["AirOps"],
+    effective_permissions: ["view_control", "view_unassigned"],
+  };
+  assert.equal(
+    scopes.resolvePrimaryWorkbenchState({}, "head@example.com", headContext)
+      .scope,
+    "control"
+  );
 
   assert.deepEqual(
     scopes.replacePrimaryWorkbenchFilters(

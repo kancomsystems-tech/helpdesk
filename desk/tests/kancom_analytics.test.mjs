@@ -54,12 +54,16 @@ for (const fixture of [
 ]) {
   assert.doesNotMatch(data, new RegExp(`export const ${fixture}`));
 }
-assert.match(navigation, /capability: "analytics",[\s\S]*analytics: true/);
 assert.match(
-  registration,
-  /meta: \{ analytics: true, capability: "analytics" \}/
+  navigation,
+  /capability: "analytics",[\s\S]*analytics: true,[\s\S]*effectivePermission: "view_analytics"/
 );
+assert.match(registration, /effectivePermission: "view_analytics"/);
 assert.match(router, /to\.meta\.analytics[\s\S]*canAccessAnalytics/);
+assert.match(
+  router,
+  /to\.meta\.effectivePermission[\s\S]*hasEffectivePermission/
+);
 
 const require = createRequire(import.meta.url);
 const output = join(tmpdir(), `kancom-access-policy-${process.pid}.cjs`);

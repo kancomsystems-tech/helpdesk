@@ -1,7 +1,10 @@
 import { useScreenSize } from "@/composables/screen";
 import "@/kancom/registerExtension";
 import { getHelpdeskExtensionRoutes } from "@/extensions/registry";
-import { useProductContextStore } from "@/kancom/product/store";
+import {
+  useProductContextStore,
+  type KancomEffectivePermission,
+} from "@/kancom/product/store";
 import { canAccessAnalytics } from "@/kancom/product/accessPolicy";
 import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/user";
@@ -27,6 +30,7 @@ declare module "vue-router" {
     manager?: boolean;
     analytics?: boolean;
     capability?: string;
+    effectivePermission?: KancomEffectivePermission;
   }
 }
 
@@ -228,6 +232,11 @@ router.beforeEach(async (to, _, next) => {
     !productContextStore.hasCapability(to.meta.capability)
   ) {
     next({ name: "TicketsAgent" });
+  } else if (
+    to.meta.effectivePermission &&
+    !productContextStore.hasEffectivePermission(to.meta.effectivePermission)
+  ) {
+    next({ name: "Dashboard" });
   } else if (
     to.meta.analytics &&
     !canAccessAnalytics(

@@ -117,7 +117,7 @@ export const operationsKpiCardLibrary: OperationsKpiCardDefinition[] = [
     group: "kpis",
     state: "live",
     defaultVisible: true,
-    allowedPersonas: allOperationsPersonas,
+    allowedPersonas: managementPersonas,
     sourceField: "kpis.unassigned",
   },
   {

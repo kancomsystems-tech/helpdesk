@@ -25,6 +25,17 @@ export type KancomCapability =
   | "enterprise_integrations";
 
 export type KancomAction = "bulk_assign";
+export type KancomEffectivePermission =
+  | "view_analytics"
+  | "view_reports"
+  | "view_control"
+  | "view_unassigned"
+  | "bulk_assign"
+  | "view_team_workload"
+  | "view_team_queues"
+  | "manage_public_views"
+  | "view_workforce"
+  | "view_quality";
 
 export type OperationalPersona = "operations_head" | "team_leader" | "agent";
 
@@ -40,6 +51,13 @@ export interface ProductContext {
     | null;
   authorized_operational_personas: OperationalPersona[];
   working_persona: OperationalPersona | null;
+  effective_persona:
+    | "administrator"
+    | "operations_head"
+    | "team_leader"
+    | "agent"
+    | null;
+  effective_permissions: KancomEffectivePermission[];
   is_platform_administrator: boolean;
   managed_teams: string[];
   working_managed_teams: string[];
@@ -74,6 +92,12 @@ export const useProductContextStore = defineStore(
     const actions = computed(
       () => new Set<KancomAction>(context.value?.actions ?? [])
     );
+    const effectivePermissions = computed(
+      () =>
+        new Set<KancomEffectivePermission>(
+          context.value?.effective_permissions ?? []
+        )
+    );
     const loading = computed(() => contextResource.loading);
     const error = computed(() => contextResource.error);
 
@@ -101,6 +125,10 @@ export const useProductContextStore = defineStore(
       return true;
     }
 
+    function hasEffectivePermission(permission: KancomEffectivePermission) {
+      return effectivePermissions.value.has(permission);
+    }
+
     async function setWorkingPersona(persona: OperationalPersona) {
       const next = (await call(
         "kancom_custom.api.product_context.set_working_persona",
@@ -116,9 +144,11 @@ export const useProductContextStore = defineStore(
       capabilities,
       context,
       edition,
+      effectivePermissions,
       error,
       hasAction,
       hasCapability,
+      hasEffectivePermission,
       init,
       loading,
       setWorkingPersona,

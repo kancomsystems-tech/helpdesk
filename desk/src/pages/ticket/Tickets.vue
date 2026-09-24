@@ -114,7 +114,7 @@ const {
 } = useView("HD Ticket");
 
 const { $dialog, $socket } = globalStore();
-const { isAdmin, isManager, userId } = useAuthStore();
+const { userId } = useAuthStore();
 
 const listViewRef = ref(null);
 const showExportModal = ref(false);
@@ -165,7 +165,9 @@ const workbenchVisibilityMetrics = computed(() =>
 const listSelections = ref(new Set<string>());
 const selectedTickets = computed(() => Array.from(listSelections.value));
 const canBulkAssign = computed(
-  () => !isCustomerPortal.value && productContextStore.hasAction("bulk_assign")
+  () =>
+    !isCustomerPortal.value &&
+    productContextStore.hasEffectivePermission("bulk_assign")
 );
 
 const selectBannerActions = [
@@ -306,7 +308,7 @@ function applyPrimaryScope() {
     userId,
     productContext.value
   );
-  const requestedScope = String(route.query.scope || "control");
+  const requestedScope = String(route.query.scope || state.scope);
   const requestedTeam = String(route.query.team || "");
   if (
     state.scope !== requestedScope ||
@@ -381,19 +383,21 @@ let viewDialog = reactive({
 });
 
 const dropdownOptions = computed(() => {
+  const defaultItems = [];
+  if (productContextStore.hasEffectivePermission("view_control")) {
+    defaultItems.push({
+      label: __("Control View"),
+      icon: "align-justify",
+      onClick: () =>
+        router.push({
+          name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
+        }),
+    });
+  }
   const items = [
     {
       group: __("Default Views"),
-      items: [
-        {
-          label: __("Control View"),
-          icon: "align-justify",
-          onClick: () =>
-            router.push({
-              name: isCustomerPortal.value ? "TicketsCustomer" : "TicketsAgent",
-            }),
-        },
-      ],
+      items: defaultItems,
     },
   ];
 
@@ -460,7 +464,10 @@ const viewActions = (view) => {
       ],
     },
   ];
-  if (!_view.public || isManager) {
+  const canManagePublicViews = productContextStore.hasEffectivePermission(
+    "manage_public_views"
+  );
+  if (!_view.public || canManagePublicViews) {
     actions[0].items.push({
       label: __("Edit"),
       icon: h(EditIcon, { class: "h-4 w-4" }),
@@ -485,7 +492,7 @@ const viewActions = (view) => {
         },
       });
     }
-    if (isManager && !isCustomerPortal.value) {
+    if (canManagePublicViews && !isCustomerPortal.value) {
       actions[0].items.push({
         label: _view?.public ? __("Make Private") : __("Make Public"),
         icon: h(FeatherIcon, {
@@ -663,7 +670,10 @@ onMounted(() => {
   applyPrimaryScope();
   if (!route.query.view) {
     currentView.value = {
-      label: __("Control View"),
+      label:
+        activeWorkbenchChip.value === "control_view"
+          ? __("Control View")
+          : __("My Queues"),
       icon: LucideAlignJustify,
     };
   }

@@ -1,4 +1,7 @@
-import type { KancomCapability } from "@/kancom/product/store";
+import type {
+  KancomCapability,
+  KancomEffectivePermission,
+} from "@/kancom/product/store";
 import type { KancomPersona } from "@/kancom/product/accessPolicy";
 import { kancomShellLabels } from "./labels";
 import LucideActivity from "~icons/lucide/activity";
@@ -53,6 +56,7 @@ export const travelosModuleNavigation = [
     activeRoutes: ["AnalyticsDashboard"],
     capability: "analytics",
     analytics: true,
+    effectivePermission: "view_analytics",
   },
   {
     label: "Workforce",
@@ -61,6 +65,7 @@ export const travelosModuleNavigation = [
     activeRoutes: ["WorkforceDashboard"],
     capability: "workforce",
     manager: true,
+    effectivePermission: "view_workforce",
   },
   {
     label: "Quality",
@@ -69,6 +74,7 @@ export const travelosModuleNavigation = [
     activeRoutes: ["QualityDashboard"],
     capability: "quality",
     manager: true,
+    effectivePermission: "view_quality",
   },
 ] as const;
 
@@ -78,20 +84,26 @@ export function filterCapabilityNavigation<
     manager?: boolean;
     admin?: boolean;
     analytics?: boolean;
+    effectivePermission?: KancomEffectivePermission;
   }
 >(
   items: readonly T[],
   hasCapability: (capability: KancomCapability) => boolean,
   hasManagerAccess = false,
   hasAdminAccess = false,
-  hasAnalyticsAccess = false
+  hasAnalyticsAccess = false,
+  hasEffectivePermission: (
+    permission: KancomEffectivePermission
+  ) => boolean = () => true
 ): T[] {
   return items.filter(
     (item) =>
       (!item.capability || hasCapability(item.capability)) &&
       (!item.manager || hasManagerAccess) &&
       (!item.admin || hasAdminAccess) &&
-      (!item.analytics || hasAnalyticsAccess)
+      (!item.analytics || hasAnalyticsAccess) &&
+      (!item.effectivePermission ||
+        hasEffectivePermission(item.effectivePermission))
   );
 }
 

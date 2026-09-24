@@ -18,26 +18,41 @@ registerHelpdeskExtension({
       name: "AnalyticsDashboard",
       component: () =>
         import("@/kancom/analytics/pages/AnalyticsDashboard.vue"),
-      meta: { analytics: true, capability: "analytics" },
+      meta: {
+        analytics: true,
+        capability: "analytics",
+        effectivePermission: "view_analytics",
+      },
     },
     {
       path: "/reports",
       name: "OperationalReports",
       component: () => import("@/kancom/reports/pages/OperationalReports.vue"),
-      meta: { capability: "basic_reports" },
+      meta: {
+        capability: "basic_reports",
+        effectivePermission: "view_reports",
+      },
     },
     {
       path: "/workforce",
       name: "WorkforceDashboard",
       component: () =>
         import("@/kancom/workforce/pages/WorkforceDashboard.vue"),
-      meta: { manager: true, capability: "workforce" },
+      meta: {
+        manager: true,
+        capability: "workforce",
+        effectivePermission: "view_workforce",
+      },
     },
     {
       path: "/quality",
       name: "QualityDashboard",
       component: () => import("@/kancom/quality/pages/QualityDashboard.vue"),
-      meta: { manager: true, capability: "quality" },
+      meta: {
+        manager: true,
+        capability: "quality",
+        effectivePermission: "view_quality",
+      },
     },
   ],
 });

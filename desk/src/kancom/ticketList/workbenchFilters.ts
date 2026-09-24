@@ -62,6 +62,7 @@ export interface WorkbenchProductContext {
     | null;
   managed_teams?: string[];
   teams?: string[];
+  effective_permissions?: string[];
 }
 
 export interface PrimaryWorkbenchState {
@@ -94,15 +95,28 @@ export function getQueueTeams(context?: WorkbenchProductContext | null) {
 }
 
 export function canUseTriage(context?: WorkbenchProductContext | null) {
-  return ["administrator", "operations_head"].includes(context?.persona || "");
+  return hasEffectivePermission(context, "view_control");
+}
+
+export function hasEffectivePermission(
+  context: WorkbenchProductContext | null | undefined,
+  permission: string
+) {
+  return Boolean(context?.effective_permissions?.includes(permission));
 }
 
 export function getVisibleWorkbenchChips(
   context?: WorkbenchProductContext | null
 ) {
-  return workbenchChips.filter(
-    (chip) => chip.key !== "triage" || canUseTriage(context)
-  );
+  return workbenchChips.filter((chip) => {
+    if (["control_view", "triage"].includes(chip.key)) {
+      return hasEffectivePermission(context, "view_control");
+    }
+    if (chip.key === "unassigned") {
+      return hasEffectivePermission(context, "view_unassigned");
+    }
+    return true;
+  });
 }
 
 export function getPrimaryWorkbenchFilters(
@@ -131,19 +145,26 @@ export function resolvePrimaryWorkbenchState(
   context?: WorkbenchProductContext | null
 ): PrimaryWorkbenchState {
   const queueTeams = getQueueTeams(context);
+  const defaultScope = hasEffectivePermission(context, "view_control")
+    ? "control"
+    : "queues";
   const requestedScope = String(
-    query.scope || "control"
+    query.scope || defaultScope
   ) as PrimaryWorkbenchScope;
   const requestedTeam = String(query.team || "");
   const allowedScopes: PrimaryWorkbenchScope[] = [
-    "control",
     "assigned",
     "queues",
     "sla_breached",
-    "unassigned",
     "closed",
   ];
 
+  if (hasEffectivePermission(context, "view_control")) {
+    allowedScopes.push("control");
+  }
+  if (hasEffectivePermission(context, "view_unassigned")) {
+    allowedScopes.push("unassigned");
+  }
   if (canUseTriage(context)) allowedScopes.push("triage");
   if (requestedTeam && queueTeams.includes(requestedTeam)) {
     allowedScopes.push("team");
@@ -151,7 +172,7 @@ export function resolvePrimaryWorkbenchState(
 
   const scope = allowedScopes.includes(requestedScope)
     ? requestedScope
-    : "control";
+    : defaultScope;
   const team = scope === "team" ? requestedTeam : "";
   return {
     scope,

@@ -6,24 +6,25 @@ import LucideUsersRound from "~icons/lucide/users-round";
 import { OrganizationsIcon } from "../icons";
 import { __ } from "@/translation";
 import { travelosShellLabels } from "@/kancom/shell/navigation";
+import type { KancomEffectivePermission } from "@/kancom/product/store";
 
 export function getAgentPortalSidebarOptions(
   hasCapability: (
     capability: "analytics" | "basic_reports" | "team_queues"
   ) => boolean,
-  persona?: string | null
+  hasEffectivePermission: (permission: KancomEffectivePermission) => boolean
 ) {
-  const reports = hasCapability("basic_reports")
-    ? {
-        label: __("Reports"),
-        icon: LucideLineChart,
-        to: "OperationalReports",
-      }
-    : null;
+  const reports =
+    hasCapability("basic_reports") && hasEffectivePermission("view_reports")
+      ? {
+          label: __("Reports"),
+          icon: LucideLineChart,
+          to: "OperationalReports",
+        }
+      : null;
 
   const canManageTeamQueues =
-    hasCapability("team_queues") &&
-    ["team_leader", "operations_head", "administrator"].includes(persona || "");
+    hasCapability("team_queues") && hasEffectivePermission("view_team_queues");
 
   return [
     {

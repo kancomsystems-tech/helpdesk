@@ -263,7 +263,8 @@ const visibleTravelosModuleNavigation = computed(() =>
     canAccessAnalytics(
       productContextStore.context?.authoritative_persona || null,
       Boolean(productContextStore.context?.is_platform_administrator)
-    )
+    ),
+    productContextStore.hasEffectivePermission
   )
 );
 
@@ -289,7 +290,7 @@ const allViews = computed(() => {
     ? customerPortalSidebarOptions
     : getAgentPortalSidebarOptions(
         productContextStore.hasCapability,
-        productContextStore.workingPersona
+        productContextStore.hasEffectivePermission
       );
 
   if (!isCallingEnabled.value) {
