@@ -378,7 +378,13 @@ export type EmailAccountFormState = {
   sent_folder_name?: string;
 };
 
-export type TicketTab = "activity" | "email" | "comment" | "details" | "call";
+export type TicketTab =
+  | "activity"
+  | "email"
+  | "comment"
+  | "details"
+  | "call"
+  | "whatsapp";
 
 export interface TabObject {
   name: TicketTab;

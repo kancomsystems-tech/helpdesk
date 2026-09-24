@@ -22,6 +22,7 @@ export type KancomCapability =
   | "workforce"
   | "quality"
   | "managed_configuration"
+  | "messaging_channels"
   | "enterprise_integrations";
 
 export type KancomAction = "bulk_assign";

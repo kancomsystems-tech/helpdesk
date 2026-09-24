@@ -6,8 +6,12 @@
     class="[&_[role='tab']]:px-0 [&_[role='tablist']]:px-5 [&_[role='tablist']]:gap-7.5 [&_[role='tablist']]:flex-shrink-0"
   >
     <template #tab-panel="{ tab }">
+      <TicketWhatsAppTab
+        v-if="tab.name === 'whatsapp'"
+        :ticket-id="String(ticket.doc.name)"
+      />
       <TicketAgentActivities
-        v-if="Boolean(activities.data)"
+        v-else-if="Boolean(activities.data)"
         ref="ticketAgentActivitiesRef"
         :activities="filterActivities(tab.name as TicketTab)"
         :title="tab.label"
@@ -50,12 +54,9 @@
 </template>
 
 <script setup lang="ts">
-import {
-  ActivityIcon,
-  CommentIcon,
-  PhoneIcon,
-} from "@/components/icons";
+import { ActivityIcon, CommentIcon, PhoneIcon } from "@/components/icons";
 import { useActiveTabManager } from "@/composables/useActiveTabManager";
+import { useProductContextStore } from "@/kancom/product/store";
 import { useTelephonyStore } from "@/stores/telephony";
 import {
   ActivitiesSymbol,
@@ -72,6 +73,9 @@ import TicketAgentActivities from "../ticket/TicketAgentActivities.vue";
 const CommunicationArea = defineAsyncComponent(
   () => import("@/components/CommunicationArea.vue")
 );
+const TicketWhatsAppTab = defineAsyncComponent(
+  () => import("@/kancom/whatsapp/TicketWhatsAppTab.vue")
+);
 
 const ticket = inject(TicketSymbol);
 const activities = inject(ActivitiesSymbol);
@@ -80,6 +84,11 @@ const ticketAgentActivitiesRef = ref(null);
 const communicationAreaRef = ref(null);
 const telephonyStore = useTelephonyStore();
 const { isCallingEnabled } = storeToRefs(telephonyStore);
+const productContextStore = useProductContextStore();
+
+const isWhatsAppAvailable = computed(() =>
+  productContextStore.hasCapability("messaging_channels")
+);
 
 const tabs: ComputedRef<TabObject[]> = computed(() => {
   const _tabs: TabObject[] = [
@@ -95,6 +104,14 @@ const tabs: ComputedRef<TabObject[]> = computed(() => {
       name: "call",
       label: "Calls",
       icon: PhoneIcon,
+    });
+  }
+
+  if (isWhatsAppAvailable.value) {
+    _tabs.push({
+      name: "whatsapp",
+      label: "WhatsApp",
+      icon: CommentIcon,
     });
   }
   return _tabs;
