@@ -52,13 +52,39 @@
         </div>
       </div>
     </div>
+
+    <div class="flex-1"></div>
+
+    <p v-if="!recipient" class="text-xs text-ink-gray-5">
+      No WhatsApp recipient available for this ticket.
+    </p>
+    <p v-if="sendError" class="text-xs text-ink-red-4">
+      {{ sendError }}
+    </p>
+    <div class="flex items-end gap-2">
+      <textarea
+        v-model="draft"
+        rows="2"
+        placeholder="Type a WhatsApp message"
+        class="flex-1 resize-none rounded-md border border-outline-gray-2 bg-surface-white px-2 py-1.5 text-sm text-ink-gray-8 focus:outline-none"
+        :disabled="!recipient || sending"
+      />
+      <Button
+        variant="solid"
+        :disabled="!canSend"
+        :loading="sending"
+        @click="send"
+      >
+        Send
+      </Button>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { globalStore } from "@/stores/globalStore";
-import { createResource, LoadingIndicator } from "frappe-ui";
-import { computed, onBeforeUnmount, onMounted, watch } from "vue";
+import { Button, call, createResource, LoadingIndicator } from "frappe-ui";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 interface WhatsAppMessageRow {
   name: string;
@@ -90,6 +116,49 @@ const messages = createResource({
 });
 
 const items = computed<WhatsAppMessageRow[]>(() => messages.data || []);
+
+// Customer-side recipient: `to` is the customer profile on every message in this
+// conversation (Slice C's proven direction model), so the most recent row is a
+// deterministic source — no phone/contact guessing here.
+const recipient = computed<string | null>(() => {
+  const withRecipient = items.value.filter((item) => item.to);
+  if (!withRecipient.length) return null;
+  return withRecipient[withRecipient.length - 1].to;
+});
+
+const draft = ref("");
+const sending = ref(false);
+const sendError = ref("");
+
+const canSend = computed(
+  () =>
+    Boolean(recipient.value) && Boolean(draft.value.trim()) && !sending.value
+);
+
+async function send() {
+  if (!canSend.value) return;
+
+  sending.value = true;
+  sendError.value = "";
+  try {
+    await call("whatsapp.whatsapp.api.messages.send_message", {
+      to: recipient.value,
+      message: draft.value.trim(),
+      reference_doctype: "HD Ticket",
+      reference_docname: props.ticketId,
+    });
+    draft.value = "";
+    // Fallback in case realtime is delayed; harmless if whatsapp_message also fires.
+    messages.reload();
+  } catch (error: any) {
+    sendError.value =
+      error?.messages?.join(", ") ||
+      error?.message ||
+      "Could not send message.";
+  } finally {
+    sending.value = false;
+  }
+}
 
 function formatTimestamp(value: string) {
   if (!value) return "";
@@ -125,6 +194,8 @@ watch(
       },
     });
     messages.reload();
+    draft.value = "";
+    sendError.value = "";
   }
 );
 </script>
