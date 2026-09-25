@@ -373,8 +373,10 @@ def search(
         r.doctype = doctype
         r.name = name
         if doctype == "HD Ticket" and not only_articles:
-            if not is_agent():
-                r = []
+            if not is_agent() or not frappe.has_permission(
+                "HD Ticket", "read", doc=name
+            ):
+                continue
             groups.setdefault("Tickets", []).append(r)
         if doctype == "HD Article":
             groups.setdefault("Articles", []).append(r)

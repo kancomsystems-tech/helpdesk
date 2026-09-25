@@ -112,6 +112,9 @@ def get_reactions(comment: str):
         frappe.throw(_("Comment not found"))
 
     doc = frappe.get_doc("HD Ticket Comment", comment)
+    frappe.has_permission(
+        "HD Ticket", "read", doc.reference_ticket, throw=True
+    )
     current_user = frappe.session.user
 
     reactions_map = {}

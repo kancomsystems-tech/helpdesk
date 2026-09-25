@@ -334,6 +334,11 @@ def merge_ticket(source: int, target: int):
     if source == target:
         frappe.throw(_("Source and target ticket cannot be same"))
 
+    frappe.has_permission("HD Ticket", "read", source, throw=True)
+    frappe.has_permission("HD Ticket", "write", source, throw=True)
+    frappe.has_permission("HD Ticket", "read", target, throw=True)
+    frappe.has_permission("HD Ticket", "write", target, throw=True)
+
     controller = get_controller("HD Ticket")
 
     source_comments = frappe.db.get_list(
@@ -450,6 +455,8 @@ def split_ticket(subject: str, communication_id: str):
 
     ticket_id = frappe.db.get_value("Communication", communication_id, "reference_name")
     ticket_doc = frappe.get_doc("HD Ticket", ticket_id)
+    frappe.has_permission("HD Ticket", "read", ticket_doc, throw=True)
+    frappe.has_permission("HD Ticket", "write", ticket_doc, throw=True)
     new_ticket = duplicate_ticket(ticket_doc, subject)
 
     # update emails
@@ -825,6 +832,7 @@ def show_banner_next_day(ticket):
 
 @frappe.whitelist()
 def show_outside_hours_banner(ticket_name: str | int):
+    frappe.has_permission("HD Ticket", "read", ticket_name, throw=True)
     show_banner_settings = frappe.db.get_single_value(
         "HD Settings", "enable_outside_hours_banner"
     )
