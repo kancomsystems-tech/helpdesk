@@ -40,20 +40,27 @@ const showSwitcher = computed(() =>
   )
 );
 const selectedLabel = computed(() =>
-  getKancomPersonaLabel(productContextStore.workingPersona)
+  getKancomPersonaLabel(productContextStore.sessionOperatingPersona)
 );
 const options = computed(() =>
   getWorkingPersonaOptions(
     productContextStore.authorizedOperationalPersonas
   ).map(({ value, label }) => ({
     label: __(label),
-    icon: value === productContextStore.workingPersona ? "check" : undefined,
+    icon:
+      value === productContextStore.sessionOperatingPersona
+        ? "check"
+        : undefined,
     onClick: () => switchPersona(value),
   }))
 );
 
 async function switchPersona(persona: OperationalPersona) {
-  if (persona === productContextStore.workingPersona || switching.value) return;
+  if (
+    persona === productContextStore.sessionOperatingPersona ||
+    switching.value
+  )
+    return;
   switching.value = true;
   try {
     await productContextStore.setWorkingPersona(persona);

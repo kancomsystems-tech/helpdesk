@@ -29,7 +29,7 @@ export function toWorkingProductContext(
 ): ProductContext {
   return {
     ...context,
-    persona: context.working_persona,
+    persona: context.session_operating_persona ?? context.working_persona,
     managed_teams: context.working_managed_teams,
   };
 }

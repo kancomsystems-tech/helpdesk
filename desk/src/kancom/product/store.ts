@@ -50,6 +50,8 @@ export interface ProductContext {
     | "agent"
     | null;
   authorized_operational_personas: OperationalPersona[];
+  default_working_persona: OperationalPersona | null;
+  session_operating_persona: OperationalPersona | null;
   working_persona: OperationalPersona | null;
   effective_persona:
     | "administrator"
@@ -76,9 +78,14 @@ export const useProductContextStore = defineStore(
       () => (contextResource.data as ProductContext | undefined) ?? null
     );
     const edition = computed(() => context.value?.edition ?? null);
-    const workingPersona = computed(
-      () => context.value?.working_persona ?? null
+    const sessionOperatingPersona = computed(
+      () =>
+        context.value?.session_operating_persona ??
+        context.value?.working_persona ??
+        null
     );
+    // Backward-compatible store alias while consumers migrate terminology.
+    const workingPersona = computed(() => sessionOperatingPersona.value);
     const authorizedOperationalPersonas = computed(
       () => context.value?.authorized_operational_personas ?? []
     );
@@ -152,6 +159,7 @@ export const useProductContextStore = defineStore(
       init,
       loading,
       setWorkingPersona,
+      sessionOperatingPersona,
       workingContext,
       workingPersona,
     };

@@ -46,6 +46,8 @@ try {
 
   const context = {
     persona: "operations_head",
+    default_working_persona: "team_leader",
+    session_operating_persona: "agent",
     working_persona: "agent",
     managed_teams: ["AirOps", "VisaOps"],
     working_managed_teams: [],
@@ -55,6 +57,14 @@ try {
     persona: "agent",
     managed_teams: [],
   });
+
+  const legacyContext = {
+    persona: "team_leader",
+    working_persona: "agent",
+    managed_teams: ["AirOps"],
+    working_managed_teams: [],
+  };
+  assert.equal(persona.toWorkingProductContext(legacyContext).persona, "agent");
 
   const switcher = await readFile(
     "src/kancom/shell/WorkingPersonaSwitcher.vue",
@@ -69,6 +79,7 @@ try {
   assert.doesNotMatch(switcher, /Working as:/);
   assert.match(switcher, /focus-visible:outline/);
   assert.match(switcher, /setWorkingPersona\(persona\)/);
+  assert.match(switcher, /sessionOperatingPersona/);
   assert.match(switcher, /route\.name !== "Dashboard"/);
   assert.doesNotMatch(switcher, /logout/);
   assert.match(desktop, /is_platform_administrator[\s\S]*System Admin/);
