@@ -4,6 +4,7 @@
   >
     <div class="text-base text-ink-gray-5">{{ __("Assign to") }}</div>
     <Link
+      v-if="canManageAssignments"
       class="form-control"
       value=""
       doctype="HD Agent"
@@ -34,6 +35,7 @@
               <UserAvatar :name="assignee.name" size="sm" />
               <div class="ml-1">{{ getUser(assignee.name).full_name }}</div>
               <Button
+                v-if="canManageAssignments || assignee.name === currentUser"
                 variant="ghost"
                 class="rounded-full !size-4 m-1"
                 @click.stop="removeValue(assignee.name)"
@@ -72,10 +74,11 @@
 <script setup>
 import UserAvatar from "@/components/UserAvatar.vue";
 import Link from "@/components/frappe-ui/Link.vue";
+import { useProductContextStore } from "@/kancom/product/store";
 import { useUserStore } from "@/stores/user";
 import { capture } from "@/telemetry";
 import { Tooltip, Switch, createResource, call } from "frappe-ui";
-import { ref, watch, useTemplateRef, nextTick } from "vue";
+import { computed, ref, watch, useTemplateRef, nextTick } from "vue";
 
 const props = defineProps({
   doctype: {
@@ -94,6 +97,10 @@ const props = defineProps({
     type: Function,
     default: null,
   },
+  team: {
+    type: String,
+    default: null,
+  },
 });
 
 const assignees = defineModel();
@@ -103,9 +110,19 @@ const assignToMe = ref(false);
 const error = ref("");
 
 const { users, getUser } = useUserStore();
+const productContext = useProductContextStore();
+const currentUser = computed(() => getUser("").name);
+const canManageAssignments = computed(() => {
+  if (!productContext.hasEffectivePermission("manage_ticket_assignments"))
+    return false;
+  if (productContext.context?.is_platform_administrator) return true;
+  return (productContext.context?.working_managed_teams || []).includes(
+    props.team
+  );
+});
 
 const removeValue = (value) => {
-  if (value === getUser("").name) {
+  if (value === currentUser.value) {
     assignToMe.value = false;
   }
 

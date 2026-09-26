@@ -28,6 +28,10 @@
               :doctype="field.doctype"
               :modelValue="field.value"
               :required="field.required"
+              :disabled="
+                field.disabled ||
+                (field.fieldname === 'agent_group' && !canManageTeam)
+              "
               @update:model-value="
               (val:string) => handleFieldUpdate(field.fieldname, val,true)
             "
@@ -64,6 +68,7 @@
 import { Link } from "@/components";
 import { parseField } from "@/composables/formCustomisation";
 import { useNotifyTicketUpdate } from "@/composables/realtime";
+import { useProductContextStore } from "@/kancom/product/store";
 import { useShortcut } from "@/composables/shortcuts";
 import { getMeta } from "@/stores/meta";
 import {
@@ -84,6 +89,17 @@ const customizations = inject(CustomizationSymbol);
 const activities = inject(ActivitiesSymbol);
 const { getFields, getField } = getMeta("HD Ticket");
 const { notifyTicketUpdate } = useNotifyTicketUpdate(ticket.value?.name);
+const productContext = useProductContextStore();
+const canManageTeam = computed(() => {
+  if (!productContext.hasEffectivePermission("manage_ticket_team"))
+    return false;
+  if (productContext.context?.is_platform_administrator) return true;
+  if (productContext.context?.effective_persona === "operations_head")
+    return true;
+  const managed = productContext.context?.working_managed_teams || [];
+  const currentTeam = ticket.value.doc.agent_group;
+  return Boolean(currentTeam && managed.includes(currentTeam));
+});
 
 // ticket_type, priority, customer, agent_group
 const coreFields = computed(() => {

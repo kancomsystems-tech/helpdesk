@@ -84,6 +84,19 @@ try {
   assert.doesNotMatch(switcher, /logout/);
   assert.match(desktop, /is_platform_administrator[\s\S]*System Admin/);
   assert.match(mobile, /is_platform_administrator[\s\S]*System Admin/);
+  const assignTo = await readFile(
+    "src/components/ticket-agent/AssignToBody.vue",
+    "utf8"
+  );
+  const ticketDetails = await readFile(
+    "src/components/ticket-agent/TicketDetailsTab.vue",
+    "utf8"
+  );
+  assert.match(assignTo, /manage_ticket_assignments/);
+  assert.match(assignTo, /assignee\.name === currentUser/);
+  assert.match(ticketDetails, /manage_ticket_team/);
+  assert.match(ticketDetails, /effective_persona === "operations_head"/);
+  assert.match(ticketDetails, /field\.fieldname === 'agent_group'/);
   const commandBar = await readFile(
     "src/kancom/operations/components/OperationsCommandBar.vue",
     "utf8"

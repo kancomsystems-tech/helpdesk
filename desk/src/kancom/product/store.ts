@@ -35,7 +35,9 @@ export type KancomEffectivePermission =
   | "view_team_queues"
   | "manage_public_views"
   | "view_workforce"
-  | "view_quality";
+  | "view_quality"
+  | "manage_ticket_assignments"
+  | "manage_ticket_team";
 
 export type OperationalPersona = "operations_head" | "team_leader" | "agent";
 

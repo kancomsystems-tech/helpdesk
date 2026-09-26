@@ -42,6 +42,7 @@
         v-model="assignees.data"
         doctype="HD Ticket"
         :docname="ticket.name"
+        :team="ticket.doc.agent_group"
         :open="isOpen"
         :onUpdate="saveAssignees"
       />

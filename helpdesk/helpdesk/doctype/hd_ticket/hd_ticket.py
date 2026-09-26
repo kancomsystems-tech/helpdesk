@@ -442,6 +442,9 @@ class HDTicket(Document):
 
     @frappe.whitelist()
     def assign_agent(self, agent: str):
+        for validator in frappe.get_hooks("helpdesk_ticket_assignment_validators"):
+            frappe.get_attr(validator)(self, [agent], "add")
+
         assign({"assign_to": [agent], "doctype": "HD Ticket", "name": self.name})
 
         if frappe.session.user != agent:
