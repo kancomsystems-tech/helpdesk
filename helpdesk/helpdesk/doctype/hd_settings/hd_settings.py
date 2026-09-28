@@ -22,6 +22,16 @@ class HDSettings(Document):
         self.validate_auto_close_days()
         self.validate_email_contents()
         self.validate_send_feedback_when_ticket_closed()
+        self.validate_default_agent_status()
+
+    def validate_default_agent_status(self):
+        if not self.default_agent_status:
+            return
+
+        if frappe.db.get_value("HD Agent Status", self.default_agent_status, "enabled"):
+            return
+
+        frappe.throw(_("The default agent status must be enabled."))
 
     def validate_auto_close_days(self):
         if self.auto_close_tickets and self.auto_close_after_days <= 0:

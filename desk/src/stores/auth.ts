@@ -32,6 +32,9 @@ export const useAuthStore = defineStore("auth", () => {
   const isManager: ComputedRef<boolean> = computed(
     () => user__.value.is_manager
   );
+  const hasAgentRecord: ComputedRef<boolean> = computed(
+    () => Boolean(user__.value.has_agent_record)
+  );
 
   const userId: ComputedRef<string> = computed(() => user__.value.user_id);
   const userImage: ComputedRef<string> = computed(
@@ -40,12 +43,24 @@ export const useAuthStore = defineStore("auth", () => {
   const userFirstName: ComputedRef<string> = computed(
     () => user__.value.user_first_name
   );
+  const userLastName: ComputedRef<string> = computed(
+    () => user__.value.user_last_name
+  );
   const userName: ComputedRef<string> = computed(() => user__.value.user_name);
   const username: ComputedRef<string> = computed(() => user__.value.username);
   const timezone: ComputedRef<string> = computed(() => user__.value.time_zone);
   const language: ComputedRef<string> = computed(() => user__.value.language);
   const userTeams: ComputedRef<string[]> = computed(
     () => user__.value.user_teams
+  );
+  const availability: ComputedRef<string> = computed(
+    () => user__.value.availability
+  );
+  const availabilityChangedOn: ComputedRef<string> = computed(
+    () => user__.value.availability_changed_on
+  );
+  const availabilityChangedBy: ComputedRef<string> = computed(
+    () => user__.value.availability_changed_by
   );
 
   function sessionUser() {
@@ -122,6 +137,10 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   return {
+    availability,
+    availabilityChangedBy,
+    availabilityChangedOn,
+    hasAgentRecord,
     hasDeskAccess,
     init,
     isAdmin,
@@ -133,6 +152,7 @@ export const useAuthStore = defineStore("auth", () => {
     userFirstName,
     userId,
     userImage,
+    userLastName,
     userName,
     username,
     timezone,

@@ -5,6 +5,7 @@
 </template>
 
 <script setup lang="ts">
+import { useAgentStatusStore } from "@/stores/agentStatus";
 import { useAuthStore } from "@/stores/auth";
 import { computed, defineAsyncComponent, onBeforeMount } from "vue";
 import { useRouter } from "vue-router";
@@ -12,6 +13,7 @@ import { useRouter } from "vue-router";
 import { useScreenSize } from "@/composables/screen";
 const router = useRouter();
 const authStore = useAuthStore();
+useAgentStatusStore();
 
 const { isMobileView } = useScreenSize();
 

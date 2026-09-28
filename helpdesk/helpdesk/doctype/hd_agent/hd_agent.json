@@ -9,7 +9,10 @@
   "user",
   "agent_name",
   "user_image",
-  "is_active"
+  "is_active",
+  "availability",
+  "availability_changed_on",
+  "availability_changed_by"
  ],
  "fields": [
   {
@@ -38,6 +41,25 @@
    "fieldname": "user_image",
    "fieldtype": "Attach Image",
    "label": "Image"
+  },
+  {
+   "fieldname": "availability",
+   "fieldtype": "Link",
+   "label": "Availability",
+   "options": "HD Agent Status"
+  },
+  {
+   "fieldname": "availability_changed_on",
+   "fieldtype": "Datetime",
+   "label": "Availability Changed On",
+   "read_only": 1
+  },
+  {
+   "fieldname": "availability_changed_by",
+   "fieldtype": "Link",
+   "label": "Availability Changed By",
+   "options": "User",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,

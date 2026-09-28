@@ -69,6 +69,7 @@ doc_events = {
 }
 
 has_permission = {
+    "HD Agent": "helpdesk.helpdesk.doctype.hd_agent.hd_agent.has_permission",
     "HD Saved Reply": "helpdesk.helpdesk.doctype.hd_saved_reply.hd_saved_reply.has_permission",
 }
 

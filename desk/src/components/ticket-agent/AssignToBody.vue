@@ -32,6 +32,15 @@
               class="flex items-center text-sm p-0.5 text-ink-gray-6 border border-outline-gray-1 bg-surface-modal rounded-full cursor-pointer"
               @click.stop
             >
+              <Tooltip
+                v-if="getAvailability(assignee.name)"
+                :text="__(getAvailability(assignee.name))"
+              >
+                <div
+                  class="ml-1 size-2 rounded-full shrink-0"
+                  :class="agentStatusStore.statusColor(getAvailability(assignee.name))"
+                />
+              </Tooltip>
               <UserAvatar :name="assignee.name" size="sm" />
               <div class="ml-1">{{ getUser(assignee.name).full_name }}</div>
               <Button
@@ -49,12 +58,23 @@
         </div>
       </template>
       <template #item-prefix="{ option }">
-        <UserAvatar class="mr-2" :name="option.value" size="sm" />
+        <div class="mr-2 flex items-center gap-2">
+          <UserAvatar :name="option.value" size="sm" />
+          <Tooltip v-if="getAvailability(option.value)" :text="__(getAvailability(option.value))">
+            <div
+              class="size-2 rounded-full shrink-0"
+              :class="agentStatusStore.statusColor(getAvailability(option.value))"
+            />
+          </Tooltip>
+        </div>
       </template>
       <template #item-label="{ option }">
         <Tooltip :text="option.value">
-          <div class="cursor-pointer text-ink-gray-9">
-            {{ getUser(option.value).full_name }}
+          <div class="cursor-pointer text-ink-gray-9 flex items-center gap-2">
+            <span>{{ getUser(option.value).full_name }}</span>
+            <span v-if="getAvailability(option.value)" class="text-p-sm text-ink-gray-6">
+              {{ __(getAvailability(option.value)) }}
+            </span>
           </div>
         </Tooltip>
       </template>
@@ -75,8 +95,10 @@
 import UserAvatar from "@/components/UserAvatar.vue";
 import Link from "@/components/frappe-ui/Link.vue";
 import { useProductContextStore } from "@/kancom/product/store";
+import { useAgentStatusStore } from "@/stores/agentStatus";
 import { useUserStore } from "@/stores/user";
 import { capture } from "@/telemetry";
+import { __ } from "@/translation";
 import { Tooltip, Switch, createResource, call } from "frappe-ui";
 import { computed, ref, watch, useTemplateRef, nextTick } from "vue";
 
@@ -109,7 +131,8 @@ const assignToMe = ref(false);
 
 const error = ref("");
 
-const { users, getUser } = useUserStore();
+const { getUser } = useUserStore();
+const agentStatusStore = useAgentStatusStore();
 const productContext = useProductContextStore();
 const currentUser = computed(() => getUser("").name);
 const canManageAssignments = computed(() => {
@@ -120,6 +143,8 @@ const canManageAssignments = computed(() => {
     props.team
   );
 });
+
+const getAvailability = (user) => agentStatusStore.getAgentAvailability(user);
 
 const removeValue = (value) => {
   if (value === currentUser.value) {

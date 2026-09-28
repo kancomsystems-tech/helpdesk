@@ -1,6 +1,6 @@
 import frappe
 
-from helpdesk.utils import get_agents_team
+from helpdesk.utils import get_agent_name, get_agents_team
 from helpdesk.utils import is_agent as _is_agent
 
 
@@ -10,6 +10,7 @@ def get_user():
     filters = {"name": current_user}
     fields = [
         "first_name",
+        "last_name",
         "full_name",
         "name",
         "user_image",
@@ -32,8 +33,21 @@ def get_user():
         or "Kancom Admin" in roles
     )
     has_desk_access = is_agent or is_admin
+    agent_name = get_agent_name(current_user)
+    has_agent_record = bool(agent_name)
+    availability = (
+        frappe.db.get_value(
+            "HD Agent",
+            agent_name,
+            ["availability", "availability_changed_on", "availability_changed_by"],
+            as_dict=True,
+        )
+        if agent_name
+        else None
+    ) or {}
     user_image = user.user_image
     user_first_name = user.first_name
+    user_last_name = user.last_name
     user_name = user.full_name
     user_id = user.name
     username = user.username
@@ -48,13 +62,18 @@ def get_user():
         "has_desk_access": has_desk_access,
         "is_admin": is_admin,
         "is_agent": is_agent,
+        "has_agent_record": has_agent_record,
         "user_id": user_id,
         "is_manager": is_manager,
         "user_image": user_image,
         "user_first_name": user_first_name,
+        "user_last_name": user_last_name,
         "user_name": user_name,
         "username": username,
         "time_zone": user.time_zone,
         "language": language,
         "user_teams": user_team_names,
+        "availability": availability.get("availability"),
+        "availability_changed_on": availability.get("availability_changed_on"),
+        "availability_changed_by": availability.get("availability_changed_by"),
     }

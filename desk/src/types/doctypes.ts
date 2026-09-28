@@ -260,4 +260,23 @@ export interface HDAgent extends DocType {
   is_active: 0 | 1;
   /** Image: Attach Image */
   user_image?: string;
+  /** Availability: Link (HD Agent Status) */
+  availability?: string;
+  /** Availability Changed On: Datetime */
+  availability_changed_on?: string;
+  /** Availability Changed By: Link (User) */
+  availability_changed_by?: string;
+}
+
+export interface HDAgentStatus extends DocType {
+  /** Agent Status: Data */
+  agent_status: string;
+  /** Enabled: Check */
+  enabled: 0 | 1;
+  /** Category: Select */
+  category: "Active" | "Away" | "Unavailable";
+  /** Color: Select */
+  color?: string;
+  /** Status Order: Int */
+  status_order?: number;
 }
