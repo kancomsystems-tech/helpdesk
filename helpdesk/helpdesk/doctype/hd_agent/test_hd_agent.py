@@ -15,6 +15,7 @@ from helpdesk.test_utils import (
     set_agent_availability,
     set_agent_status_enabled,
 )
+from helpdesk.utils import is_admin, is_agent_manager
 
 
 class TestHDAgent(FrappeTestCase):
@@ -28,6 +29,27 @@ class TestHDAgent(FrappeTestCase):
 
     def tearDown(self):
         frappe.set_user("Administrator")
+
+    def _get_or_create_user(self, email: str, first_name: str):
+        if frappe.db.exists("User", email):
+            return frappe.get_doc("User", email)
+
+        return frappe.get_doc(
+            {
+                "doctype": "User",
+                "email": email,
+                "first_name": first_name,
+                "send_welcome_email": 0,
+            }
+        ).insert(ignore_permissions=True)
+
+    def _ensure_role(self, role_name: str):
+        if frappe.db.exists("Role", role_name):
+            return
+
+        frappe.get_doc({"doctype": "Role", "role_name": role_name}).insert(
+            ignore_permissions=True
+        )
 
     def _disable_status(self, status: str):
         set_agent_status_enabled(status, 0)
@@ -100,6 +122,32 @@ class TestHDAgent(FrappeTestCase):
         self.assertEqual(
             frappe.db.get_value("HD Agent", other, "availability_changed_by"), manager
         )
+
+    def test_system_manager_can_set_another_agents_availability(self):
+        other = make_agent("sys_managed_agent@test.com", first_name="System Managed")
+        manager = self._get_or_create_user("system_manager@test.com", "System Manager")
+        manager.add_roles("System Manager")
+
+        self._set_availability_as(manager.name, other, "Away")
+
+        self.assertEqual(frappe.db.get_value("HD Agent", other, "availability"), "Away")
+
+    def test_non_admin_roles_do_not_change_global_is_admin(self):
+        system_manager = self._get_or_create_user(
+            "system_manager_admin_check@test.com", "System Manager"
+        )
+        system_manager.add_roles("System Manager")
+
+        self._ensure_role("Kancom Admin")
+        kancom_admin = self._get_or_create_user(
+            "kancom_admin_check@test.com", "Kancom Admin"
+        )
+        kancom_admin.add_roles("Kancom Admin")
+
+        self.assertFalse(is_admin(system_manager.name))
+        self.assertFalse(is_admin(kancom_admin.name))
+        self.assertTrue(is_agent_manager(system_manager.name))
+        self.assertTrue(is_agent_manager(kancom_admin.name))
 
     def test_agent_can_still_read_another_agent(self):
         other = make_agent("readable_agent@test.com", first_name="Readable Agent")

@@ -96,7 +96,7 @@ class TestHDAgentStatus(FrappeTestCase):
         set_agent_availability(second, "Focusing")
 
         with patch(
-            "helpdesk.helpdesk.doctype.hd_agent.hd_agent.publish_event"
+            "helpdesk.helpdesk.doctype.hd_agent_status.hd_agent_status.publish_event"
         ) as publish:
             focusing.enabled = 0
             focusing.save()

@@ -100,7 +100,7 @@ def has_permission(doc: Document, ptype: str, user: str | None = None) -> bool:
         return is_agent_manager(user)
 
     if ptype not in ("write", "delete"):
-        return is_agent(user)
+        return is_agent(user) or is_agent_manager(user)
 
     return is_agent_manager(user) or doc.user == user
 
