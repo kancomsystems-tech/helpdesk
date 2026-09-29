@@ -16,6 +16,7 @@ from .welcome_ticket import create_welcome_ticket
 def after_install():
     create_custom_fields(get_custom_fields())
     add_default_status()
+    add_default_agent_status()
     add_default_categories_and_articles()
     add_default_ticket_priorities()
     add_default_sla()
@@ -363,6 +364,37 @@ def add_default_status():
 
     frappe.db.set_single_value("HD Settings", "default_ticket_status", "Open")
     frappe.db.set_single_value("HD Settings", "ticket_reopen_status", "Open")
+
+
+def add_default_agent_status():
+    statuses = [
+        {
+            "agent_status": "Active",
+            "category": "Active",
+            "color": "Green",
+            "status_order": 10,
+        },
+        {
+            "agent_status": "Away",
+            "category": "Away",
+            "color": "Amber",
+            "status_order": 20,
+        },
+        {
+            "agent_status": "Unavailable",
+            "category": "Unavailable",
+            "color": "Red",
+            "status_order": 30,
+        },
+    ]
+    for status in statuses:
+        if not frappe.db.exists("HD Agent Status", status["agent_status"]):
+            frappe.get_doc(
+                {"doctype": "HD Agent Status", "enabled": 1, **status}
+            ).insert()
+
+    if not frappe.db.get_single_value("HD Settings", "default_agent_status"):
+        frappe.db.set_single_value("HD Settings", "default_agent_status", "Active")
 
 
 def add_fts_index():

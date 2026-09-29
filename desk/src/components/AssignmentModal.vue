@@ -19,11 +19,30 @@
         "
       >
         <template #item-prefix="{ option }">
-          <UserAvatar class="mr-2" :name="option.value" size="sm" />
+          <div class="mr-2 flex items-center gap-2">
+            <UserAvatar :name="option.value" size="sm" />
+            <Tooltip
+              v-if="getAvailability(option.value)"
+              :text="__(getAvailability(option.value))"
+            >
+              <div
+                class="size-2 rounded-full shrink-0"
+                :class="agentStatusStore.statusColor(getAvailability(option.value))"
+              />
+            </Tooltip>
+          </div>
         </template>
         <template #item-label="{ option }">
           <Tooltip :text="option.value">
-            {{ getUser(option.value).full_name }}
+            <div class="flex items-center gap-2">
+              <span>{{ getUser(option.value).full_name }}</span>
+              <span
+                v-if="getAvailability(option.value)"
+                class="text-p-sm text-ink-gray-6"
+              >
+                {{ __(getAvailability(option.value)) }}
+              </span>
+            </div>
           </Tooltip>
         </template>
       </AutocompleteNew>
@@ -41,11 +60,30 @@
         "
       >
         <template #item-prefix="{ option }">
-          <UserAvatar class="mr-2" :name="option.value" size="sm" />
+          <div class="mr-2 flex items-center gap-2">
+            <UserAvatar :name="option.value" size="sm" />
+            <Tooltip
+              v-if="getAvailability(option.value)"
+              :text="__(getAvailability(option.value))"
+            >
+              <div
+                class="size-2 rounded-full shrink-0"
+                :class="agentStatusStore.statusColor(getAvailability(option.value))"
+              />
+            </Tooltip>
+          </div>
         </template>
         <template #item-label="{ option }">
           <Tooltip :text="option.value">
-            {{ getUser(option.value).full_name }}
+            <div class="flex items-center gap-2">
+              <span>{{ getUser(option.value).full_name }}</span>
+              <span
+                v-if="getAvailability(option.value)"
+                class="text-p-sm text-ink-gray-6"
+              >
+                {{ __(getAvailability(option.value)) }}
+              </span>
+            </div>
           </Tooltip>
         </template>
       </SearchComplete>
@@ -62,6 +100,19 @@
             variant="outline"
           >
             <template #prefix>
+              <Tooltip
+                v-if="getAvailability(currentAssignee.name)"
+                :text="__(getAvailability(currentAssignee.name))"
+              >
+                <div
+                  class="size-2 rounded-full shrink-0"
+                  :class="
+                    agentStatusStore.statusColor(
+                      getAvailability(currentAssignee.name)
+                    )
+                  "
+                />
+              </Tooltip>
               <UserAvatar :name="currentAssignee.name" size="sm" />
             </template>
             <template #suffix>
@@ -81,9 +132,11 @@
 
 <script setup lang="ts">
 import { AutocompleteNew, SearchComplete, UserAvatar } from "@/components";
+import { useAgentStatusStore } from "@/stores/agentStatus";
 import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
 import { useUserStore } from "@/stores/user";
+import { __ } from "@/translation";
 import { call, createResource } from "frappe-ui";
 import { useOnboarding } from "frappe-ui/frappe";
 import { computed, onMounted, ref } from "vue";
@@ -112,11 +165,13 @@ const show = defineModel();
 const emit = defineEmits(["update"]);
 
 const { getUser } = useUserStore();
+const agentStatusStore = useAgentStatusStore();
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { isManager } = useAuthStore();
 const { teamRestrictionApplied, assignWithinTeam } = useConfigStore();
 
 const error = ref("");
+const getAvailability = (user: string) => agentStatusStore.getAgentAvailability(user);
 
 const addAssignee = (value) => {
   error.value = "";

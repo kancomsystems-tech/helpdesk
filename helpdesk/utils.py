@@ -53,11 +53,28 @@ def is_agent(user: str = None) -> bool:
     """
     user = user or frappe.session.user
     return (
-        is_admin()
+        is_admin(user)
         or "Agent Manager" in frappe.get_roles(user)
         or "Agent" in frappe.get_roles(user)
         or bool(frappe.db.exists("HD Agent", {"name": user}))
     )
+
+
+def is_agent_manager(user: str = None) -> bool:
+    user = user or frappe.session.user
+    roles = frappe.get_roles(user)
+    return (
+        is_admin(user)
+        or "System Manager" in roles
+        or "Agent Manager" in roles
+        or "Kancom Admin" in roles
+        or "Kancom Manager" in roles
+    )
+
+
+def get_agent_name(user: str = None) -> str | None:
+    user = user or frappe.session.user
+    return frappe.db.exists("HD Agent", {"user": user})
 
 
 def publish_event(

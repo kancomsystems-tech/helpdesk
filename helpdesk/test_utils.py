@@ -5,6 +5,7 @@ from frappe.core.doctype.communication.test_communication import create_email_ac
 from frappe.utils import add_to_date, getdate
 
 from helpdesk.api.settings.field_dependency import create_update_field_dependency
+from helpdesk.setup.install import add_default_agent_status
 from helpdesk.utils import is_frappe_version
 
 if is_frappe_version("16", above=True):
@@ -22,6 +23,7 @@ def before_tests():
     frappe.db.set_single_value(
         "HD Settings", "enable_email_ticket_feedback", 0
     )  # nosemgrep
+    add_default_agent_status()
     # frappe.flags.mute_emails = True
     make_holiday_list()
     make_new_sla()
@@ -174,6 +176,48 @@ def create_agent(
         ).insert(ignore_permissions=True)
 
     return user
+
+
+def make_agent(
+    email: str, first_name: str | None = None, last_name: str | None = None
+) -> str:
+    user = create_agent(email, first_name, last_name)
+    return user.name
+
+
+def make_agent_status(
+    name: str,
+    category: str = "Active",
+    enabled: int = 1,
+    color: str = "Green",
+    status_order: int = 10,
+):
+    doc = frappe.get_doc(
+        {
+            "doctype": "HD Agent Status",
+            "agent_status": name,
+            "category": category,
+            "enabled": enabled,
+            "color": color,
+            "status_order": status_order,
+        }
+    )
+    return doc.insert()
+
+
+def set_default_agent_status(status: str | None):
+    frappe.db.set_single_value("HD Settings", "default_agent_status", status)
+
+
+def set_agent_availability(agent: str, status: str):
+    doc = frappe.get_doc("HD Agent", agent)
+    doc.availability = status
+    doc.save(ignore_permissions=True)
+    return doc
+
+
+def set_agent_status_enabled(status: str, enabled: int):
+    frappe.db.set_value("HD Agent Status", status, "enabled", enabled)
 
 
 def get_current_week_monday(hours: int = 11):

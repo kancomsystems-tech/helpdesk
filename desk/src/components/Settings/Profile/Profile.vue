@@ -115,6 +115,20 @@
             v-model="profile.lastName"
           />
         </div>
+        <div
+          v-if="auth.hasAgentRecord"
+          class="flex items-center justify-between mt-6"
+        >
+          <div class="flex flex-col gap-1">
+            <span class="text-base font-medium text-ink-gray-8">
+              {{ __("Availability") }}
+            </span>
+            <span class="text-p-sm text-ink-gray-6">{{
+              __("Set whether you're available for new work.")
+            }}</span>
+          </div>
+          <AvailabilityMenu class="w-40" />
+        </div>
         <div class="flex items-center justify-between mt-6">
           <div class="flex flex-col gap-1">
             <span class="text-base font-medium text-ink-gray-8">
@@ -187,6 +201,7 @@ import {
 import { Autocomplete } from "@/components";
 import { __ } from "@/translation";
 import { useAuthStore } from "@/stores/auth";
+import AvailabilityMenu from "@/components/AvailabilityMenu.vue";
 import CameraIcon from "~icons/lucide/camera";
 import ChangePasswordModal from "./components/ChangePasswordModal.vue";
 import { disableSettingModalOutsideClick } from "../settingsModal";
@@ -215,8 +230,10 @@ const isTimezoneChanged = computed(() => {
 });
 
 const isAccountInfoDirty = computed(() => {
-  const agentName = agentData.data?.agent_name?.split(" ");
-  if (!agentName) return false;
+  const agentName = auth.hasAgentRecord
+    ? agentData.data?.agent_name?.split(" ")
+    : [auth.userFirstName, auth.userLastName].filter(Boolean);
+  if (!agentName?.length) return false;
   const isDirty =
     profile.value.firstName !== agentName[0] ||
     profile.value.lastName !== (agentName[1] || "");
@@ -230,7 +247,7 @@ const isAccountInfoDirty = computed(() => {
 
 const agentData = createResource({
   url: "frappe.client.get",
-  auto: true,
+  auto: auth.hasAgentRecord,
   makeParams() {
     return {
       doctype: "HD Agent",
@@ -262,6 +279,9 @@ const timezoneData = createResource({
 const setAgent = createResource({
   url: "frappe.client.set_value",
   validate: () => {
+    if (!auth.hasAgentRecord) {
+      return;
+    }
     if (!profile.value.firstName.trim()) {
       return __("Please enter first name at least");
     }
@@ -322,7 +342,7 @@ const saveTimezoneResource = createResource({
 });
 
 const onSave = () => {
-  if (isAccountInfoDirty.value) {
+  if (auth.hasAgentRecord && isAccountInfoDirty.value) {
     setAgent.submit();
   }
 
